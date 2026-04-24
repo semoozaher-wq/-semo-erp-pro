@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEMO ERP | دخول</title>
-    <!-- مكتبات Firebase الأساسية -->
+    <!-- مكتبات Firebase v8 -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
+    
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { background: #1e293b; padding: 30px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; outline: none; font-size: 16px; background: #0f172a; color: white; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; outline: none; font-size: 16px; background: #0f172a; color: white; box-sizing: border-box; }
         .btn { width: 100%; padding: 12px; background: #3b82f6; border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; }
         .link { color: #94a3b8; cursor: pointer; display: block; margin-top: 15px; font-size: 14px; }
         .hidden { display: none; }
@@ -20,14 +21,18 @@
 <body>
     <div class="card">
         <h1 style="color:#3b82f6; margin-bottom:20px;">SEMO ERP</h1>
+        
+        <!-- صندوق الدخول (إيميل أو هاتف) -->
         <div id="login-box">
-            <input type="text" id="l-id" placeholder="الإيميل أو الهاتف">
+            <input type="text" id="l-id" placeholder="الإيميل أو رقم الهاتف">
             <input type="password" id="l-p" placeholder="كلمة المرور">
             <button class="btn" onclick="login()">دخول</button>
-            <span class="link" onclick="toggle()">تأسيس حساب جديد</span>
+            <span class="link" onclick="toggle()">إنشاء حساب جديد</span>
         </div>
+
+        <!-- صندوق الإنشاء (يتطلب الإيميل والهاتف معاً للربط) -->
         <div id="signup-box" class="hidden">
-            <input type="email" id="s-e" placeholder="الإيميل">
+            <input type="email" id="s-e" placeholder="البريد الإلكتروني">
             <input type="text" id="s-ph" placeholder="رقم الهاتف">
             <input type="password" id="s-p" placeholder="كلمة المرور">
             <button class="btn" style="background:#10b981" onclick="signup()">إنشاء حساب</button>
@@ -49,29 +54,48 @@
             document.getElementById('signup-box').classList.toggle('hidden'); 
         }
 
+        // إنشاء حساب: يخزن الإيميل وكلمة المرور في Auth، ويربط الهاتف بالإيميل في Database
         function signup() {
-            const e = document.getElementById('s-e').value, p = document.getElementById('s-p').value, ph = document.getElementById('s-ph').value;
-            if(!e || !p || !ph) return alert("أكمل البيانات");
+            const e = document.getElementById('s-e').value, 
+                  p = document.getElementById('s-p').value, 
+                  ph = document.getElementById('s-ph').value;
+
+            if(!e || !p || !ph) return alert("أكمل جميع البيانات");
 
             firebase.auth().createUserWithEmailAndPassword(e, p).then(() => {
-                firebase.database().ref('users_map/' + ph).set({ email: e }).then(() => {
-                    alert("تم النجاح! جاري التحويل...");
+                // تخزين العلاقة بين الرقم والإيميل
+                firebase.database().ref('phone_to_email/' + ph).set({ email: e }).then(() => {
+                    alert("تم التسجيل بنجاح");
                     window.location.href = "dashboard.html";
                 });
             }).catch(err => alert("خطأ: " + err.message));
         }
 
         function login() {
-            const id = document.getElementById('l-id').value, p = document.getElementById('l-p').value;
-            if(id.includes('@')) { auth(id, p); }
-            else {
-                firebase.database().ref('users_map/' + id).once('value', s => {
-                    if(s.exists()) auth(s.val().email, p);
-                    else alert("الرقم غير مسجل");
+            const input = document.getElementById('l-id').value;
+            const p = document.getElementById('l-p').value;
+
+            if(!input || !p) return alert("أدخل البيانات");
+
+            // إذا كان المدخل يحتوي على @ فهو إيميل، وإلا سنبحث عنه كرقم هاتف
+            if(input.includes('@')) {
+                executeAuth(input, p);
+            } else {
+                firebase.database().ref('phone_to_email/' + input).once('value', s => {
+                    if(s.exists()) {
+                        executeAuth(s.val().email, p);
+                    } else {
+                        alert("رقم الهاتف هذا غير مسجل لدينا");
+                    }
                 });
             }
         }
-        function auth(e, p) { firebase.auth().signInWithEmailAndPassword(e, p).then(() => window.location.href = "dashboard.html").catch(err => alert(err.message)); }
+
+        function executeAuth(email, password) {
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then(() => window.location.href = "dashboard.html")
+                .catch(err => alert("خطأ في الدخول: " + err.message));
+        }
     </script>
 </body>
 </html>
