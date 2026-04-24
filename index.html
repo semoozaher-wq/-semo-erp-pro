@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP | دخول مباشر</title>
+    <title>SEMO ERP | الدخول الذكي</title>
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
@@ -22,20 +22,18 @@
     <div class="card">
         <h1 style="color:var(--main); margin-bottom: 20px;">SEMO ERP</h1>
         
-        <!-- واجهة الدخول -->
-        <div id="login-form">
+        <div id="login-view">
             <input type="text" id="log-id" placeholder="الإيميل أو رقم الهاتف">
             <input type="password" id="log-pass" placeholder="كلمة المرور">
             <button class="btn" onclick="login()">دخول النظام</button>
             <span class="link" onclick="toggle()">تأسيس حساب جديد</span>
         </div>
 
-        <!-- واجهة التسجيل -->
-        <div id="signup-form" class="hidden">
+        <div id="signup-view" class="hidden">
             <input type="email" id="sign-email" placeholder="البريد الإلكتروني">
-            <input type="text" id="sign-phone" placeholder="رقم الهاتف">
+            <input type="text" id="sign-phone" placeholder="رقم الهاتف (بدون +)">
             <input type="password" id="sign-pass" placeholder="كلمة المرور">
-            <button class="btn" style="background:#10b981" onclick="signup()">إنشاء ودخول فوراً ✅</button>
+            <button class="btn" style="background:#10b981" onclick="signup()">إنشاء الحساب والربط ✅</button>
             <span class="link" onclick="toggle()">العودة للدخول</span>
         </div>
     </div>
@@ -49,41 +47,53 @@
         };
         if (!firebase.apps.length) firebase.initializeApp(config);
 
+        const db = firebase.database();
+        const auth = firebase.auth();
+
         function toggle() {
-            document.getElementById('login-form').classList.toggle('hidden');
-            document.getElementById('signup-form').classList.toggle('hidden');
+            document.getElementById('login-view').classList.toggle('hidden');
+            document.getElementById('signup-view').classList.toggle('hidden');
         }
 
-        // تسجيل مباشر بدون SMS
+        // دالة التسجيل التي تربط الهاتف بالإيميل
         function signup() {
             const e = document.getElementById('sign-email').value, 
                   p = document.getElementById('sign-pass').value,
-                  ph = document.getElementById('sign-phone').value;
+                  ph = document.getElementById('sign-phone').value.replace('+', '').trim();
             
             if(!e || !p || !ph) return alert("أكمل البيانات");
 
-            firebase.auth().createUserWithEmailAndPassword(e, p).then(() => {
-                firebase.database().ref('users_map/' + ph).set({ email: e });
-                window.location.href = "dashboard.html"; // دخول فوري
-            }).catch(err => alert(err.message));
+            auth.createUserWithEmailAndPassword(e, p).then((user) => {
+                // أهم خطوة: حفظ الرقم في قاعدة البيانات وربطه بالإيميل
+                db.ref('users_map/' + ph).set({ email: e }).then(() => {
+                    alert("تم التسجيل وربط الهاتف بنجاح!");
+                    window.location.href = "dashboard.html";
+                });
+            }).catch(err => alert("خطأ في التسجيل: " + err.message));
         }
 
         function login() {
-            const id = document.getElementById('log-id').value, p = document.getElementById('log-pass').value;
+            let id = document.getElementById('log-id').value.replace('+', '').trim();
+            const p = document.getElementById('log-pass').value;
+
             if(id.includes('@')) {
-                auth(id, p);
+                performAuth(id, p);
             } else {
-                firebase.database().ref('users_map/' + id).once('value', s => {
-                    if(s.exists()) auth(s.val().email, p);
-                    else alert("الرقم غير مسجل");
+                // البحث عن الإيميل المرتبط برقم الهاتف في قاعدة البيانات
+                db.ref('users_map/' + id).once('value', s => {
+                    if(s.exists()) {
+                        performAuth(s.val().email, p);
+                    } else {
+                        alert("رقم الهاتف هذا غير مسجل أو لم يتم ربطه عند التسجيل");
+                    }
                 });
             }
         }
 
-        function auth(e, p) {
-            firebase.auth().signInWithEmailAndPassword(e, p)
+        function performAuth(email, pass) {
+            auth.signInWithEmailAndPassword(email, pass)
             .then(() => window.location.href = "dashboard.html")
-            .catch(() => alert("بيانات خاطئة"));
+            .catch(() => alert("كلمة المرور أو الحساب غير صحيح"));
         }
     </script>
 </body>
