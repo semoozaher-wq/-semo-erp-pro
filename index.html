@@ -3,67 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SEMO ERP | تسجيل الدخول</title>
-    <!-- الروابط الرسمية للمكتبات لضمان العمل 100% -->
+    <title>SEMO ERP | نظام المحاسبة الموحد</title>
+    
     <link rel="stylesheet" href="https://cloudflare.com">
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
     <script src="https://cloudflare.com"></script>
+
     <style>
         :root { --accent: #3b82f6; --bg: #0f172a; --success: #10b981; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; background-image: radial-gradient(circle at top right, #1e293b, #0f172a); }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 30px; width: 92%; max-width: 420px; text-align: center; color: white; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        h1 { color: var(--accent); letter-spacing: 2px; margin-bottom: 5px; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; background: rgba(0,0,0,0.3); color: white; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
-        .iti { width: 100%; margin: 10px 0; text-align: left; color: black; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; background: rgba(0,0,0,0.3); color: white; font-size: 16px; outline: none; }
+        .iti { width: 100% !important; margin: 10px 0; text-align: left; }
+        .iti__country-list { background-color: #1e293b !important; color: white !important; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 15px; cursor: pointer; font-weight: 800; margin-top: 15px; transition: 0.3s; font-size: 16px; }
         .btn-p { background: var(--accent); color: white; }
-        .btn-p:hover { background: #2563eb; transform: translateY(-2px); }
         .btn-s { background: var(--success); color: white; }
         .hidden { display: none; }
         .link { color: var(--accent); cursor: pointer; text-decoration: none; font-size: 0.85rem; display: block; margin-top: 15px; background: none; border: none; width: 100%; }
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: white; color: var(--bg); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10000; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: white; color: var(--bg); padding: 12px 25px; border-radius: 50px; display: none; z-index: 10000; font-weight: bold; }
     </style>
 </head>
 <body>
+
     <div class="glass" id="auth-box">
-        <h1>SEMO ERP</h1>
-        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px;">نظام إدارة المؤسسات الاحترافي</p>
+        <h1 style="color: var(--accent);">SEMO ERP</h1>
+        <p style="color: #94a3b8; margin-bottom: 25px;">الدخول الموحد (إيميل أو هاتف)</p>
         
-        <!-- واجهة الدخول بالإيميل -->
+        <!-- واجهة الدخول المرنة -->
         <div id="login-view">
-            <input type="email" id="email" placeholder="البريد الإلكتروني">
-            <input type="password" id="pass" placeholder="كلمة المرور">
-            <button class="btn btn-p" onclick="login()">دخول المؤسسة</button>
-            <button class="link" onclick="toggle('signup-view')">ليس لديك حساب؟ سجل الآن</button>
-            <button class="link" onclick="toggle('phone-view')" style="opacity: 0.8;">📲 دخول سريع برقم الهاتف</button>
+            <input type="text" id="login-id" placeholder="البريد الإلكتروني أو رقم الهاتف">
+            <input type="password" id="login-pass" placeholder="كلمة المرور">
+            <button class="btn btn-p" onclick="smartLogin()">دخول النظام</button>
+            <button class="link" onclick="toggle('signup-view')">تأسيس حساب جديد</button>
         </div>
 
-        <!-- واجهة التسجيل الجديد -->
+        <!-- واجهة التسجيل -->
         <div id="signup-view" class="hidden">
-            <h3>تأسيس حساب جديد</h3>
+            <h3>تسجيل مؤسسة جديدة</h3>
             <input type="email" id="sign-email" placeholder="البريد الإلكتروني">
-            <input type="tel" id="sign-phone">
-            <input type="password" id="sign-pass" placeholder="كلمة المرور">
-            <button class="btn btn-s" onclick="signup()">إنشاء وتفعيل الحساب</button>
-            <button class="link" onclick="toggle('login-view')">لديك حساب؟ سجل دخولك</button>
-        </div>
-
-        <!-- واجهة الدخول بالهاتف -->
-        <div id="phone-view" class="hidden">
-            <h3>الدخول عبر الهاتف</h3>
-            <input type="tel" id="log-phone">
-            <div id="recaptcha-container"></div>
-            <button class="btn btn-p" onclick="sendSMS()">إرسال كود التحقق 💬</button>
-            <div id="otp-sec" class="hidden">
-                <input type="text" id="otp" placeholder="أدخل الكود المكون من 6 أرقام">
-                <button class="btn btn-s" onclick="verifyOTP()">تأكيد ودخول</button>
-            </div>
-            <button class="link" onclick="toggle('login-view')">رجوع للدخول بالإيميل</button>
+            <input type="tel" id="sign-phone"> 
+            <input type="password" id="sign-pass" placeholder="تعيين كلمة المرور">
+            <button class="btn btn-s" onclick="signup()">إنشاء الحساب بالبيانات</button>
+            <button class="link" onclick="toggle('login-view')">العودة للدخول</button>
         </div>
     </div>
+
     <div id="toast"></div>
 
     <script>
@@ -71,67 +59,61 @@
             apiKey: "AIzaSyC2EVpNEG9XjcPEelUA8lkIUcUceN6Oh0k",
             authDomain: "://firebaseapp.com",
             projectId: "semo-erp-pro13",
-            storageBucket: "semo-erp-pro13.firebasestorage.app",
-            messagingSenderId: "915256659491",
-            appId: "1:915256659491:web:eb9c8ef55450aedc7c6b96"
+            databaseURL: "https://firebaseio.com"
         };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        const itiConf = { initialCountry: "ly", preferredCountries: ["ly", "eg", "sa"], separateDialCode: true, utilsScript: "https://cloudflare.com" };
-        const itiS = window.intlTelInput(document.querySelector("#sign-phone"), itiConf);
-        const itiL = window.intlTelInput(document.querySelector("#log-phone"), itiConf);
+        const itiOptions = { initialCountry: "ly", separateDialCode: true, utilsScript: "https://cloudflare.com" };
+        const itiS = window.intlTelInput(document.querySelector("#sign-phone"), itiOptions);
 
-        function toggle(id) { 
-            document.querySelectorAll('#auth-box > div').forEach(d => d.classList.add('hidden')); 
-            document.getElementById(id).classList.remove('hidden'); 
-        }
-        
-        function notify(m) { 
-            const t = document.getElementById('toast'); 
-            t.innerText = m; t.style.display = 'block'; 
-            setTimeout(() => t.style.display = 'none', 4000); 
-        }
+        function toggle(id) { document.querySelectorAll('#auth-box > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function notify(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); }
 
-        // تسجيل حساب جديد مع معالجة الـ IDs الصحيحة
+        // تسجيل الحساب وربط الرقم بالإيميل في قاعدة البيانات
         function signup() {
             const e = document.getElementById('sign-email').value;
             const p = document.getElementById('sign-pass').value;
-            const ph = itiS.getNumber();
+            const ph = itiS.getNumber().replace('+', ''); // إزالة + لتسهيل البحث
 
-            if(!e || !p || !ph) { notify("الرجاء إكمال كافة البيانات"); return; }
+            if(!e || !p || !ph) { notify("أكمل البيانات أولاً"); return; }
 
             firebase.auth().createUserWithEmailAndPassword(e, p).then(u => {
-                notify("تم إنشاء الحساب! جاري التحويل للمركز المالي...");
+                // تخزين رابط (رقم الهاتف -> الإيميل) في قاعدة البيانات للبحث لاحقاً
+                db.ref('phoneToEmail/' + ph).set({ email: e });
+                notify("تم إنشاء الحساب بنجاح ✅");
                 setTimeout(() => window.location.assign("dashboard.html"), 1500);
             }).catch(err => notify("خطأ: " + err.message));
         }
 
-        // دخول مباشر بالإيميل (بدون إجبار على التفعيل)
-        function login() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('pass').value;
-            firebase.auth().signInWithEmailAndPassword(e, p).then(u => {
-                window.location.assign("dashboard.html");
-            }).catch(err => notify("بيانات الدخول غير صحيحة"));
+        // الدخول الذكي (يفحص إذا كان المدخل إيميل أو رقم هاتف)
+        function smartLogin() {
+            let id = document.getElementById('login-id').value.trim();
+            const p = document.getElementById('login-pass').value;
+
+            if(!id || !p) { notify("أدخل البيانات"); return; }
+
+            // إذا كان المدخل رقماً فقط (بدون @)، نبحث عن الإيميل المرتبط به
+            if (!id.includes('@')) {
+                let cleanPhone = id.replace('+', '');
+                db.ref('phoneToEmail/' + cleanPhone).once('value').then(snap => {
+                    if (snap.exists()) {
+                        let linkedEmail = snap.val().email;
+                        performAuth(linkedEmail, p);
+                    } else {
+                        notify("رقم الهاتف هذا غير مسجل لدينا");
+                    }
+                });
+            } else {
+                // إذا كان المدخل إيميل، ندخل به مباشرة
+                performAuth(id, p);
+            }
         }
 
-        // نظام التحقق بالهاتف
-        function sendSMS() {
-            const num = itiL.getNumber();
-            if(!num) { notify("أدخل رقم هاتف صحيح"); return; }
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
-            firebase.auth().signInWithPhoneNumber(num, window.recaptchaVerifier).then(res => {
-                window.confirmResult = res; 
-                document.getElementById('otp-sec').classList.remove('hidden');
-                notify("تم إرسال الكود لهاتفك 📱");
-            }).catch(err => notify("خطأ: تأكد من إضافة الدومين في Firebase"));
-        }
-
-        function verifyOTP() { 
-            const code = document.getElementById('otp').value;
-            confirmResult.confirm(code).then(() => {
-                window.location.assign("dashboard.html");
-            }).catch(() => notify("الكود الذي أدخلته غير صحيح")); 
+        function performAuth(email, pass) {
+            firebase.auth().signInWithEmailAndPassword(email, pass)
+                .then(() => window.location.assign("dashboard.html"))
+                .catch(() => notify("بيانات الدخول غير صحيحة"));
         }
     </script>
 </body>
