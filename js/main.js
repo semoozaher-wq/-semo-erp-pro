@@ -1,5 +1,5 @@
 import { initializeApp } from "https://gstatic.com";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://gstatic.com";
 import { getDatabase, ref, set, get, child } from "https://gstatic.com";
 
 const firebaseConfig = {
@@ -16,6 +16,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+// ربط الدوال بالـ window لتعمل مع الأزرار
 window.toggle = () => {
     document.getElementById('login-box').classList.toggle('hidden');
     document.getElementById('signup-box').classList.toggle('hidden');
@@ -27,9 +28,9 @@ window.signup = async () => {
     try {
         await createUserWithEmailAndPassword(auth, e, p);
         await set(ref(db, 'users_map/' + ph), { email: e });
-        alert("تم بنجاح!");
+        alert("تم التسجيل بنجاح!");
         window.location.href = "dashboard.html";
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert("خطأ: " + err.message); }
 };
 
 window.login = async () => {
@@ -44,5 +45,5 @@ window.login = async () => {
         }
         await signInWithEmailAndPassword(auth, email, p);
         window.location.href = "dashboard.html";
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert("فشل الدخول: " + err.message); }
 };
