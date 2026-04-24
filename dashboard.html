@@ -4,106 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المركز المالي | SEMO ERP</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <link rel="stylesheet" href="https://cloudflare.com">
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
-    <script src="https://cloudflare.com"></script>
-
     <style>
-        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f1f5f9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); display: flex; height: 100vh; }
-        aside { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; }
-        .nav-item { padding: 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; transition: 0.3s; }
-        .nav-item.active { background: #1e293b; color: white; border-right: 4px solid var(--accent); }
-        main { flex: 1; padding: 30px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .val { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 10px; display: block; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; background: var(--accent); color: white; }
+        body { background: #f1f5f9; font-family: sans-serif; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .val { font-size: 1.5rem; font-weight: bold; color: #2563eb; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <h2>المركز المالي الموحد 📊</h2>
+        <p id="user-mail">جاري التحميل...</p>
+    </div>
 
-    <aside>
-        <div style="padding:30px; font-weight:900; color:var(--accent); font-size:1.5rem;">SEMO ERP</div>
-        <nav>
-            <div class="nav-item active"><i class="fas fa-home"></i> <span>المركز المالي</span></div>
-            <div class="nav-item" onclick="logout()"><i class="fas fa-power-off"></i> <span>خروج</span></div>
-        </nav>
-    </aside>
+    <div class="grid">
+        <div class="card"><h4>ليبي</h4><div class="val" id="ly">0.00</div></div>
+        <div class="card"><h4>مصري</h4><div class="val" id="eg">0.00</div></div>
+        <div class="card"><h4>سعودي</h4><div class="val" id="sa">0.00</div></div>
+    </div>
 
-    <main>
-        <div style="margin-bottom: 30px;">
-            <h2 id="user-display">مرحباً بك..</h2>
-        </div>
-
-        <div class="grid">
-            <div class="card" style="border-right: 5px solid #3b82f6;"><h4>ليبي (د.ل)</h4><span class="val" id="st-ly">0.00</span></div>
-            <div class="card" style="border-right: 5px solid #10b981;"><h4>مصري (ج.م)</h4><span class="val" id="st-eg">0.00</span></div>
-            <div class="card" style="border-right: 5px solid #f59e0b;"><h4>سعودي (ر.س)</h4><span class="val" id="st-sa">0.00</span></div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="card">
-                <h3>إضافة عملية مبيعات</h3>
-                <input type="text" id="cust" placeholder="اسم العميل">
-                <select id="curr"><option value="د.ل">دينار ليبي</option><option value="ج.م">جنيه مصري</option><option value="ر.س">ريال سعودي</option></select>
-                <input type="number" id="amt" placeholder="المبلغ">
-                <button class="btn" onclick="save()">ترحيل العملية ✅</button>
-            </div>
-            <div class="card">
-                <h3>تحديث رقم الهاتف</h3>
-                <input type="tel" id="new-phone">
-                <button class="btn" style="background:#64748b; margin-top:10px;" onclick="updatePhone()">تغيير رقم الدخول 📲</button>
-            </div>
-        </div>
-    </main>
+    <div class="card" style="max-width: 400px;">
+        <h3>إضافة عملية</h3>
+        <input type="text" id="desc" placeholder="البيان">
+        <input type="number" id="amt" placeholder="المبلغ">
+        <select id="cur">
+            <option value="ly">دينار ليبي</option>
+            <option value="eg">جنيه مصري</option>
+            <option value="sa">ريال سعودي</option>
+        </select>
+        <button class="btn" onclick="add()">حفظ العملية</button>
+        <button onclick="firebase.auth().signOut()" style="margin-top:10px; background:none; border:none; color:red; cursor:pointer;">خروج</button>
+    </div>
 
     <script>
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyC2EVpNEG9XjcPEelUA8lkIUcUceN6Oh0k",
             authDomain: "://firebaseapp.com",
             projectId: "semo-erp-pro13",
             databaseURL: "https://firebaseio.com"
         };
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(config);
         const db = firebase.database();
-        let uID, uEmail;
-
-        const iti = window.intlTelInput(document.querySelector("#new-phone"), { initialCountry: "ly", separateDialCode: true });
+        let uID;
 
         firebase.auth().onAuthStateChanged(user => {
-            if (user) { uID = user.uid; uEmail = user.email; document.getElementById('user-display').innerText = "المسؤول: " + uEmail; sync(); }
-            else window.location.assign("index.html");
+            if(user) {
+                uID = user.uid;
+                document.getElementById('user-mail').innerText = user.email;
+                sync();
+            } else { window.location.href = "index.html"; }
         });
 
-        function save() {
-            const n = document.getElementById('cust').value, a = parseFloat(document.getElementById('amt').value), c = document.getElementById('curr').value;
-            if(n && a) {
-                db.ref('users/' + uID + '/sales').push({ n, a, c, t: Date.now() });
-                alert("تم الترحيل للسحابة ✅");
+        function add() {
+            const d = document.getElementById('desc').value, a = parseFloat(document.getElementById('amt').value), c = document.getElementById('cur').value;
+            if(d && a) {
+                db.ref('data/' + uID).push({ d, a, c });
+                alert("تم الحفظ");
             }
         }
 
-        function updatePhone() {
-            const ph = iti.getNumber().replace('+', '');
-            db.ref('phoneToEmail/' + ph).set({ email: uEmail }).then(() => alert("تم تحديث رقم الدخول بنجاح!"));
-        }
-
         function sync() {
-            db.ref('users/' + uID + '/sales').on('value', snap => {
-                const sales = snap.val() ? Object.values(snap.val()) : [];
-                const calc = (c) => sales.filter(s => s.c === c).reduce((sum, i) => sum + i.a, 0).toFixed(2);
-                document.getElementById('st-ly').innerText = calc('د.ل');
-                document.getElementById('st-eg').innerText = calc('ج.م');
-                document.getElementById('st-sa').innerText = calc('ر.س');
+            db.ref('data/' + uID).on('value', s => {
+                const logs = s.val() ? Object.values(s.val()) : [];
+                const sum = (c) => logs.filter(l => l.c === c).reduce((total, i) => total + i.a, 0).toFixed(2);
+                document.getElementById('ly').innerText = sum('ly');
+                document.getElementById('eg').innerText = sum('eg');
+                document.getElementById('sa').innerText = sum('sa');
             });
         }
-        function logout() { firebase.auth().signOut(); }
     </script>
 </body>
 </html>
