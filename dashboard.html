@@ -11,41 +11,41 @@
         body { background: #f1f5f9; font-family: sans-serif; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .val { font-size: 1.5rem; font-weight: bold; color: #2563eb; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; }
+        .val { font-size: 1.6rem; font-weight: bold; color: #2563eb; margin-top: 5px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
+        .btn { background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>المركز المالي الموحد 📊</h2>
-        <p id="user-mail">جاري التحميل...</p>
+        <p id="user-info" style="color: #64748b;">جاري المزامنة...</p>
     </div>
 
     <div class="grid">
-        <div class="card"><h4>ليبي</h4><div class="val" id="ly">0.00</div></div>
-        <div class="card"><h4>مصري</h4><div class="val" id="eg">0.00</div></div>
-        <div class="card"><h4>سعودي</h4><div class="val" id="sa">0.00</div></div>
+        <div class="card" style="border-right: 5px solid #2563eb;"><h4>ليبي (د.ل)</h4><div class="val" id="ly">0.00</div></div>
+        <div class="card" style="border-right: 5px solid #10b981;"><h4>مصري (ج.م)</h4><div class="val" id="eg">0.00</div></div>
+        <div class="card" style="border-right: 5px solid #f59e0b;"><h4>سعودي (ر.س)</h4><div class="val" id="sa">0.00</div></div>
     </div>
 
-    <div class="card" style="max-width: 400px;">
-        <h3>إضافة عملية</h3>
-        <input type="text" id="desc" placeholder="البيان">
+    <div class="card" style="max-width: 450px; margin-top: 20px;">
+        <h3>تسجيل عملية جديدة</h3>
+        <input type="text" id="desc" placeholder="اسم العميل أو البيان">
         <input type="number" id="amt" placeholder="المبلغ">
         <select id="cur">
             <option value="ly">دينار ليبي</option>
             <option value="eg">جنيه مصري</option>
             <option value="sa">ريال سعودي</option>
         </select>
-        <button class="btn" onclick="add()">حفظ العملية</button>
-        <button onclick="firebase.auth().signOut()" style="margin-top:10px; background:none; border:none; color:red; cursor:pointer;">خروج</button>
+        <button class="btn" onclick="add()">حفظ وترحيل العملية ✅</button>
+        <button onclick="firebase.auth().signOut()" style="margin-top:15px; border:none; background:none; color:red; cursor:pointer; width:100%;">تسجيل الخروج</button>
     </div>
 
     <script>
         const config = {
             apiKey: "AIzaSyC2EVpNEG9XjcPEelUA8lkIUcUceN6Oh0k",
             authDomain: "://firebaseapp.com",
-            projectId: "semo-erp-pro13",
+            projectId: "my-pos-system-33831",
             databaseURL: "https://firebaseio.com"
         };
         firebase.initializeApp(config);
@@ -55,7 +55,7 @@
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
                 uID = user.uid;
-                document.getElementById('user-mail').innerText = user.email;
+                document.getElementById('user-info').innerText = "المسؤول: " + user.email;
                 sync();
             } else { window.location.href = "index.html"; }
         });
@@ -63,15 +63,17 @@
         function add() {
             const d = document.getElementById('desc').value, a = parseFloat(document.getElementById('amt').value), c = document.getElementById('cur').value;
             if(d && a) {
-                db.ref('data/' + uID).push({ d, a, c });
-                alert("تم الحفظ");
+                db.ref('erp_data/' + uID).push({ d, a, c });
+                alert("تمت الإضافة بنجاح!");
+                document.getElementById('desc').value = '';
+                document.getElementById('amt').value = '';
             }
         }
 
         function sync() {
-            db.ref('data/' + uID).on('value', s => {
+            db.ref('erp_data/' + uID).on('value', s => {
                 const logs = s.val() ? Object.values(s.val()) : [];
-                const sum = (c) => logs.filter(l => l.c === c).reduce((total, i) => total + i.a, 0).toFixed(2);
+                const sum = (c) => logs.filter(l => l.c === c).reduce((t, i) => t + i.a, 0).toLocaleString(undefined, {minimumFractionDigits: 2});
                 document.getElementById('ly').innerText = sum('ly');
                 document.getElementById('eg').innerText = sum('eg');
                 document.getElementById('sa').innerText = sum('sa');
