@@ -1,9 +1,7 @@
-// استيراد المكتبات من CDN (الإصدار العاشر v10)
 import { initializeApp } from "https://gstatic.com";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
 import { getDatabase, ref, set, get, child } from "https://gstatic.com";
 
-// إعدادات Firebase الخاصة بك
 const firebaseConfig = {
   apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
   authDomain: "://firebaseapp.com",
@@ -14,67 +12,40 @@ const firebaseConfig = {
   databaseURL: "https://firebaseio.com"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// دالة التبديل بين واجهة الدخول والتسجيل
+// دالة التبديل
 window.toggle = () => {
-    const loginBox = document.getElementById('login-box');
-    const signupBox = document.getElementById('signup-box');
-    loginBox.classList.toggle('hidden');
-    signupBox.classList.toggle('hidden');
+    document.getElementById('login-box').classList.toggle('hidden');
+    document.getElementById('signup-box').classList.toggle('hidden');
 };
 
-// دالة إنشاء حساب جديد (إيميل + هاتف)
+// دالة إنشاء حساب
 window.signup = async () => {
-    const email = document.getElementById('s-e').value;
-    const password = document.getElementById('s-p').value;
-    const phone = document.getElementById('s-ph').value;
-
-    if (!email || !password || !phone) return alert("يرجى إكمال جميع البيانات");
-
+    const e = document.getElementById('s-e').value, p = document.getElementById('s-p').value, ph = document.getElementById('s-ph').value;
+    if(!e || !p || !ph) return alert("أكمل البيانات");
     try {
-        // إنشاء المستخدم في نظام المصادقة
-        await createUserWithEmailAndPassword(auth, email, password);
-        
-        // ربط رقم الهاتف بالإيميل في قاعدة البيانات
-        await set(ref(db, 'users_map/' + phone), { email: email });
-        
-        alert("تم إنشاء الحساب بنجاح!");
+        await createUserWithEmailAndPassword(auth, e, p);
+        await set(ref(db, 'users_map/' + ph), { email: e });
+        alert("تم التسجيل بنجاح!");
         window.location.href = "dashboard.html";
-    } catch (error) {
-        alert("خطأ في الإنشاء: " + error.message);
-    }
+    } catch (err) { alert("خطأ: " + err.message); }
 };
 
-// دالة تسجيل الدخول (بالإيميل أو رقم الهاتف)
+// دالة الدخول
 window.login = async () => {
-    const identifier = document.getElementById('l-id').value;
-    const password = document.getElementById('l-p').value;
-
-    if (!identifier || !password) return alert("يرجى إدخال البيانات");
-
+    const id = document.getElementById('l-id').value, p = document.getElementById('l-p').value;
+    if(!id || !p) return alert("أدخل البيانات");
     try {
-        let emailToAuth = identifier;
-
-        // إذا كان المدخل لا يحتوي على @ (يعني رقم هاتف)
-        if (!identifier.includes('@')) {
-            const dbRef = ref(db);
-            const snapshot = await get(child(dbRef, `users_map/${identifier}`));
-            
-            if (snapshot.exists()) {
-                emailToAuth = snapshot.val().email;
-            } else {
-                throw new Error("رقم الهاتف هذا غير مسجل لدينا");
-            }
+        let email = id;
+        if (!id.includes('@')) {
+            const snapshot = await get(child(ref(db), `users_map/${id}`));
+            if (snapshot.exists()) email = snapshot.val().email;
+            else throw new Error("رقم الهاتف غير مسجل");
         }
-
-        // تنفيذ عملية تسجيل الدخول
-        await signInWithEmailAndPassword(auth, emailToAuth, password);
+        await signInWithEmailAndPassword(auth, email, p);
         window.location.href = "dashboard.html";
-    } catch (error) {
-        alert("فشل الدخول: " + error.message);
-    }
+    } catch (err) { alert("فشل الدخول: " + err.message); }
 };
