@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP | دخول</title>
+    <title>SEMO ERP | نظام الإدارة</title>
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { background: #1e293b; padding: 40px 30px; border-radius: 24px; width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid #334155; }
         h1 { color: #3b82f6; margin-bottom: 30px; font-size: 28px; }
         input { width: 100%; padding: 14px; margin: 12px 0; border-radius: 12px; border: 1px solid #334155; outline: none; font-size: 16px; background: #0f172a; color: white; box-sizing: border-box; }
         .btn { width: 100%; padding: 14px; background: #3b82f6; border: none; color: white; font-weight: bold; border-radius: 12px; cursor: pointer; margin-top: 20px; font-size: 16px; }
-        .btn:active { transform: scale(0.98); }
-        .link { color: #94a3b8; cursor: pointer; display: block; margin-top: 30px; font-size: 14px; text-decoration: underline; }
+        .link { color: #94a3b8; cursor: pointer; display: block; margin-top: 30px; font-size: 14px; text-decoration: underline; line-height: 1.5; }
         .hidden { display: none; }
     </style>
 </head>
@@ -19,24 +18,26 @@
 
     <div class="card">
         <h1>SEMO ERP</h1>
+        
         <!-- واجهة الدخول -->
         <div id="login-box">
             <input type="text" id="l-id" placeholder="الإيميل أو رقم الهاتف">
             <input type="password" id="l-p" placeholder="كلمة المرور">
-            <button class="btn" id="loginBtn">دخول</button>
-            <span class="link" onclick="toggleView()">تأسيس حساب جديد</span>
+            <button class="btn" onclick="login()">دخول</button>
+            <div class="link" onclick="toggleView()">تأسيس حساب جديد</div>
         </div>
+
         <!-- واجهة التسجيل -->
         <div id="signup-box" class="hidden">
             <input type="email" id="s-e" placeholder="البريد الإلكتروني">
             <input type="text" id="s-ph" placeholder="رقم الهاتف">
             <input type="password" id="s-p" placeholder="كلمة المرور">
-            <button class="btn" style="background:#10b981" id="signupBtn">إنشاء حساب</button>
-            <span class="link" onclick="toggleView()">رجوع للدخول</span>
+            <button class="btn" style="background:#10b981" onclick="signup()">إنشاء حساب</button>
+            <div class="link" onclick="toggleView()">رجوع للدخول</div>
         </div>
     </div>
 
-    <!-- كود البرمجة المباشر -->
+    <!-- كود البرمجة مدمج مباشرة لضمان العمل -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://gstatic.com";
@@ -56,17 +57,16 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // وظيفة التبديل
+        // جعل الدوال متاحة للأزرار
         window.toggleView = () => {
             document.getElementById('login-box').classList.toggle('hidden');
             document.getElementById('signup-box').classList.toggle('hidden');
         };
 
-        // وظيفة الدخول عند الضغط
-        document.getElementById('loginBtn').addEventListener('click', async () => {
+        window.login = async () => {
             const id = document.getElementById('l-id').value;
             const p = document.getElementById('l-p').value;
-            if(!id || !p) return alert("أدخل البيانات");
+            if(!id || !p) return alert("يرجى إدخال البيانات");
 
             try {
                 let email = id;
@@ -76,25 +76,23 @@
                     else throw new Error("رقم الهاتف غير مسجل");
                 }
                 await signInWithEmailAndPassword(auth, email, p);
-                alert("تم الدخول بنجاح! جاري التحويل...");
                 window.location.href = "dashboard.html";
             } catch (err) { alert("خطأ: " + err.message); }
-        });
+        };
 
-        // وظيفة التسجيل عند الضغط
-        document.getElementById('signupBtn').addEventListener('click', async () => {
+        window.signup = async () => {
             const e = document.getElementById('s-e').value;
             const ph = document.getElementById('s-ph').value;
             const p = document.getElementById('s-p').value;
-            if(!e || !ph || !p) return alert("أكمل البيانات");
+            if(!e || !ph || !p) return alert("يرجى إكمال البيانات");
 
             try {
                 await createUserWithEmailAndPassword(auth, e, p);
                 await set(ref(db, 'users_map/' + ph), { email: e });
-                alert("تم إنشاء الحساب بنجاح!");
+                alert("تم التسجيل بنجاح!");
                 window.location.href = "dashboard.html";
-            } catch (err) { alert("فشل التسجيل: " + err.message); }
-        });
+            } catch (err) { alert("فشل: " + err.message); }
+        };
     </script>
 </body>
 </html>
