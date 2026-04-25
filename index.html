@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- مكتبة الرسوم البيانية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- مكتبة التصدير إلى Excel -->
+    <!-- مكتبة التصدير Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
@@ -18,84 +18,82 @@
             --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --text-muted: #94a3b8;
             --border: #334155; --glass: rgba(30, 41, 59, 0.95);
         }
-
-        * { box-sizing: border-box; transition: all 0.3s ease; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        * { box-sizing: border-box; transition: all 0.3s ease; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
         
-        /* تنسيقات عامة */
         .hidden { display: none !important; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); }
-        .btn-danger { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
         
-        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 14px; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-
-        /* صفحة تسجيل الدخول */
-        #login-view { display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); }
-        .login-card { background: var(--glass); padding: 40px; border-radius: 20px; width: 400px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .logo-area { margin-bottom: 30px; color: var(--primary); font-size: 32px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        /* التخطيط الرئيسي (Layout) */
+        /* Login Page */
+        #login-view { display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #0f172a, #1e293b); position: relative; z-index: 1000; }
+        .login-card { background: var(--glass); padding: 40px; border-radius: 20px; width: 400px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s; }
+        .logo-area { margin-bottom: 30px; color: var(--primary); font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .logo-area i { font-size: 40px; }
+        
+        .input-group { position: relative; margin-bottom: 15px; text-align: right; }
+        .input-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 13px; }
+        .input-group input { padding-right: 40px; }
+        .toggle-password { position: absolute; left: 15px; top: 38px; cursor: pointer; color: var(--text-muted); background: none; border: none; font-size: 18px; }
+        .toggle-password:hover { color: var(--primary); }
+        
+        /* Toasts */
+        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 2000; }
+        .toast { background: var(--card); color: white; padding: 15px 20px; margin-top: 10px; border-radius: 10px; border-right: 4px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; transform: translateX(-100%); animation: slideIn 0.3s forwards; min-width: 300px; }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast.warning { border-color: var(--warning); }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* App Layout */
         #app-layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; padding: 20px; }
+        .sidebar { width: 260px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; padding: 20px; transition: 0.3s; }
         .sidebar-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
         .menu-item { padding: 12px 15px; margin: 5px 0; border-radius: 10px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; gap: 12px; font-weight: 500; }
         .menu-item:hover, .menu-item.active { background: var(--primary); color: white; transform: translateX(-5px); }
         .menu-item i { font-size: 20px; }
         
-        .main-content { margin-right: 260px; flex: 1; padding: 30px; width: calc(100% - 260px); }
+        .main-content { margin-right: 260px; flex: 1; padding: 30px; width: calc(100% - 260px); transition: 0.3s; }
         
-        /* الرأس (Header) */
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: var(--card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--border); }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .avatar { width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         
-        /* البطاقات والإحصائيات */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); position: relative; overflow: hidden; }
         .stat-card::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--primary); }
         .stat-value { font-size: 28px; font-weight: bold; margin: 10px 0; }
         .stat-icon { position: absolute; left: 20px; top: 20px; font-size: 32px; opacity: 0.2; }
         
-        /* الجداول */
         .table-container { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
         .data-table th, .data-table td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border); }
         .data-table th { color: var(--text-muted); font-size: 13px; }
         .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .status-completed { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
         .status-rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-
-        /* الرسوم البيانية */
+        
         .chart-container { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); height: 400px; margin-bottom: 30px; }
         
-        /* التنبيهات (Toasts) */
-        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
-        .toast { background: var(--card); color: white; padding: 15px 20px; margin-top: 10px; border-radius: 10px; border-right: 4px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; transform: translateX(-100%); animation: slideIn 0.3s forwards; }
-        .toast.success { border-color: var(--success); }
-        .toast.error { border-color: var(--danger); }
-        .toast.warning { border-color: var(--warning); }
-        @keyframes slideIn { to { transform: translateX(0); } }
+        .blur-text { filter: blur(5px); user-select: none; cursor: help; position: relative; }
+        .blur-text:hover { filter: blur(0); }
         
-        /* المودال (Modal) */
+        /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal.active { opacity: 1; pointer-events: all; }
         .modal-content { background: var(--card); width: 500px; padding: 30px; border-radius: 20px; border: 1px solid var(--border); transform: scale(0.9); transition: 0.3s; }
         .modal.active .modal-content { transform: scale(1); }
 
-        /* إخفاء الأرقام (Secure Mode) */
-        .blur-text { filter: blur(5px); user-select: none; cursor: help; position: relative; }
-        .blur-text:hover { filter: blur(0); }
-        .blur-text::after { content: '👁️'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0; }
-        .blur-text:hover::after { opacity: 1; }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .sidebar { width: 70px; padding: 10px; }
             .sidebar h2, .menu-item span, .top-bar h1 { display: none; }
@@ -114,18 +112,35 @@
         <div class="login-card">
             <div class="logo-area"><i class="ph ph-cube"></i> SEMO ERP</div>
             <h2 style="margin-bottom: 20px;">تسجيل الدخول</h2>
-            <input type="text" id="login-user" placeholder="اسم المستخدم (admin / manager / sales)" style="margin-bottom: 15px;">
-            <input type="password" id="login-pass" placeholder="كلمة المرور (1234)" style="margin-bottom: 20px;">
-            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">دخول <i class="ph ph-arrow-left"></i></button>
-            <p style="margin-top: 15px; color: var(--text-muted); font-size: 13px;">
-                جرب: <b>admin</b> (كامل الصلاحيات) أو <b>sales</b> (موظف مبيعات)
-            </p>
+            <div class="input-group">
+                <label>اسم المستخدم</label>
+                <input type="text" id="login-user" placeholder="admin أو sales">
+            </div>
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="login-pass" placeholder="1234">
+                <button type="button" class="toggle-password" onclick="togglePass('login-pass')">
+                    <i class="ph ph-eye" id="eye-login"></i>
+                </button>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">
+                <span>دخول</span> <i class="ph ph-arrow-left"></i>
+            </button>
+            <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">ليس لديك حساب؟</p>
+                <button class="btn btn-outline" style="width: 100%;" onclick="showSignup()">إنشاء حساب جديد</button>
+            </div>
+            <!-- نموذج التسجيل المخفي -->
+            <div id="signup-form" class="hidden" style="margin-top:15px; text-align:right;">
+                <input type="text" id="new-user" placeholder="اسم المستخدم الجديد" style="margin-bottom:10px;">
+                <input type="password" id="new-pass" placeholder="كلمة المرور" style="margin-bottom:10px;">
+                <button class="btn btn-success" style="width:100%" onclick="handleSignup()">تسجيل</button>
+            </div>
         </div>
     </div>
 
     <!-- التطبيق الرئيسي -->
     <div id="app-layout" class="hidden">
-        <!-- القائمة الجانبية -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <i class="ph ph-cube" style="font-size: 32px; color: var(--primary);"></i>
@@ -133,27 +148,19 @@
             </div>
             <div class="menu-item active" onclick="navigate('dashboard')"><i class="ph ph-squares-four"></i> <span>الرئيسية</span></div>
             <div class="menu-item" onclick="navigate('sales')"><i class="ph ph-shopping-cart"></i> <span>المبيعات</span></div>
-            <div class="menu-item" onclick="navigate('inventory')"><i class="ph ph-package"></i> <span>المخزن</span></div>
-            <div class="menu-item" onclick="navigate('users')"><i class="ph ph-users"></i> <span>الموظفين</span></div>
             <div class="menu-item" onclick="navigate('audit')"><i class="ph ph-shield-check"></i> <span>سجل العمليات</span></div>
-            <div class="menu-item" onclick="navigate('settings')"><i class="ph ph-gear"></i> <span>الإعدادات</span></div>
-            
             <button class="btn btn-danger" style="margin-top: auto; width: 100%;" onclick="handleLogout()"><i class="ph ph-sign-out"></i> <span>خروج</span></button>
         </div>
 
-        <!-- المحتوى -->
         <div class="main-content">
-            <!-- الشريط العلوي -->
             <div class="top-bar">
                 <div>
                     <h1 id="page-title" style="margin: 0;">لوحة التحكم</h1>
                     <span id="date-display" style="color: var(--text-muted); font-size: 14px;"></span>
                 </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <button class="btn btn-outline" onclick="toggleSecureMode()" id="secure-btn" title="إخفاء الأرقام"><i class="ph ph-eye-slash"></i></button>
-                    <button class="btn btn-outline" onclick="exportData()" title="تصدير Excel"><i class="ph ph-download-simple"></i></button>
-                    <button class="btn btn-outline" onclick="backupData()" title="نسخ احتياطي"><i class="ph ph-hard-drives"></i></button>
-                    <button class="btn btn-outline" onclick="restoreData()" title="استعادة"><i class="ph ph-upload-simple"></i></button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn btn-outline" onclick="toggleSecureMode()" id="secure-btn"><i class="ph ph-eye-slash"></i></button>
+                    <button class="btn btn-outline" onclick="exportData()"><i class="ph ph-download-simple"></i></button>
                     <div class="user-info">
                         <div class="avatar" id="user-avatar">A</div>
                         <div>
@@ -164,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- صفحة: الرئيسية (Dashboard) -->
+            <!-- صفحة: الرئيسية -->
             <div id="page-dashboard" class="page-view">
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -172,4 +179,531 @@
                         <h3>إجمالي المبيعات</h3>
                         <div class="stat-value blur-text" id="total-sales">0 ج.م</div>
                     </div>
-                    <div
+                    <div class="stat-card">
+                        <i class="ph ph-receipt stat-icon"></i>
+                        <h3>عدد الفواتير</h3>
+                        <div class="stat-value blur-text" id="total-invoices">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="ph ph-package stat-icon"></i>
+                        <h3>المنتجات</h3>
+                        <div class="stat-value blur-text" id
+                                                    <span id="total-products">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="ph ph-users stat-icon"></i>
+                        <h3>العملاء النشطين</h3>
+                        <div class="stat-value blur-text" id="active-clients">0</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="table-container">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <h3>أحدث العمليات</h3>
+                        <button class="btn btn-primary" onclick="navigate('sales')">عرض الكل</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>العميل</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-sales-table">
+                            <!-- سيتم ملؤها بواسطة JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- صفحة: المبيعات -->
+            <div id="page-sales" class="page-view hidden">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h2>إدارة المبيعات والفواتير</h2>
+                    <button class="btn btn-success" onclick="openModal('invoice-modal')">
+                        <i class="ph ph-plus"></i> فاتورة جديدة
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="search-invoice" placeholder="بحث برقم الفاتورة أو اسم العميل..." onkeyup="filterInvoices()">
+                        <select id="filter-status" onchange="filterInvoices()" style="width: 150px;">
+                            <option value="all">كل الحالات</option>
+                            <option value="paid">مدفوع</option>
+                            <option value="pending">قيد الانتظار</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>رقم الفاتورة</th>
+                                <th>العميل</th>
+                                <th>المنتجات</th>
+                                <th>المجموع</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoices-table">
+                            <!-- بيانات الفواتير -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- صفحة: سجل العمليات (Audit Log) -->
+            <div id="page-audit" class="page-view hidden">
+                <h2>سجل العمليات (Audit Log)</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>المستخدم</th>
+                                <th>الإجراء</th>
+                                <th>التفاصيل</th>
+                                <th>IP (محاكاة)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table">
+                            <!-- سجل العمليات -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة فاتورة (Modal) -->
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">إضافة فاتورة جديدة</h3>
+            <form id="invoice-form" onsubmit="saveInvoice(event)">
+                <div class="input-group">
+                    <label>اسم العميل</label>
+                    <input type="text" id="inv-client" required placeholder="أدخل اسم العميل">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="input-group">
+                        <label>رقم الفاتورة</label>
+                        <input type="text" id="inv-id" required placeholder="مثال: INV-001">
+                    </div>
+                    <div class="input-group">
+                        <label>الحالة</label>
+                        <select id="inv-status">
+                            <option value="paid">مدفوع</option>
+                            <option value="pending">قيد الانتظار</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>المبلغ الإجمالي (ج.م)</label>
+                    <input type="number" id="inv-amount" required min="0" placeholder="0.00">
+                </div>
+                <div class="input-group">
+                    <label>ملاحظات</label>
+                    <input type="text" id="inv-notes" placeholder="ملاحظات إضافية">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('invoice-modal')">إلغاء</button>
+                    <button type="submit" class="btn btn-success">حفظ الفاتورة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- كود JavaScript -->
+    <script>
+        // --- تهيئة البيانات (State) ---
+        let currentUser = null;
+        let secureMode = false;
+        let invoices = JSON.parse(localStorage.getItem('semo_invoices')) || [
+            { id: 'INV-1001', client: 'شركة الأمل', amount: 5000, status: 'paid', date: '2023-10-01', items: 'برمجيات' },
+            { id: 'INV-1002', client: 'مؤسسة النور', amount: 1200, status: 'pending', date: '2023-10-02', items: 'استشارات' },
+            { id: 'INV-1003', client: 'متجر السعادة', amount: 3400, status: 'paid', date: '2023-10-03', items: 'تجهيزات' }
+        ];
+        let auditLogs = JSON.parse(localStorage.getItem('semo_logs')) || [];
+
+        // --- دوال المساعدة ---
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = type === 'success' ? 'ph-check-circle' : type === 'error' ? 'ph-warning-circle' : 'ph-info';
+            toast.innerHTML = `<i class="ph ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
+
+        const logAction = (action, details) => {
+            const log = {
+                time: new Date().toLocaleString('ar-EG'),
+                user: currentUser ? currentUser.username : 'System',
+                action: action,
+                details: details,
+                ip: '192.168.1.' + Math.floor(Math.random() * 255)
+            };
+            auditLogs.unshift(log);
+            if(auditLogs.length > 50) auditLogs.pop();
+            localStorage.setItem('semo_logs', JSON.stringify(auditLogs));
+            renderAuditLog();
+        };
+
+        const togglePass = (id) => {
+            const input = document.getElementById(id);
+            const icon = document.getElementById(id === 'login-pass' ? 'eye-login' : 'eye-signup');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('ph-eye', 'ph-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('ph-eye-slash', 'ph-eye');
+            }
+        };
+
+        // --- نظام المصادقة ---
+        const handleSignup = () => {
+            const user = document.getElementById('new-user').value;
+            const pass = document.getElementById('new-pass').value;
+            if(!user || !pass) return showToast('يرجى ملء جميع الحقول', 'error');
+            
+            // حفظ مستخدم جديد (محاكاة)
+            localStorage.setItem(`user_${user}`, pass);
+            showToast('تم إنشاء الحساب بنجاح! قم بتسجيل الدخول.', 'success');
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('login-user').value = user;
+        };
+
+        const handleLogin = () => {
+            const userIn = document.getElementById('login-user').value;
+            const passIn = document.getElementById('login-pass').value;
+            
+            // مستخدمين افتراضيين للتجربة
+            const validUsers = { 'admin': '1234', 'sales': '1234' };
+            const storedUser = localStorage.getItem(`user_${userIn}`);
+
+            if ((validUsers[userIn] && validUsers[userIn] === passIn) || (storedUser && storedUser === passIn)) {
+                currentUser = { 
+                    username: userIn, 
+                    role: userIn === 'admin' ? 'المدير العام' : 'مدير المبيعات',
+                    avatar: userIn.charAt(0).toUpperCase()
+                };
+                enterApp();
+            } else {
+                showToast('بيانات الدخول غير صحيحة', 'error');
+            }
+        };
+
+        const handleLogout = () => {
+            logAction('خروج', `مستخدم ${currentUser.username} غادر النظام`);
+            currentUser = null;
+            document.getElementById('app-layout').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('login-pass').value = '';
+        };
+
+        const showSignup = () => {
+            document.getElementById('signup-form').classList.toggle('hidden');
+        };
+
+        // --- واجهة التطبيق ---
+        const enterApp = () => {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-layout').classList.remove('hidden');
+            document.getElementById('user-name').innerText = currentUser.username;
+            document.getElementById('user-role').innerText = currentUser.role;
+            document.getElementById('user-avatar').innerText = currentUser.avatar;
+            
+            document.getElementById('date-display').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            logAction('دخول', `تسجيل دخول جديد للمستخدم ${currentUser.username}`);
+            navigate('dashboard');
+        };
+
+        const navigate = (pageId) => {
+            // تحديث القائمة الجانبية
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            const activeMenu = document.querySelector(`.menu-item[onclick="navigate('${pageId}')"]`);
+            if(activeMenu) activeMenu.classList.add('active');
+
+            // إخفاء جميع الصفحات
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            
+            // إظهار الصفحة المطلوبة
+            const target = document.getElementById(`page-${pageId}`);
+            if(target) target.classList.remove('hidden');
+
+            // تحديث العنوان
+            const titles = { 'dashboard': 'لوحة التحكم', 'sales': 'إدارة المبيعات', 'audit': 'سجل العمليات' };
+            document.getElementById('page-title').innerText = titles[pageId] || 'الصفحة';
+
+            // إعادة تحميل البيانات
+            if(pageId === 'dashboard') updateDashboard();
+            if(pageId === 'sales') renderInvoices();
+            if(pageId === 'audit') renderAuditLog();
+        };
+
+        // --- إدارة الفواتير ---
+        const openModal = (id) => document.getElementById(id).classList.add('active');
+        const closeModal = (id) => document.getElementById(id).classList.remove('active');
+
+        const saveInvoice = (e) => {
+            e.preventDefault();
+            const newInv = {
+                id: document.getElementById('inv-id').value,
+                client: document.getElementById('inv-client').value,
+                amount: parseFloat(document.getElementById('inv-amount').value),
+                status: document.getElementById('inv-status').value,
+                date: new Date().toISOString().split('T'),
+                items: document.getElementById('inv-notes').value || 'عام'
+            };
+
+            // التحقق من تكرار العدد
+            if(invoices.some(i => i.id === newInv.id)) {
+                showToast('رقم الفاتورة موجود مسبقاً!', 'error');
+                return;
+            }
+
+            invoices.unshift(newInv);
+            localStorage.setItem('semo_invoices', JSON.stringify(invoices));
+            logAction('إضافة فاتورة', `تم إنشاء فاتورة ${newInv.id} للعميل ${newInv.client}`);
+            
+            closeModal('invoice-modal');
+            document.getElementById('invoice-form').reset();
+            showToast('تم حفظ الفاتورة بنجاح');
+            renderInvoices(); // تحديث الجدول إذا كنا في صفحة المبيعات
+            updateDashboard(); // تحديث الداشبورد
+        };
+
+        const renderInvoices = () => {
+            const tbody = document.getElementById('invoices-table');
+            tbody.innerHTML = '';
+            invoices.forEach(inv => {
+                let statusClass = inv.status === 'paid' ? 'status-completed' : inv.status === 'pending' ? 'status-pending' : 'status-rejected';
+                let statusText = inv.status === 'paid' ? 'مدفوع' : inv.status === 'pending' ? 'قيد الانتظار' : 'ملغي';
+                
+                const row = `
+                    <tr>
+                        <td>${inv.id}</td>
+                        <td>${inv.client}</td>
+                        <td>${inv.items}</td>
+                        <td><strong>${inv.amount.toLocaleString()} ج.م</strong></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${inv.date}</td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 5px 10px;" onclick="deleteInvoice('${inv.id}')">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        };
+
+        const deleteInvoice = (id) => {
+            if(confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
+                invoices = invoices.filter(i => i.id !== id);
+                localStorage.setItem('semo_invoices', JSON.stringify(invoices));
+                logAction('حذف فاتورة', `تم حذف الفاتورة ${id}`);
+                renderInvoices();
+                updateDashboard();
+                showToast('تم الحذف بنجاح', 'warning');
+            }
+        };
+
+        const filterInvoices = () => {
+            const search = document.getElementById('search-invoice').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+            
+            const filtered = invoices.filter(inv => {
+                const matchesSearch = inv.client.toLowerCase().includes(search) || inv.id.toLowerCase().includes(search);
+                const matchesStatus = status === 'all' || inv.status === status;
+                return matchesSearch && matchesStatus;
+            });
+
+            renderInvoices(filtered);
+        };
+
+        // --- لوحة التحكم والرسوم البيانية ---
+        let salesChartInstance = null;
+
+        const updateDashboard = () => {
+            // حساب الإحصائيات
+            const totalSales = invoices.reduce((sum, inv) => inv.status !== 'cancelled' ? sum + inv.amount : sum, 0);
+            const totalInvoices = invoices.length;
+            const activeClients = [...new Set(invoices.map(i => i.client))].length;
+            
+            // تحديث النصوص (مع تأثير الضبابية إذا كان الوضع الآمن مفعل)
+            const blurClass = secureMode ? 'blur-text' : '';
+            document.getElementById('total-sales').innerHTML = `<span class="${blurClass}">${totalSales.toLocaleString()} ج.م</span>`;
+            document.getElementById('total-invoices').innerHTML = `<span class="${blurClass}">${totalInvoices}</span>`;
+            document.getElementById('active-clients').innerHTML = `<span class="${blurClass}">${activeClients}</span>`;
+            document.getElementById('total-products').innerHTML = `<span class="${blurClass}">125</span>`; // ثابت للمحاكاة
+
+            // تحديث الجدول الصغير
+            const            const recentTable = document.getElementById('recent-sales-table');
+            recentTable.innerHTML = '';
+            invoices.slice(0, 5).forEach(inv => {
+                let statusClass = inv.status === 'paid' ? 'status-completed' : inv.status === 'pending' ? 'status-pending' : 'status-rejected';
+                let statusText = inv.status === 'paid' ? 'مدفوع' : inv.status === 'pending' ? 'قيد الانتظار' : 'ملغي';
+                
+                const row = `
+                    <tr>
+                        <td>${inv.id}</td>
+                        <td>${inv.client}</td>
+                        <td class="blur-text">${inv.amount.toLocaleString()} ج.م</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${inv.date}</td>
+                    </tr>
+                `;
+                recentTable.innerHTML += row;
+            });
+
+            // تحديث الرسم البياني
+            renderChart();
+        };
+
+        const renderChart = () => {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // تجميع البيانات حسب الشهر (محاكاة)
+            const labels = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
+            const data = [12000, 19000, 3000, 5000, 20000, 30000]; // بيانات وهمية للعرض
+
+            if (salesChartInstance) {
+                salesChartInstance.destroy();
+            }
+
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'المبيعات (ج.م)',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3b82f6',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' ج.م';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155', borderDash: [5, 5] },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        };
+
+        // --- سجل العمليات (Audit Log) ---
+        const renderAuditLog = () => {
+            const tbody = document.getElementById('audit-table');
+            tbody.innerHTML = '';
+            auditLogs.forEach(log => {
+                const row = `
+                    <tr>
+                        <td style="font-size:12px; color:var(--text-muted)">${log.time}</td>
+                        <td><span style="color:var(--primary)">@${log.user}</span></td>
+                        <td>${log.action}</td>
+                        <td style="color:var(--text-muted)">${log.details}</td>
+                        <td style="font-size:12px">${log.ip}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        };
+
+        // --- الميزات الإضافية ---
+        const toggleSecureMode = () => {
+            secureMode = !secureMode;
+            const btn = document.getElementById('secure-btn');
+            if (secureMode) {
+                btn.innerHTML = '<i class="ph ph-eye"></i>';
+                btn.style.color = 'var(--success)';
+                showToast('تم تفعيل وضع الخصوصية (إخفاء البيانات)', 'success');
+            } else {
+                btn.innerHTML = '<i class="ph ph-eye-slash"></i>';
+                btn.style.color = 'var(--text-muted)';
+                showToast('تم إيقاف وضع الخصوصية', 'success');
+            }
+            updateDashboard();
+        };
+
+        const exportData = () => {
+            if (invoices.length === 0) {
+                showToast('لا توجد بيانات للتصدير', 'warning');
+                return;
+            }
+            
+            // تحويل البيانات إلى تنسيق Excel
+            const ws = XLSX.utils.json_to_sheet(invoices);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "المبيعات");
+            
+            // تحميل الملف
+            XLSX.writeFile(wb, "SEMO_ERP_Export.xlsx");
+            logAction('تصدير بيانات', 'تم تصدير تقرير المبيعات إلى Excel');
+            showToast('تم تحميل ملف Excel بنجاح', 'success');
+        };
+
+        // --- التشغيل الأولي ---
+        window.onload = function() {
+            // فحص حالة الجلسة (اختياري)
+            const savedUser = sessionStorage.getItem('semo_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                enterApp();
+            }
+            
+            // ضبط التاريخ
+            document.getElementById('date-display').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        // إغلاق النوافذ عند النقر خارجها
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
+    </script>
+</body>
+</html>
