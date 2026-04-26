@@ -5,25 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SEMO ERP | نظام إدارة المؤسسات</title>
     <style>
-        /* ==================== CSS RESET ==================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* ==================== VARIABLES ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
             --primary: #3b82f6;
             --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --dark: #0f172a;
             --dark-card: #1e293b;
             --dark-border: #334155;
-            --light: #f8fafc;
             --light-card: #ffffff;
             --light-border: #e2e8f0;
             --text-dark: #f8fafc;
@@ -31,71 +22,37 @@
             --muted-dark: #94a3b8;
             --muted-light: #64748b;
         }
-
         body {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
             transition: all 0.3s ease;
         }
-
-        /* الوضع الفاتح */
         body.light-mode {
             background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
         }
-
         body.light-mode .login-card {
             background: var(--light-card);
             border: 1px solid var(--light-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-
-        body.light-mode .login-card h1 {
-            color: var(--primary);
-        }
-
-        body.light-mode .login-card p {
-            color: var(--muted-light);
-        }
-
         body.light-mode .input-group input,
         body.light-mode .demo-box {
             background: #f8fafc;
             border-color: var(--light-border);
             color: var(--text-light);
         }
-
-        body.light-mode .input-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
         body.light-mode .demo-box {
-            background: rgba(245, 158, 11, 0.08);
+            background: rgba(245,158,11,0.08);
         }
-
-        body.light-mode .demo-box p {
-            color: #d97706;
-        }
-
-        body.light-mode .demo-box span {
-            color: var(--muted-light);
-        }
-
-        body.light-mode .divider {
-            color: var(--muted-light);
-        }
-
+        body.light-mode .demo-box p { color: #d97706; }
+        body.light-mode .demo-box span { color: var(--muted-light); }
+        body.light-mode .divider { color: var(--muted-light); }
         body.light-mode .divider::before,
-        body.light-mode .divider::after {
-            background: var(--light-border);
-        }
-
-        /* ==================== CARD ==================== */
+        body.light-mode .divider::after { background: var(--light-border); }
         .login-card {
             background: var(--dark-card);
             padding: 45px 35px;
@@ -104,535 +61,182 @@
             max-width: 460px;
             text-align: center;
             border: 1px solid var(--dark-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             position: relative;
-            transition: all 0.3s ease;
             animation: fadeInUp 0.5s ease;
         }
-
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        /* ==================== LOGO ==================== */
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             margin: 0 auto 20px;
-            font-size: 36px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+            font-size: 36px; font-weight: bold; color: white;
+            box-shadow: 0 10px 25px -5px rgba(59,130,246,0.4);
         }
-
-        h1 {
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            color: var(--muted-dark);
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-
-        body.light-mode .subtitle {
-            color: var(--muted-light);
-        }
-
-        /* ==================== MODE TOGGLE ==================== */
+        h1 { color: var(--primary); font-size: 28px; margin-bottom: 8px; }
+        .subtitle { color: var(--muted-dark); font-size: 14px; margin-bottom: 25px; }
         .mode-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: none;
-            border: none;
-            color: var(--muted-dark);
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; top: 20px; left: 20px;
+            background: none; border: none;
+            color: var(--muted-dark); font-size: 22px; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        .mode-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--primary);
-        }
-
-        body.light-mode .mode-toggle:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        /* ==================== DEMO BOX ==================== */
+        .mode-toggle:hover { background: rgba(255,255,255,0.1); color: var(--primary); }
         .demo-box {
-            background: rgba(245, 158, 11, 0.12);
+            background: rgba(245,158,11,0.12);
             border: 1px solid var(--warning);
             border-radius: 20px;
             padding: 18px;
             margin: 25px 0 20px;
             text-align: right;
-            transition: all 0.3s ease;
         }
-
-        .demo-box p {
-            color: var(--warning);
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .demo-box span {
-            color: var(--muted-dark);
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            font-family: monospace;
-        }
-
-        body.light-mode .demo-box span {
-            color: var(--muted-light);
-        }
-
-        .demo-box i {
-            width: 20px;
-            font-size: 14px;
-        }
-
-        /* ==================== BUTTONS ==================== */
+        .demo-box p { color: var(--warning); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .demo-box span { color: var(--muted-dark); font-size: 13px; display: flex; align-items: center; gap: 8px; padding: 6px 0; font-family: monospace; }
         .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            width: 100%; padding: 14px; border: none; border-radius: 60px;
+            font-weight: 700; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             margin-top: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
         .btn-demo {
             background: linear-gradient(135deg, var(--warning), #d97706);
             color: white;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
         }
-
-        .btn-demo:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-        }
-
-        /* ==================== INPUTS ==================== */
-        .input-group {
-            margin-bottom: 18px;
-            text-align: right;
-        }
-
+        .btn-demo:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,158,11,0.4); }
+        .input-group { margin-bottom: 18px; }
         .input-group input {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 60px;
+            width: 100%; padding: 14px 18px; border-radius: 60px;
             border: 1px solid var(--dark-border);
             background: var(--dark);
             color: var(--text-dark);
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
+            font-size: 15px; outline: none;
         }
-
         .input-group input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
-
-        .input-group input::placeholder {
-            color: var(--muted-dark);
-            font-size: 13px;
-        }
-
-        body.light-mode .input-group input::placeholder {
-            color: var(--muted-light);
-        }
-
-        /* ==================== DIVIDER ==================== */
         .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--muted-dark);
-            font-size: 13px;
+            display: flex; align-items: center; text-align: center;
+            margin: 20px 0; color: var(--muted-dark); font-size: 13px;
         }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--dark-border);
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--dark-border);
         }
-
-        .divider::before {
-            margin-left: 15px;
-        }
-
-        .divider::after {
-            margin-right: 15px;
-        }
-
-        /* ==================== SHORTCUT TIP ==================== */
+        .divider::before { margin-left: 15px; }
+        .divider::after { margin-right: 15px; }
         .shortcut-tip {
-            margin-top: 20px;
-            font-size: 12px;
-            color: var(--muted-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            margin-top: 20px; font-size: 12px; color: var(--muted-dark);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
-        body.light-mode .shortcut-tip {
-            color: var(--muted-light);
-        }
-
-        /* ==================== NOTIFICATION ==================== */
         .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 60px;
-            z-index: 1000;
-            font-weight: 600;
-            font-size: 14px;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 60px; z-index: 1000;
+            font-weight: 600; font-size: 14px;
             animation: slideDown 0.3s ease;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
         }
-
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
-        .notification.success {
-            background: var(--success);
-            color: white;
-        }
-
-        .notification.error {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* ==================== RESPONSIVE ==================== */
+        .notification.success { background: var(--success); color: white; }
+        .notification.error { background: var(--danger); color: white; }
         @media (max-width: 480px) {
-            .login-card {
-                padding: 35px 25px;
-            }
-            
-            .logo {
-                width: 65px;
-                height: 65px;
-                font-size: 28px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .btn {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
-            .demo-box span {
-                font-size: 11px;
-                flex-wrap: wrap;
-            }
-        }
-
-        /* ==================== ICONS ==================== */
-        .icon-emoji {
-            font-size: 18px;
+            .login-card { padding: 35px 25px; }
+            .logo { width: 65px; height: 65px; font-size: 28px; }
+            h1 { font-size: 24px; }
+            .btn { padding: 12px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
-
 <div class="login-card">
-    <button class="mode-toggle" onclick="toggleMode()" id="modeToggle" title="تغيير الوضع">🌙</button>
-    
-    <div class="logo">
-        <span>S</span>
-    </div>
-    
+    <button class="mode-toggle" onclick="toggleMode()" id="modeToggle">🌙</button>
+    <div class="logo">S</div>
     <h1>SEMO ERP</h1>
     <p class="subtitle">نظام متكامل لإدارة المؤسسات</p>
-
-    <!-- ==================== DEMO ACCOUNTS BOX ==================== -->
     <div class="demo-box">
         <p>🚀 حسابات تجريبية جاهزة</p>
-        <span><span class="icon-emoji">📧</span> admin@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👑 مدير</span>
-        <span><span class="icon-emoji">📧</span> user@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👤 مستخدم</span>
+        <span>📧 admin@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👑 مدير</span>
+        <span>📧 user@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👤 مستخدم</span>
     </div>
-
-    <!-- ==================== DEMO BUTTON ==================== -->
-    <button class="btn btn-demo" id="demoLoginBtn" onclick="directLogin()">
-        🚀 دخول سريع – حساب تجريبي
-    </button>
-
+    <button class="btn btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب تجريبي</button>
     <div class="divider">أو</div>
-
-    <!-- ==================== MANUAL LOGIN FORM ==================== -->
-    <div class="input-group">
-        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
-    </div>
-    <div class="input-group">
-        <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password">
-    </div>
-
-    <button class="btn btn-primary" id="manualLoginBtn" onclick="manualLogin()">
-        🔐 تسجيل الدخول
-    </button>
-
-    <!-- ==================== SHORTCUT TIP ==================== -->
-    <div class="shortcut-tip">
-        <span>⏎</span>
-        <span>اضغط Enter للتسجيل السريع</span>
-    </div>
+    <div class="input-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email"></div>
+    <div class="input-group"><input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password"></div>
+    <button class="btn btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
+    <div class="shortcut-tip"><span>⏎</span><span>اضغط Enter للتسجيل السريع</span></div>
 </div>
-
 <script>
-    // ==================== DEMO ACCOUNTS ====================
     const DEMO_ACCOUNTS = {
-        admin: {
-            uid: "demo-admin-001",
-            email: "admin@semo.com",
-            password: "123456",
-            role: "admin",
-            name: "مدير النظام",
-            companyName: "SEMO ERP",
-            isActive: true
-        },
-        user: {
-            uid: "demo-user-001",
-            email: "user@semo.com",
-            password: "123456",
-            role: "user",
-            name: "مستخدم عادي",
-            companyName: "SEMO ERP",
-            isActive: true
-        }
+        admin: { uid: "demo-admin-001", email: "admin@semo.com", password: "123456", role: "admin", name: "مدير النظام", companyName: "SEMO ERP", isActive: true },
+        user: { uid: "demo-user-001", email: "user@semo.com", password: "123456", role: "user", name: "مستخدم عادي", companyName: "SEMO ERP", isActive: true }
     };
-
-    // ==================== NOTIFICATION SYSTEM ====================
     let activeNotification = null;
-
     function showNotification(message, type = 'success') {
-        if (activeNotification) {
-            activeNotification.remove();
-        }
-        
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        activeNotification = notification;
-        
-        setTimeout(() => {
-            if (notification) {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.3s';
-                setTimeout(() => {
-                    if (notification && notification.remove) {
-                        notification.remove();
-                        if (activeNotification === notification) {
-                            activeNotification = null;
-                        }
-                    }
-                }, 300);
-            }
-        }, 3000);
+        if (activeNotification) activeNotification.remove();
+        const n = document.createElement('div');
+        n.className = `notification ${type}`;
+        n.textContent = message;
+        document.body.appendChild(n);
+        activeNotification = n;
+        setTimeout(() => { if (n) { n.style.opacity = '0'; setTimeout(() => n.remove(), 300); if (activeNotification === n) activeNotification = null; } }, 3000);
     }
-
-    // ==================== DIRECT DEMO LOGIN ====================
     function directLogin() {
-        const admin = DEMO_ACCOUNTS.admin;
-        localStorage.setItem('semo_user', JSON.stringify(admin));
-        showNotification('✅ مرحباً بك! جاري التحويل إلى لوحة التحكم...', 'success');
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 800);
+        localStorage.setItem('semo_user', JSON.stringify(DEMO_ACCOUNTS.admin));
+        showNotification('✅ مرحباً بك! جاري التحويل...', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 800);
     }
-
-    // ==================== MANUAL LOGIN ====================
     function manualLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
-        
-        if (!email || !password) {
-            showNotification('⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور', 'error');
-            return;
+        if (!email || !password) { showNotification('⚠️ الرجاء إدخال البريد وكلمة المرور', 'error'); return; }
+        let found = null;
+        for (let k in DEMO_ACCOUNTS) {
+            if (DEMO_ACCOUNTS[k].email === email && DEMO_ACCOUNTS[k].password === password) found = DEMO_ACCOUNTS[k];
         }
-        
-        let foundUser = null;
-        
-        for (let key in DEMO_ACCOUNTS) {
-            if (DEMO_ACCOUNTS[key].email === email && DEMO_ACCOUNTS[key].password === password) {
-                foundUser = DEMO_ACCOUNTS[key];
-                break;
-            }
-        }
-        
-        if (foundUser) {
-            localStorage.setItem('semo_user', JSON.stringify(foundUser));
-            showNotification(`✅ مرحباً ${foundUser.name}! جاري التحويل...`, 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 800);
+        if (found) {
+            localStorage.setItem('semo_user', JSON.stringify(found));
+            showNotification(`✅ مرحباً ${found.name}! جاري التحويل...`, 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 800);
         } else {
-            showNotification('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+            showNotification('❌ البريد أو كلمة المرور غير صحيحة', 'error');
         }
     }
-
-    // ==================== THEME TOGGLE (Light/Dark Mode) ====================
     function toggleMode() {
-        const body = document.body;
-        const modeBtn = document.getElementById('modeToggle');
-        
-        body.classList.toggle('light-mode');
-        
-        if (body.classList.contains('light-mode')) {
-            modeBtn.innerHTML = '☀️';
-            localStorage.setItem('semo_theme', 'light');
-        } else {
-            modeBtn.innerHTML = '🌙';
-            localStorage.setItem('semo_theme', 'dark');
-        }
+        document.body.classList.toggle('light-mode');
+        const btn = document.getElementById('modeToggle');
+        btn.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
+        localStorage.setItem('semo_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     }
-
-    // ==================== LOAD SAVED THEME ====================
     function loadTheme() {
-        const savedTheme = localStorage.getItem('semo_theme');
-        const modeBtn = document.getElementById('modeToggle');
-        
-        if (savedTheme === 'light') {
+        if (localStorage.getItem('semo_theme') === 'light') {
             document.body.classList.add('light-mode');
-            if (modeBtn) modeBtn.innerHTML = '☀️';
-        } else {
-            document.body.classList.remove('light-mode');
-            if (modeBtn) modeBtn.innerHTML = '🌙';
+            document.getElementById('modeToggle').textContent = '☀️';
         }
     }
-
-    // ==================== CHECK EXISTING SESSION ====================
-    function checkExistingSession() {
-        const savedUser = localStorage.getItem('semo_user');
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                if (user && user.email && user.isActive !== false) {
-                    showNotification('✅ مرحباً بعودتك! جاري التحويل...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 500);
-                }
-            } catch (e) {
-                localStorage.removeItem('semo_user');
-            }
-        }
+    function checkSession() {
+        const user = localStorage.getItem('semo_user');
+        if (user) { try { if (JSON.parse(user).email) window.location.href = 'dashboard.html'; } catch(e) {} }
     }
-
-    // ==================== KEYBOARD SHORTCUT (ENTER KEY) ====================
-    function setupKeyboardShortcut() {
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const email = document.getElementById('loginEmail').value.trim();
-                const password = document.getElementById('loginPassword').value.trim();
-                
-                if (email || password) {
-                    manualLogin();
-                } else {
-                    directLogin();
-                }
-            }
-        });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualLogin(); });
+    window.addEventListener('DOMContentLoaded', () => { loadTheme(); checkSession(); });
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW not registered', err));
     }
-
-    // ==================== SERVICE WORKER FOR OFFLINE SUPPORT ====================
-    function registerServiceWorker() {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                console.log('✅ Service Worker registered successfully:', registration.scope);
-            }).catch(function(error) {
-                console.log('❌ Service Worker registration failed:', error);
-            });
-        }
-    }
-
-    // ==================== INITIALIZE ====================
-    window.addEventListener('DOMContentLoaded', function() {
-        loadTheme();
-        checkExistingSession();
-        setupKeyboardShortcut();
-        registerServiceWorker();
-    });
 </script>
-
-<!-- ==================== SIMPLE SERVICE WORKER FOR OFFLINE (create sw.js file) ==================== -->
-<script>
-    // هذ الكود للتوثيق فقط – الملف sw.js يحتاج إلى إنشاء منفصل
-    console.log('📱 للتشغيل بدون إنترنت، قم بإنشاء ملف sw.js في نفس المجلد بالمحتوى أدناه');
-</script>
-
 </body>
 </html>
