@@ -2,241 +2,105 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SEMO ERP | نظام إدارة المؤسسات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الأعمال | دخول</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --dark: #0f172a;
-            --dark-card: #1e293b;
-            --dark-border: #334155;
-            --light-card: #ffffff;
-            --light-border: #e2e8f0;
-            --text-dark: #f8fafc;
-            --text-light: #1e293b;
-            --muted-dark: #94a3b8;
-            --muted-light: #64748b;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', Tahoma, sans-serif; }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: all 0.3s ease;
         }
-        body.light-mode {
-            background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
-        }
-        body.light-mode .login-card {
-            background: var(--light-card);
-            border: 1px solid var(--light-border);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        body.light-mode .input-group input,
-        body.light-mode .demo-box {
-            background: #f8fafc;
-            border-color: var(--light-border);
-            color: var(--text-light);
-        }
-        body.light-mode .demo-box {
-            background: rgba(245,158,11,0.08);
-        }
-        body.light-mode .demo-box p { color: #d97706; }
-        body.light-mode .demo-box span { color: var(--muted-light); }
-        body.light-mode .divider { color: var(--muted-light); }
-        body.light-mode .divider::before,
-        body.light-mode .divider::after { background: var(--light-border); }
         .login-card {
-            background: var(--dark-card);
-            padding: 45px 35px;
-            border-radius: 32px;
+            background: white;
+            border-radius: 30px;
+            padding: 40px 35px;
             width: 100%;
-            max-width: 460px;
+            max-width: 450px;
             text-align: center;
-            border: 1px solid var(--dark-border);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            position: relative;
-            animation: fadeInUp 0.5s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .logo {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 36px; font-weight: bold; color: white;
-            box-shadow: 0 10px 25px -5px rgba(59,130,246,0.4);
-        }
-        h1 { color: var(--primary); font-size: 28px; margin-bottom: 8px; }
-        .subtitle { color: var(--muted-dark); font-size: 14px; margin-bottom: 25px; }
-        .mode-toggle {
-            position: absolute; top: 20px; left: 20px;
-            background: none; border: none;
-            color: var(--muted-dark); font-size: 22px; cursor: pointer;
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .mode-toggle:hover { background: rgba(255,255,255,0.1); color: var(--primary); }
+        .login-card h1 { color: #1e3c72; margin-bottom: 10px; }
+        .login-card p { color: #6c757d; margin-bottom: 30px; }
         .demo-box {
-            background: rgba(245,158,11,0.12);
-            border: 1px solid var(--warning);
-            border-radius: 20px;
-            padding: 18px;
-            margin: 25px 0 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
             text-align: right;
         }
-        .demo-box p { color: var(--warning); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .demo-box span { color: var(--muted-dark); font-size: 13px; display: flex; align-items: center; gap: 8px; padding: 6px 0; font-family: monospace; }
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 60px;
-            font-weight: 700; font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-top: 12px;
+        .demo-box p { font-weight: bold; color: #ffc107; margin-bottom: 8px; }
+        .demo-box span { display: block; font-size: 13px; color: #495057; margin: 5px 0; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ced4da;
+            border-radius: 40px;
+            font-size: 15px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 16px;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
-        .btn-demo {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-            color: white;
-            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
-        }
-        .btn-demo:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,158,11,0.4); }
-        .input-group { margin-bottom: 18px; }
-        .input-group input {
-            width: 100%; padding: 14px 18px; border-radius: 60px;
-            border: 1px solid var(--dark-border);
-            background: var(--dark);
-            color: var(--text-dark);
-            font-size: 15px; outline: none;
-        }
-        .input-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-        .divider {
-            display: flex; align-items: center; text-align: center;
-            margin: 20px 0; color: var(--muted-dark); font-size: 13px;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; height: 1px; background: var(--dark-border);
-        }
-        .divider::before { margin-left: 15px; }
-        .divider::after { margin-right: 15px; }
-        .shortcut-tip {
-            margin-top: 20px; font-size: 12px; color: var(--muted-dark);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .notification {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 12px 24px; border-radius: 60px; z-index: 1000;
-            font-weight: 600; font-size: 14px;
-            animation: slideDown 0.3s ease;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        .notification.success { background: var(--success); color: white; }
-        .notification.error { background: var(--danger); color: white; }
-        @media (max-width: 480px) {
-            .login-card { padding: 35px 25px; }
-            .logo { width: 65px; height: 65px; font-size: 28px; }
-            h1 { font-size: 24px; }
-            .btn { padding: 12px; font-size: 14px; }
-        }
+        .btn-primary { background: #ffc107; color: #1e3c72; margin-top: 10px; }
+        .btn-primary:hover { background: #ffca2c; transform: translateY(-2px); }
+        .btn-demo { background: #28a745; color: white; margin-bottom: 15px; }
+        .btn-demo:hover { background: #218838; transform: translateY(-2px); }
+        .divider { margin: 20px 0; color: #adb5bd; position: relative; }
+        .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 45%; height: 1px; background: #dee2e6; }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        .shortcut { font-size: 12px; color: #6c757d; margin-top: 15px; }
     </style>
 </head>
 <body>
 <div class="login-card">
-    <button class="mode-toggle" onclick="toggleMode()" id="modeToggle">🌙</button>
-    <div class="logo">S</div>
-    <h1>SEMO ERP</h1>
-    <p class="subtitle">نظام متكامل لإدارة المؤسسات</p>
+    <h1>📊 نظام إدارة الأعمال</h1>
+    <p>متكامل – مخزون، مبيعات، مشتريات، عملاء، موردين، حسابات</p>
     <div class="demo-box">
         <p>🚀 حسابات تجريبية جاهزة</p>
-        <span>📧 admin@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👑 مدير</span>
-        <span>📧 user@semo.com &nbsp;|&nbsp; 🔑 123456 &nbsp;|&nbsp; 👤 مستخدم</span>
+        <span>📧 admin@system.com | 🔑 123456 (مدير)</span>
+        <span>📧 user@system.com | 🔑 123456 (مستخدم)</span>
     </div>
-    <button class="btn btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب تجريبي</button>
+    <button class="btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب تجريبي</button>
     <div class="divider">أو</div>
-    <div class="input-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email"></div>
-    <div class="input-group"><input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password"></div>
-    <button class="btn btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
-    <div class="shortcut-tip"><span>⏎</span><span>اضغط Enter للتسجيل السريع</span></div>
+    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    <button class="btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
+    <div class="shortcut">⏎ اضغط Enter للتسجيل السريع</div>
 </div>
 <script>
     const DEMO_ACCOUNTS = {
-        admin: { uid: "demo-admin-001", email: "admin@semo.com", password: "123456", role: "admin", name: "مدير النظام", companyName: "SEMO ERP", isActive: true },
-        user: { uid: "demo-user-001", email: "user@semo.com", password: "123456", role: "user", name: "مستخدم عادي", companyName: "SEMO ERP", isActive: true }
+        admin: { email: "admin@system.com", password: "123456", name: "مدير النظام", role: "admin" },
+        user:  { email: "user@system.com",  password: "123456", name: "مستخدم عادي", role: "user" }
     };
-    let activeNotification = null;
-    function showNotification(message, type = 'success') {
-        if (activeNotification) activeNotification.remove();
-        const n = document.createElement('div');
-        n.className = `notification ${type}`;
-        n.textContent = message;
-        document.body.appendChild(n);
-        activeNotification = n;
-        setTimeout(() => { if (n) { n.style.opacity = '0'; setTimeout(() => n.remove(), 300); if (activeNotification === n) activeNotification = null; } }, 3000);
-    }
     function directLogin() {
         localStorage.setItem('semo_user', JSON.stringify(DEMO_ACCOUNTS.admin));
-        showNotification('✅ مرحباً بك! جاري التحويل...', 'success');
-        setTimeout(() => window.location.href = 'dashboard.html', 800);
+        window.location.href = 'dashboard.html';
     }
     function manualLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
-        if (!email || !password) { showNotification('⚠️ الرجاء إدخال البريد وكلمة المرور', 'error'); return; }
-        let found = null;
-        for (let k in DEMO_ACCOUNTS) {
-            if (DEMO_ACCOUNTS[k].email === email && DEMO_ACCOUNTS[k].password === password) found = DEMO_ACCOUNTS[k];
-        }
+        const found = Object.values(DEMO_ACCOUNTS).find(acc => acc.email === email && acc.password === password);
         if (found) {
             localStorage.setItem('semo_user', JSON.stringify(found));
-            showNotification(`✅ مرحباً ${found.name}! جاري التحويل...`, 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 800);
+            window.location.href = 'dashboard.html';
         } else {
-            showNotification('❌ البريد أو كلمة المرور غير صحيحة', 'error');
+            alert('❌ البريد أو كلمة المرور غير صحيحة');
         }
-    }
-    function toggleMode() {
-        document.body.classList.toggle('light-mode');
-        const btn = document.getElementById('modeToggle');
-        btn.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
-        localStorage.setItem('semo_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
-    function loadTheme() {
-        if (localStorage.getItem('semo_theme') === 'light') {
-            document.body.classList.add('light-mode');
-            document.getElementById('modeToggle').textContent = '☀️';
-        }
-    }
-    function checkSession() {
-        const user = localStorage.getItem('semo_user');
-        if (user) { try { if (JSON.parse(user).email) window.location.href = 'dashboard.html'; } catch(e) {} }
     }
     document.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualLogin(); });
-    window.addEventListener('DOMContentLoaded', () => { loadTheme(); checkSession(); });
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW not registered', err));
-    }
+    if (localStorage.getItem('semo_user')) window.location.href = 'dashboard.html';
 </script>
 </body>
 </html>
