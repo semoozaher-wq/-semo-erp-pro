@@ -31,6 +31,7 @@ function notify(msg, type='success') {
 function autoRepairData() {
     if (localStorage.getItem('bms_migration_done') === 'true') return;
     let fixes = { inventory:0, clients:0, suppliers:0, sales:0, purchases:0, expenses:0, revenues:0 };
+    
     db.inventory = (db.inventory || []).map(item => {
         let changed = false;
         if (item.minQty === undefined) { item.minQty = 5; changed=true; }
@@ -41,6 +42,7 @@ function autoRepairData() {
         if (changed) fixes.inventory++;
         return item;
     });
+    
     db.clients = (db.clients || []).map(c => {
         let changed = false;
         if (c.totalPurchases === undefined) { c.totalPurchases = 0; changed=true; }
@@ -52,6 +54,7 @@ function autoRepairData() {
         if (changed) fixes.clients++;
         return c;
     });
+    
     db.suppliers = (db.suppliers || []).map(s => {
         let changed = false;
         if (s.totalPurchases === undefined) { s.totalPurchases = 0; changed=true; }
@@ -64,6 +67,7 @@ function autoRepairData() {
         if (changed) fixes.suppliers++;
         return s;
     });
+    
     db.sales = (db.sales || []).map(s => {
         let changed = false;
         if (s.clientName === undefined) { s.clientName = s.client || 'نقدي'; changed=true; }
@@ -74,6 +78,7 @@ function autoRepairData() {
         if (changed) fixes.sales++;
         return s;
     });
+    
     db.purchases = (db.purchases || []).map(p => {
         let changed = false;
         if (p.total === undefined) { p.total = (p.qty||0)*(p.price||0); changed=true; }
@@ -84,6 +89,7 @@ function autoRepairData() {
         if (changed) fixes.purchases++;
         return p;
     });
+    
     db.expenses = (db.expenses || []).map(e => {
         let changed = false;
         if (e.type === undefined) { e.type = 'عام'; changed=true; }
@@ -92,6 +98,7 @@ function autoRepairData() {
         if (changed) fixes.expenses++;
         return e;
     });
+    
     db.revenues = (db.revenues || []).map(r => {
         let changed = false;
         if (r.type === undefined) { r.type = 'عام'; changed=true; }
@@ -100,9 +107,12 @@ function autoRepairData() {
         if (changed) fixes.revenues++;
         return r;
     });
+    
     ['inventory','clients','suppliers','sales','purchases','expenses','revenues','settings'].forEach(k => save(k));
     localStorage.setItem('bms_migration_done', 'true');
-    if (fixes.inventory+fixes.clients+fixes.suppliers+fixes.sales+fixes.purchases+fixes.expenses+fixes.revenues > 0) notify('🛠️ تم إصلاح البيانات تلقائياً', 'info');
+    if (fixes.inventory+fixes.clients+fixes.suppliers+fixes.sales+fixes.purchases+fixes.expenses+fixes.revenues > 0) {
+        notify('🛠️ تم إصلاح البيانات تلقائياً', 'info');
+    }
 }
 
 // ==================== التبويبات والمحتوى الديناميكي ====================
@@ -155,12 +165,12 @@ function generateSection(section) {
     let html = '';
     if(section === 'dashboard') html = `<div class="stats-grid" id="statsGrid"></div><div class="stats-grid" id="chartsGrid" style="grid-template-columns:1fr 1fr;"></div><div id="lowStockAlerts" class="stats-grid"></div>`;
     else if(section === 'inventory') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addInventoryModal')">➕ منتج جديد</button><input type="text" id="searchInventory" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>المنتج</th><th>الفئة</th><th>الكمية</th><th>سعر الشراء</th><th>سعر البيع</th><th>الربح</th><th>الحد الأدنى</th><th>إجراءات</th></tr></thead><tbody id="inventoryTableBody"></tbody></table></div>`;
-    else if(section === 'sales') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addSaleModal')">➕ فاتورة بيع</button><input type="text" id="searchSales" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="salesTableBody"></tbody><tr></div>`;
-    else if(section === 'purchases') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addPurchaseModal')">➕ أمر شراء</button><input type="text" id="searchPurchases" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="purchasesTableBody"></tbody></table></div>`;
-    else if(section === 'clients') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addClientModal')">➕ عميل جديد</button><input type="text" id="searchClients" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>إجمالي المشتريات</th><th>الديون</th><th>إجراءات</th></tr></thead><tbody id="clientsTableBody"></tbody><table></div>`;
-    else if(section === 'suppliers') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addSupplierModal')">➕ مورد جديد</button><input type="text" id="searchSuppliers" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>المنتج</th><th>إجمالي المشتريات</th><th>إجراءات</th></tr></thead><tbody id="suppliersTableBody"></tbody></table></div>`;
+    else if(section === 'sales') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addSaleModal')">➕ فاتورة بيع</button><input type="text" id="searchSales" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="salesTableBody"></tbody></table></div>`;
+    else if(section === 'purchases') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addPurchaseModal')">➕ أمر شراء</button><input type="text" id="searchPurchases" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="purchasesTableBody"></tbody></table></div>`;
+    else if(section === 'clients') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addClientModal')">➕ عميل جديد</button><input type="text" id="searchClients" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>إجمالي المشتريات</th><th>الديون</th><th>إجراءات</th></tr></thead><tbody id="clientsTableBody"></tbody></table></div>`;
+    else if(section === 'suppliers') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addSupplierModal')">➕ مورد جديد</button><input type="text" id="searchSuppliers" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>المنتج</th><th>إجمالي المشتريات</th><th>إجراءات</th></tr></thead><tbody id="suppliersTableBody"></tbody></tr></div>`;
     else if(section === 'expenses') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addExpenseModal')">➕ مصروف جديد</button><input type="text" id="searchExpenses" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>ملاحظات</th><th>إجراءات</th></tr></thead><tbody id="expensesTableBody"></tbody></table></div>`;
-    else if(section === 'revenues') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addRevenueModal')">➕ إيراد جديد</button><input type="text" id="searchRevenues" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>ملاحظات</th><th>إجراءات</th></tr></thead><tbody id="revenuesTableBody"></tbody></table></div>`;
+    else if(section === 'revenues') html = `<div style="margin-bottom:15px"><button class="btn btn-primary" onclick="showModal('addRevenueModal')">➕ إيراد جديد</button><input type="text" id="searchRevenues" placeholder="🔍 بحث..." style="width:200px;margin-right:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>ملاحظات</th><th>إجراءات</th></tr></thead><tbody id="revenuesTableBody"></tbody></table></div>`;
     else if(section === 'reports') html = `<div id="reportContainer"></div>`;
     container.innerHTML += `<div id="section-${section}" class="section">${html}</div>`;
 }
@@ -211,15 +221,12 @@ function renderInventoryTable() {
     if(search) data = data.filter(i=>i.name.toLowerCase().includes(search)); 
     let tbody = document.getElementById('inventoryTableBody'); 
     if(!tbody) return; 
-    tbody.innerHTML = data.map((i,idx)=>`<td>
+    tbody.innerHTML = data.map((i,idx)=>`<tr>
         <td>${idx+1}</td>
         <td>${i.name}</td>
         <td>${i.category||'-'}</td>
         <td>${i.qty}</td>
-        <td>${(i.buyPrice||0).toLocaleString()} ج</td>
-        <td>${(i.sellPrice||0).toLocaleString()} ج</td>
-        <td>${(((i.sellPrice||0)-(i.buyPrice||0))*i.qty).toLocaleString()} ج</td>
-        <td>${i.minQty||5}</td>
+        <td>${(i.buyPrice||0).toLocaleString()} ج</td><td>${(i.sellPrice||0).toLocaleString()} ج</td><td>${(((i.sellPrice||0)-(i.buyPrice||0))*i.qty).toLocaleString()} ج</td><td>${i.minQty||5}</td>
         <td><button class="btn btn-sm btn-warning" onclick="editInventory(${i.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteInventory(${i.id})">🗑️</button></td>
      `).join(''); 
 }
@@ -250,22 +257,17 @@ function deleteInventory(id){ if(confirm('حذف المنتج؟')){ db.inventory
 
 // ==================== المبيعات ====================
 function renderSalesTable(){ let data=db.sales||[]; let tbody=document.getElementById('salesTableBody'); if(!tbody)return; tbody.innerHTML=data.map((s,idx)=>`<tr>
-    <td>${idx+1}</td>
-    <td>${s.date}</td>
-    <td>${s.clientName}</td>
-    <td>${(s.total||0).toLocaleString()} ج</td>
-    <td>${(s.paid||0).toLocaleString()} ج</td>
-    <td>${((s.total||0)-(s.paid||0)).toLocaleString()} ج</td>
+    <td>${idx+1}</td><td>${s.date}</td><td>${s.clientName}</td><td>${(s.total||0).toLocaleString()} ج</td><td>${(s.paid||0).toLocaleString()} ج</td><td>${((s.total||0)-(s.paid||0)).toLocaleString()} ج</td>
     <td><span style="background:${s.status==='مدفوع'?'#28a745':s.status==='جزئي'?'#fd7e14':'#dc3545'};color:white;padding:2px 8px;border-radius:20px">${s.status}</span></td>
     <td><button class="btn btn-sm btn-info" onclick="viewSale(${s.id})">🧾</button> <button class="btn btn-sm btn-warning" onclick="editSale(${s.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteSale(${s.id})">🗑️</button></td>
-     `).join(''); }
+    </tr>`).join(''); }
 function addSale(){ let client=document.getElementById('saleClient').value, total=parseFloat(document.getElementById('saleTotal').value), paid=parseFloat(document.getElementById('salePaid').value)||0, date=document.getElementById('saleDate').value||today(); if(!client||isNaN(total)){ notify('املأ الحقول','danger'); return; } let status=paid>=total?'مدفوع':paid>0?'جزئي':'آجل'; db.sales.push({id:Date.now(), clientName:client, total, paid, status, date}); save('sales'); renderSalesTable(); updateDashboard(); closeModal('addSaleModal'); notify('تمت الإضافة'); }
 function viewSale(id){ let s=db.sales.find(s=>s.id===id); if(!s)return; notify(`فاتورة: ${s.clientName} - ${s.total} ج - تاريخ ${s.date}`,'info'); }
 function editSale(id){ alert('تعديل المبيعات قيد التطوير'); }
 function deleteSale(id){ if(confirm('حذف البيع؟')){ db.sales=db.sales.filter(s=>s.id!==id); save('sales'); renderSalesTable(); updateDashboard(); notify('تم الحذف','danger'); } }
 
 // ==================== المشتريات ====================
-function renderPurchasesTable(){ let data=db.purchases||[]; let tbody=document.getElementById('purchasesTableBody'); if(!tbody)return; tbody.innerHTML=data.map((p,idx)=>`<tr>
+function renderPurchasesTable(){ let data=db.purchases||[]; let tbody=document.getElementById('purchasesTableBody'); if(!tbody)return; tbody.innerHTML=data.map((p,idx)=>`</td>
     <td>${idx+1}</td>
     <td>${p.date}</td>
     <td>${p.supplier}</td>
@@ -275,34 +277,24 @@ function renderPurchasesTable(){ let data=db.purchases||[]; let tbody=document.g
     <td>${p.total}</td>
     <td>${p.status}</td>
     <td><button class="btn btn-sm btn-danger" onclick="deletePurchase(${p.id})">🗑️</button></td>
-     `).join(''); }
+    </tr>`).join(''); }
 function addPurchase(){ let supplier=document.getElementById('purchaseSupplier').value, product=document.getElementById('purchaseProduct').value, qty=parseInt(document.getElementById('purchaseQty').value), price=parseFloat(document.getElementById('purchasePrice').value), date=document.getElementById('purchaseDate').value||today(); if(!supplier||!product||isNaN(qty)||isNaN(price)){ notify('املأ الحقول','danger'); return; } let total=qty*price; db.purchases.push({id:Date.now(), supplier,product,qty,price,total,status:'مدفوع',date}); save('purchases'); renderPurchasesTable(); updateDashboard(); closeModal('addPurchaseModal'); notify('تمت الإضافة'); }
 function deletePurchase(id){ if(confirm('حذف الشراء؟')){ db.purchases=db.purchases.filter(p=>p.id!==id); save('purchases'); renderPurchasesTable(); updateDashboard(); notify('تم الحذف','danger'); } }
 
 // ==================== العملاء ====================
 function renderClientsTable(){ let data=db.clients||[]; let tbody=document.getElementById('clientsTableBody'); if(!tbody)return; tbody.innerHTML=data.map((c,idx)=>`<tr>
-    <td>${idx+1}</td>
-    <td>${c.name}</td>
-    <td>${c.phone||'-'}</td>
-    <td>${c.email||'-'}</td>
-    <td>${(c.totalPurchases||0).toLocaleString()} ج</td>
-    <td>${(c.debt||0).toLocaleString()} ج</td>
+    <td>${idx+1}</td><td>${c.name}</td><td>${c.phone||'-'}</td><td>${c.email||'-'}</td><td>${(c.totalPurchases||0).toLocaleString()} ج</td><td>${(c.debt||0).toLocaleString()} ج</td>
     <td><button class="btn btn-sm btn-warning" onclick="editClient(${c.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteClient(${c.id})">🗑️</button></td>
-     `).join(''); }
+    </tr>`).join(''); }
 function addClient(){ let name=document.getElementById('clientName').value; if(!name){ notify('أدخل اسم العميل','danger'); return; } db.clients.push({id:Date.now(), name, phone:'', email:'', totalPurchases:0, debt:0}); save('clients'); renderClientsTable(); updateDashboard(); closeModal('addClientModal'); notify('تمت الإضافة'); }
 function editClient(id){ alert('تعديل العميل قيد التطوير'); }
 function deleteClient(id){ if(confirm('حذف العميل؟')){ db.clients=db.clients.filter(c=>c.id!==id); save('clients'); renderClientsTable(); updateDashboard(); notify('تم الحذف','danger'); } }
 
 // ==================== الموردين ====================
 function renderSuppliersTable(){ let data=db.suppliers||[]; let tbody=document.getElementById('suppliersTableBody'); if(!tbody)return; tbody.innerHTML=data.map((s,idx)=>`<tr>
-    <td>${idx+1}</td>
-    <td>${s.name}</td>
-    <td>${s.phone||'-'}</td>
-    <td>${s.email||'-'}</td>
-    <td>${s.product||'-'}</td>
-    <td>${(s.totalPurchases||0).toLocaleString()} ج</td>
+    <td>${idx+1}</td><td>${s.name}</td><td>${s.phone||'-'}</td><td>${s.email||'-'}</td><td>${s.product||'-'}</td><td>${(s.totalPurchases||0).toLocaleString()} ج</td>
     <td><button class="btn btn-sm btn-warning" onclick="editSupplier(${s.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteSupplier(${s.id})">🗑️</button></td>
-     `).join(''); }
+    <tr>`).join(''); }
 function addSupplier(){ let name=document.getElementById('supplierName').value; if(!name){ notify('أدخل اسم المورد','danger'); return; } db.suppliers.push({id:Date.now(), name, phone:'', email:'', product:'', totalPurchases:0}); save('suppliers'); renderSuppliersTable(); updateDashboard(); closeModal('addSupplierModal'); notify('تمت الإضافة'); }
 function editSupplier(id){ alert('تعديل المورد قيد التطوير'); }
 function deleteSupplier(id){ if(confirm('حذف المورد؟')){ db.suppliers=db.suppliers.filter(s=>s.id!==id); save('suppliers'); renderSuppliersTable(); updateDashboard(); notify('تم الحذف','danger'); } }
@@ -312,13 +304,14 @@ function renderExpensesTable(){ let data=db.expenses||[]; let tbody=document.get
     <td>${idx+1}</td>
     <td>${e.date}</td>
     <td>${e.type}</td>
-    </table>
+    <td>${e.amount}</td>
+    <td>${e.note||'-'}</td>
     <td><button class="btn btn-sm btn-danger" onclick="deleteExpense(${e.id})">🗑️</button></td>
     </tr>`).join(''); }
 function addExpense(){ let type=document.getElementById('expenseType').value, amount=parseFloat(document.getElementById('expenseAmount').value), date=document.getElementById('expenseDate').value||today(); if(!type||isNaN(amount)){ notify('املأ الحقول','danger'); return; } db.expenses.push({id:Date.now(), type, amount, date}); save('expenses'); renderExpensesTable(); updateDashboard(); closeModal('addExpenseModal'); notify('تمت الإضافة'); }
 function deleteExpense(id){ if(confirm('حذف المصروف؟')){ db.expenses=db.expenses.filter(e=>e.id!==id); save('expenses'); renderExpensesTable(); updateDashboard(); notify('تم الحذف','danger'); } }
 
-function renderRevenuesTable(){ let data=db.revenues||[]; let tbody=document.getElementById('revenuesTableBody'); if(!tbody)return; tbody.innerHTML=data.map((r,idx)=>`<tr>
+function renderRevenuesTable(){ let data=db.revenues||[]; let tbody=document.getElementById('revenuesTableBody'); if(!tbody)return; tbody.innerHTML=data.map((r,idx)=>`</td>
     <td>${idx+1}</td>
     <td>${r.date}</td>
     <td>${r.type}</td>
@@ -370,4 +363,4 @@ function initApp() {
     document.getElementById('searchSuppliers')?.addEventListener('input', renderSuppliersTable);
     document.getElementById('searchExpenses')?.addEventListener('input', renderExpensesTable);
     document.getElementById('searchRevenues')?.addEventListener('input', renderRevenuesTable);
-  }
+    }
