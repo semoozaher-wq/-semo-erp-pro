@@ -61,52 +61,82 @@
         .divider::before { left: 0; }
         .divider::after { right: 0; }
         .shortcut { font-size: 12px; color: #6c757d; margin-top: 15px; }
+        .error-msg {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 13px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="login-card">
     <h1>📊 نظام إدارة الأعمال</h1>
     <p>متكامل – مخزون، مبيعات، مشتريات، عملاء، موردين، حسابات</p>
+    
     <div class="demo-box">
         <p>🚀 حسابات تجريبية جاهزة</p>
         <span>📧 admin@system.com | 🔑 123456 (مدير)</span>
         <span>📧 user@system.com | 🔑 123456 (مستخدم)</span>
     </div>
-    <button class="btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب تجريبي</button>
+    
+    <button class="btn-demo" id="demoLoginBtn">🚀 دخول سريع – حساب تجريبي</button>
+    
     <div class="divider">أو</div>
+    
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
     <input type="password" id="loginPassword" placeholder="كلمة المرور">
-    <button class="btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
+    <button class="btn-primary" id="manualLoginBtn">🔐 تسجيل الدخول</button>
+    
     <div class="shortcut">⏎ اضغط Enter للتسجيل السريع</div>
+    <div id="errorMsg" class="error-msg"></div>
 </div>
 
-<script src="main.js"></script>
 <script>
-    // تسجيل Service Worker للتشغيل بدون إنترنت
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered', reg)).catch(err => console.log('SW failed', err));
-    }
-    // دوال تسجيل الدخول
     const DEMO_ACCOUNTS = {
         admin: { email: "admin@system.com", password: "123456", name: "مدير النظام", role: "admin" },
         user:  { email: "user@system.com",  password: "123456", name: "مستخدم عادي", role: "user" }
     };
+
+    function showError(msg) {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+        setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
+    }
+
     function directLogin() {
         localStorage.setItem('semo_user', JSON.stringify(DEMO_ACCOUNTS.admin));
         window.location.href = 'dashboard.html';
     }
+
     function manualLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
+        
+        if (!email || !password) {
+            showError('⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+            return;
+        }
+        
         const found = Object.values(DEMO_ACCOUNTS).find(acc => acc.email === email && acc.password === password);
+        
         if (found) {
             localStorage.setItem('semo_user', JSON.stringify(found));
             window.location.href = 'dashboard.html';
         } else {
-            alert('❌ البريد أو كلمة المرور غير صحيحة');
+            showError('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة');
         }
     }
+
+    document.getElementById('demoLoginBtn').addEventListener('click', directLogin);
+    document.getElementById('manualLoginBtn').addEventListener('click', manualLogin);
+    
     document.addEventListener('keydown', (e) => { if (e.key === 'Enter') manualLogin(); });
+    
     if (localStorage.getItem('semo_user')) window.location.href = 'dashboard.html';
 </script>
 </body>
