@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SEMO ERP | النسخة الكاملة النهائية</title>
+    <title>SEMO ERP | النسخة النهائية المستقرة</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -82,7 +82,7 @@
 </head>
 <body>
     <div class="login-container" id="loginContainer">
-        <div class="login-card"><div class="logo">S</div><h1>SEMO ERP</h1><p class="sub">النسخة الكاملة النهائية</p>
+        <div class="login-card"><div class="logo">S</div><h1>SEMO ERP</h1><p class="sub">النسخة النهائية المستقرة</p>
         <div class="demo-box"><p>🚀 حسابات تجريبية</p><span>admin@semo.com | 123456</span></div>
         <button class="btn btn-demo" onclick="directLogin()">🚀 دخول سريع</button><div class="divider">أو</div>
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني"><input type="password" id="loginPassword" placeholder="كلمة المرور">
@@ -92,7 +92,7 @@
         <div class="sidebar">
             <div class="sidebar-header"><h2>SEMO ERP</h2></div>
             <div class="user-info"><div class="avatar" id="userAvatar">A</div><div><div id="userName">المدير</div><div style="font-size:12px;color:var(--text-muted)" id="userRole">مدير النظام</div></div></div>
-            <div class="menu-item" data-page="dashboard">🏠 <span>الرئيسية</span></div>
+            <div class="menu-item active" data-page="dashboard">🏠 <span>الرئيسية</span></div>
             <div class="menu-item" data-page="inventory">📦 <span>المخزون</span></div>
             <div class="menu-item" data-page="sales">🛒 <span>المبيعات</span></div>
             <div class="menu-item" data-page="purchases">📥 <span>المشتريات</span></div>
@@ -115,7 +115,8 @@
             <div id="pageContainer"></div>
         </div>
     </div>
-    <!-- Modals -->
+
+    <!-- Modals (الإعدادات والنسخ الاحتياطي والتفاصيل) -->
     <div id="settingsModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>⚙️ الإعدادات المتقدمة</h3><button class="close-modal" onclick="closeModal('settingsModal')">✕</button></div>
     <div style="display:flex;flex-direction:column;gap:12px">
         <button class="btn-sm btn-secondary" onclick="showAutoBackupPanel()">💾 النسخ الاحتياطي التلقائي</button>
@@ -128,8 +129,9 @@
     </div></div></div>
     <div id="detailsModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle">التفاصيل</h3><button class="close-modal" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
     <div id="backupModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>💾 النسخ الاحتياطي التلقائي</h3><button class="close-modal" onclick="closeModal('backupModal')">✕</button></div><div id="backupPanelBody"></div></div></div>
+
     <script>
-        // ----------------------------- البيانات الأساسية -----------------------------
+        // ------------------------------------------------ البيانات الأساسية ------------------------------------------------
         let db = {
             inventory: JSON.parse(localStorage.getItem('semo_inventory')) || [],
             sales: JSON.parse(localStorage.getItem('semo_sales')) || [],
@@ -152,24 +154,32 @@
         setInterval(takeAutoBackup,30000);
         function today(){ return new Date().toLocaleDateString('ar-EG'); }
         function notify(msg,type='success'){ let t=document.createElement('div'); t.className='toast'; t.style.background=type==='success'?'#10b981':type==='danger'?'#ef4444':'#f59e0b'; t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
-        // ----------------------------- تسجيل الدخول -----------------------------
+
+        // ------------------------------------------------ تسجيل الدخول ------------------------------------------------
         const DEMO_ACCOUNTS={admin:{email:"admin@semo.com",password:"123456",name:"مدير النظام",role:"admin"}};
         function directLogin(){ localStorage.setItem('semo_user',JSON.stringify(DEMO_ACCOUNTS.admin)); document.getElementById('loginContainer').style.display='none'; document.getElementById('appContainer').classList.add('active'); document.getElementById('userName').innerText=DEMO_ACCOUNTS.admin.name; document.getElementById('userAvatar').innerText=DEMO_ACCOUNTS.admin.name.charAt(0); document.getElementById('userRole').innerText='مدير النظام'; renderPage('dashboard'); }
         function manualLogin(){ let e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value.trim(); if(e===DEMO_ACCOUNTS.admin.email && p===DEMO_ACCOUNTS.admin.password) directLogin(); else alert('بيانات الدخول غير صحيحة'); }
         document.addEventListener('keydown',(e)=>{ if(e.key==='Enter' && document.getElementById('loginContainer').style.display!=='none') directLogin(); });
         if(localStorage.getItem('semo_user')) directLogin();
-        // ----------------------------- UI تبديل الوضع -----------------------------
+
+        // ------------------------------------------------ واجهة المستخدم ------------------------------------------------
         function toggleTheme(){ document.body.classList.toggle('light-mode'); document.querySelector('.mode-toggle').textContent=document.body.classList.contains('light-mode')?'☀️ النهاري':'🌙 الليلي'; }
         function toggleMobileView(){ document.body.classList.toggle('mobile'); document.querySelector('.view-toggle').textContent=document.body.classList.contains('mobile')?'🖥️ كمبيوتر':'📱 موبايل'; }
-        // ----------------------------- التبويبات -----------------------------
+
+        // ------------------------------------------------ قلب النظام (التبويبات) ------------------------------------------------
         let currentPage = 'dashboard';
         function renderPage(page) {
             currentPage = page;
+            // تحديث الـ Active Menu
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            let activeItem = document.querySelector(`.menu-item[data-page="${page}"]`);
-            if (activeItem) activeItem.classList.add('active');
+            let activeMenuItem = document.querySelector(`.menu-item[data-page="${page}"]`);
+            if(activeMenuItem) activeMenuItem.classList.add('active');
+            
+            // تغيير العنوان العلوي
             const titles = { dashboard:'🏠 الرئيسية', inventory:'📦 المخزون', sales:'🛒 المبيعات', purchases:'📥 المشتريات', clients:'👥 العملاء', suppliers:'🏭 الموردين', expenses:'💸 المصروفات', revenues:'💰 الإيرادات', reports:'📊 التقارير' };
             document.getElementById('pageTitle').innerHTML = titles[page];
+            
+            // استدعاء دالة عرض الصفحة المطلوبة
             if(page === 'dashboard') renderDashboard();
             else if(page === 'inventory') renderInventory();
             else if(page === 'sales') renderSales();
@@ -180,14 +190,23 @@
             else if(page === 'revenues') renderRevenues();
             else if(page === 'reports') renderReports();
         }
-        // ربط أحداث التبويبات
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.getAttribute('data-page');
-                if(page) renderPage(page);
+
+        // ربط جميع أزرار القائمة الجانبية (التبويبات)
+        function bindMenuEvents() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const pageName = item.getAttribute('data-page');
+                if(pageName) {
+                    // إزالة أي حدث قديم مرتبط
+                    item.removeEventListener('click', item._listener);
+                    // إضافة الحدث الجديد
+                    const listener = () => renderPage(pageName);
+                    item.addEventListener('click', listener);
+                    item._listener = listener;
+                }
             });
-        });
-        // ----------------------------- عرض الصفحات -----------------------------
+        }
+
+        // ------------------------------------------------ وظائف العرض لكل صفحة ------------------------------------------------
         function renderDashboard(){
             let totalSales=db.sales.reduce((s,i)=>s+(i.total||0),0), totalPurchases=db.purchases.reduce((s,i)=>s+(i.total||0),0), totalExpenses=db.expenses.reduce((s,i)=>s+(i.amount||0),0), totalRevenues=db.revenues.reduce((s,i)=>s+(i.amount||0),0), profit=totalSales-totalPurchases-totalExpenses+totalRevenues;
             let html=`<div class="stats-grid">
@@ -199,59 +218,60 @@
                 <div class="stat-card" onclick="renderPage('inventory')"><div class="icon">📦</div><div class="value">${db.inventory.length}</div><div class="label">المنتجات</div></div>
                 <div class="stat-card" onclick="renderPage('clients')"><div class="icon">👥</div><div class="value">${db.clients.length}</div><div class="label">العملاء</div></div>
             </div>
-            <div class="card-box"><div class="card-header">📋 آخر الفواتير</div><div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${db.sales.slice(0,5).map(s=>`<tr><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td></tr>`).join('')}</tbody></table></div></div>`;
+            <div class="card-box"><div class="card-header">📋 آخر الفواتير</div><div class="table-wrapper"><tr><thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${db.sales.slice(0,5).map(s=>`<tr><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td></tr>`).join('')}</tbody></table></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderInventory(){
-            let html=`<div class="card-box"><div class="card-header"><span>📦 المنتجات</span><button class="btn-success btn-sm" onclick="showAddInventory()">➕ منتج جديد</button></div><div class="table-wrapper"></tr><thead><tr><th>#</th><th>المنتج</th><th>الفئة</th><th>الكمية</th><th>السعر</th><th>إجراءات</th></tr></thead><tbody>${db.inventory.map((i,idx)=>`<tr><td>${idx+1}</td><td>${i.name}</td><td>${i.category||'-'}</td><td>${i.qty}</td><td>${i.price} ج</td><td><button class="btn-warning btn-sm" onclick="editInventory(${i.id})">✏️</button> <button class="btn-danger btn-sm" onclick="deleteInventory(${i.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>📦 المنتجات</span><button class="btn-success btn-sm" onclick="showAddInventory()">➕ منتج جديد</button></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>المنتج</th><th>الفئة</th><th>الكمية</th><th>السعر</th><th>إجراءات</th></tr></thead><tbody>${db.inventory.map((i,idx)=>`<tr><td>${idx+1}</td><td>${i.name}</td><td>${i.category||'-'}</td><td>${i.qty}</td><td>${i.price} ج</td><td><button class="btn-warning btn-sm" onclick="editInventory(${i.id})">✏️</button> <button class="btn-danger btn-sm" onclick="deleteInventory(${i.id})">🗑️</button></td></tr>`).join('')}</tbody></td></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderSales(){
-            let html=`<div class="card-box"><div class="card-header"><span>🛒 المبيعات</span><button class="btn-success btn-sm" onclick="showAddSale()">➕ فاتورة جديدة</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>${db.sales.map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.date}</td><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td><button class="btn-danger btn-sm" onclick="deleteSale(${s.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>🛒 المبيعات</span><button class="btn-success btn-sm" onclick="showAddSale()">➕ فاتورة جديدة</button></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>${db.sales.map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.date}</td><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td><button class="btn-danger btn-sm" onclick="deleteSale(${s.id})">🗑️</button></td></tr>`).join('')}</tbody><tr></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderPurchases(){
-            let html=`<div class="card-box"><div class="card-header"><span>📥 المشتريات</span><button class="btn-success btn-sm" onclick="showAddPurchase()">➕ أمر شراء</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>إجراءات</th></tr></thead><tbody>${db.purchases.map((p,idx)=>`<tr><td>${idx+1}</td><td>${p.date}</td><td class="clickable" onclick="showSupplierPurchases('${p.supplier}')">${p.supplier}</td><td>${p.product}</td><td>${p.qty}</td><td>${p.price} ج</td><td>${p.total} ج</td><td><button class="btn-danger btn-sm" onclick="deletePurchase(${p.id})">🗑️</button></td></tr>`).join('')}</tbody></td></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>📥 المشتريات</span><button class="btn-success btn-sm" onclick="showAddPurchase()">➕ أمر شراء</button></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>إجراءات</th></tr></thead><tbody>${db.purchases.map((p,idx)=>`<tr><td>${idx+1}</td><td>${p.date}</td><td class="clickable" onclick="showSupplierPurchases('${p.supplier}')">${p.supplier}</td><td>${p.product}</td><td>${p.qty}</td><td>${p.price} ج</td><td>${p.total} ج</td><td><button class="btn-danger btn-sm" onclick="deletePurchase(${p.id})">🗑️</button></td></td>`).join('')}</tbody><tr></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderClients(){
-            let html=`<div class="card-box"><div class="card-header"><span>👥 العملاء</span><button class="btn-success btn-sm" onclick="showAddClient()">➕ عميل جديد</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي المشتريات</th><th>الدين</th><th>إجراءات</th></tr></thead><tbody>${db.clients.map((c,idx)=>`<tr><td>${idx+1}</td><td class="clickable" onclick="showClientInvoices('${c.name}')">${c.name}</td><td>${c.phone||'-'}</td><td>${(c.totalPurchases||0).toLocaleString()} ج</td><td style="color:${(c.debt||0)>0?'#ef4444':'#10b981'}">${(c.debt||0).toLocaleString()} ج</td><td><button class="btn-danger btn-sm" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>👥 العملاء</span><button class="btn-success btn-sm" onclick="showAddClient()">➕ عميل جديد</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي المشتريات</th><th>الدين</th><th>إجراءات</th></tr></thead><tbody>${db.clients.map((c,idx)=>`<tr><td class="clickable" onclick="showClientInvoices('${c.name}')">${c.name}</td><td>${c.phone||'-'}</td><td>${(c.totalPurchases||0).toLocaleString()} ج</td><td style="color:${(c.debt||0)>0?'#ef4444':'#10b981'}">${(c.debt||0).toLocaleString()} ج</td><td><button class="btn-danger btn-sm" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderSuppliers(){
-            let html=`<div class="card-box"><div class="card-header"><span>🏭 الموردين</span><button class="btn-success btn-sm" onclick="showAddSupplier()">➕ مورد جديد</button></div><div class="table-wrapper"></tr><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>المنتج</th><th>إجمالي المشتريات</th><th>إجراءات</th></tr></thead><tbody>${db.suppliers.map((s,idx)=>`<tr><td>${idx+1}</td><td class="clickable" onclick="showSupplierPurchases('${s.name}')">${s.name}</td><td>${s.phone||'-'}</td><td>${s.product||'-'}</td><td>${(s.totalPurchases||0).toLocaleString()} ج</td><td><button class="btn-danger btn-sm" onclick="deleteSupplier(${s.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>🏭 الموردين</span><button class="btn-success btn-sm" onclick="showAddSupplier()">➕ مورد جديد</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>المنتج</th><th>إجمالي المشتريات</th><th>إجراءات</th></tr></thead><tbody>${db.suppliers.map((s,idx)=>`<tr><td class="clickable" onclick="showSupplierPurchases('${s.name}')">${s.name}</td><td>${s.phone||'-'}</td><td>${s.product||'-'}</td><td>${(s.totalPurchases||0).toLocaleString()} ج</td><td><button class="btn-danger btn-sm" onclick="deleteSupplier(${s.id})">🗑️</button></td></tr>`).join('')}</tbody><tr></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderExpenses(){
-            let html=`<div class="card-box"><div class="card-header"><span>💸 المصروفات</span><button class="btn-success btn-sm" onclick="showAddExpense()">➕ مصروف جديد</button></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>إجراءات</th></tr></thead><tbody>${db.expenses.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.date}</td><td>${e.type}</td><td>${e.amount} ج</td><td><button class="btn-danger btn-sm" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>💸 المصروفات</span><button class="btn-success btn-sm" onclick="showAddExpense()">➕ مصروف جديد</button></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>إجراءات</th></tr></thead><tbody>${db.expenses.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.date}</td><td>${e.type}</td><td>${e.amount} ج</td><td><button class="btn-danger btn-sm" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`).join('')}</tbody></td></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderRevenues(){
-            let html=`<div class="card-box"><div class="card-header"><span>💰 الإيرادات</span><button class="btn-success btn-sm" onclick="showAddRevenue()">➕ إيراد جديد</button></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>إجراءات</th></tr></thead><tbody>${db.revenues.map((r,idx)=>`<tr><td>${idx+1}</td><td>${r.date}</td><td>${r.type}</td><td>${r.amount} ج</td><td><button class="btn-danger btn-sm" onclick="deleteRevenue(${r.id})">🗑️</button></td></tr>`).join('')}</tbody></tr></div></div>`;
+            let html=`<div class="card-box"><div class="card-header"><span>💰 الإيرادات</span><button class="btn-success btn-sm" onclick="showAddRevenue()">➕ إيراد جديد</button></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>إجراءات</th></tr></thead><tbody>${db.revenues.map((r,idx)=>`<tr><td>${idx+1}</td><td>${r.date}</td><td>${r.type}</td><td>${r.amount} ج</td><td><button class="btn-danger btn-sm" onclick="deleteRevenue(${r.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
         function renderReports(){
             let totalSales=db.sales.reduce((s,i)=>s+(i.total||0),0), totalPurchases=db.purchases.reduce((s,i)=>s+(i.total||0),0), totalExpenses=db.expenses.reduce((s,i)=>s+(i.amount||0),0), totalRevenues=db.revenues.reduce((s,i)=>s+(i.amount||0),0), profit=totalSales-totalPurchases-totalExpenses+totalRevenues;
             let html=`<div class="stats-grid"><div class="stat-card"><div class="value">${totalSales.toLocaleString()} ج</div><div class="label">المبيعات</div></div><div class="stat-card"><div class="value">${totalPurchases.toLocaleString()} ج</div><div class="label">المشتريات</div></div><div class="stat-card"><div class="value">${totalExpenses.toLocaleString()} ج</div><div class="label">المصروفات</div></div><div class="stat-card"><div class="value">${totalRevenues.toLocaleString()} ج</div><div class="label">الإيرادات</div></div><div class="stat-card"><div class="value" style="color:${profit>=0?'#10b981':'#ef4444'}">${profit.toLocaleString()} ج</div><div class="label">صافي الربح</div></div></div>
-            <div class="card-box"><div class="card-header">📊 تقرير المبيعات</div><div class="table-wrapper"><table><thead><tr><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><tr></thead><tbody>${db.sales.map(s=>`<tr><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td>${s.date}</td></tr>`).join('')}</tbody></tr></div></div>`;
+            <div class="card-box"><div class="card-header">📊 تقرير المبيعات</div><div class="table-wrapper"><td><thead><tr><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>${db.sales.map(s=>`</td><td class="clickable" onclick="showClientInvoices('${s.clientName}')">${s.clientName}</td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td>${s.date}</td></tr>`).join('')}</tbody></table></div></div>`;
             document.getElementById('pageContainer').innerHTML = html;
         }
-        // ----------------------------- التفاصيل -----------------------------
+
+        // ------------------------------------------------ دوال التفاصيل والإعدادات ------------------------------------------------
         function openSettingsModal(){ document.getElementById('settingsModal').classList.add('show'); }
         function closeModal(id){ if(id) document.getElementById(id).classList.remove('show'); else { document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show')); } }
         function showModal(title,body){ document.getElementById('modalTitle').innerHTML=title; document.getElementById('modalBody').innerHTML=body; document.getElementById('detailsModal').classList.add('show'); }
-        function showClientInvoices(name){ let items=db.sales.filter(s=>s.clientName===name); if(!items.length) return showModal(`فواتير ${name}`,'لا توجد فواتير'); showModal(`فواتير ${name}`,`<div class="table-wrapper"><tr><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${items.map(s=>`<td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td>${s.status}</td></tr>`).join('')}</tbody></table></div>`); }
+        function showClientInvoices(name){ let items=db.sales.filter(s=>s.clientName===name); if(!items.length) return showModal(`فواتير ${name}`,'لا توجد فواتير'); showModal(`فواتير ${name}`,`<div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${items.map(s=>`<td><td class="clickable" onclick="showInvoiceDetails('${s.id}')">${s.total} ج</span></td><td>${s.status}</td></tr>`).join('')}</tbody></table></div>`); }
         function showInvoiceDetails(id){ let inv=db.sales.find(s=>s.id==id); if(!inv) return; showModal(`تفاصيل الفاتورة #${inv.id}`,`<p><strong>التاريخ:</strong> ${inv.date}</p><p><strong>العميل:</strong> ${inv.clientName}</p><p><strong>المبلغ:</strong> ${inv.total} ج</p><p><strong>الحالة:</strong> ${inv.status}</p><button class="btn-sm btn-primary" onclick="window.print()">🖨️ طباعة</button>`); }
-        function showSupplierPurchases(name){ let items=db.purchases.filter(p=>p.supplier===name); if(!items.length) return showModal(`مشتريات المورد ${name}`,'لا توجد مشتريات'); showModal(`مشتريات المورد ${name}`,`<div class="table-wrapper"></table><thead><tr><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${items.map(p=>`<tr><td class="clickable" onclick="showInvoiceDetails('${p.id}')">${p.total} ج</span></td><td>${p.product}</td><td>${p.qty}</td><td>${p.price} ج</td><td>${p.total} ج</td></tr>`).join('')}</tbody></table></div>`); }
-        // ----------------------------- النسخ الاحتياطي والمشاركة -----------------------------
-        function showAutoBackupPanel(){ let backups=db.backupSnapshots.slice(0,10); let html=backups.length?`<div class="table-wrapper"><table><thead><tr><th>الوقت</th><th>إجراء</th></tr></thead><tbody>${backups.map((b,i)=>`<tr><td>${new Date(b.timestamp).toLocaleString()}</td><td><button class="btn-sm btn-primary" onclick="restoreFromBackup(${i})">استعادة</button></td></tr>`).join('')}</tbody></table></div>`:'<div style="padding:20px;text-align:center">لا توجد نسخ احتياطية تلقائية بعد</div>'; document.getElementById('backupPanelBody').innerHTML=html; document.getElementById('backupModal').classList.add('show'); }
+        function showSupplierPurchases(name){ let items=db.purchases.filter(p=>p.supplier===name); if(!items.length) return showModal(`مشتريات المورد ${name}`,'لا توجد مشتريات'); showModal(`مشتريات المورد ${name}`,`<div class="table-wrapper"><tr><thead><tr><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${items.map(p=>`<tr><td class="clickable" onclick="showInvoiceDetails('${p.id}')">${p.total} ج</span></td><td>${p.product}</td><td>${p.qty}</td><td>${p.price} ج</td><td>${p.total} ج</td></tr>`).join('')}</tbody></table></div>`); }
+        function showAutoBackupPanel(){ let backups=db.backupSnapshots.slice(0,10); let html=backups.length?`<div class="table-wrapper"></td><thead><tr><th>الوقت</th><th>إجراء</th></tr></thead><tbody>${backups.map((b,i)=>`<tr><td>${new Date(b.timestamp).toLocaleString()}</td><td><button class="btn-sm btn-primary" onclick="restoreFromBackup(${i})">استعادة</button></td></tr>`).join('')}</tbody></table></div>`:'<div style="padding:20px;text-align:center">لا توجد نسخ احتياطية تلقائية بعد</div>'; document.getElementById('backupPanelBody').innerHTML=html; document.getElementById('backupModal').classList.add('show'); }
         function restoreFromBackup(idx){ let snap=db.backupSnapshots[idx]; if(confirm('استعادة البيانات؟ سيتم فقدان التغييرات الحديثة')){ Object.assign(db,JSON.parse(JSON.stringify(snap.data))); saveAll(); notify('✅ تم الاستعادة'); renderPage(currentPage); closeModal('backupModal'); } }
         function exportBackup(){ let data=JSON.stringify(db); let blob=new Blob([data],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`semo_backup_${Date.now()}.json`; a.click(); notify('✅ تم تصدير النسخة'); }
         function importFromDrive(){ let input=document.createElement('input'); input.type='file'; input.accept='.json'; input.onchange=e=>{ let file=e.target.files[0]; let reader=new FileReader(); reader.onload=ev=>{ try{ let data=JSON.parse(ev.target.result); Object.assign(db,data); saveAll(); notify('✅ تم الاستيراد'); renderPage(currentPage); }catch(err){ notify('ملف غير صالح','danger'); } }; reader.readAsText(file); }; input.click(); }
         function shareCurrentReport(){ let totalSales=db.sales.reduce((s,i)=>s+(i.total||0),0); let text=`📊 تقرير SEMO ERP\nالمبيعات: ${totalSales.toLocaleString()} ج\nالعملاء: ${db.clients.length}\nالمنتجات: ${db.inventory.length}`; if(navigator.share){ navigator.share({title:'تقرير SEMO ERP',text:text}).catch(()=>{ prompt('انسخ النص',text); }); } else { prompt('انسخ النص للمشاركة',text); } notify('✅ تم التجهيز للمشاركة'); }
         function exportExcel(){ let wsData=db.sales.map(s=>({التاريخ:s.date,العميل:s.clientName,المبلغ:s.total,الحالة:s.status})); let ws=XLSX.utils.json_to_sheet(wsData); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'المبيعات'); XLSX.writeFile(wb,`semo_mobay3at_${Date.now()}.xlsx`); notify('✅ تم تصدير Excel'); }
         function exportPDF(){ let {jsPDF}=window.jspdf; let doc=new jsPDF({direction:'rtl'}); doc.text('تقرير المبيعات - SEMO ERP',10,10); let rows=db.sales.map(s=>[s.date,s.clientName,`${s.total} ج`,s.status]); doc.autoTable({head:[['التاريخ','العميل','المبلغ','الحالة']],body:rows,startY:20}); doc.save(`semo_report_${Date.now()}.pdf`); notify('✅ تم تصدير PDF'); }
-        // ----------------------------- دوال الإضافة والتعديل والحذف (CRUD) -----------------------------
+
+        // ------------------------------------------------ دوال الإضافة والتعديل والحذف ------------------------------------------------
         function showAddInventory(){ let n=prompt('اسم المنتج'); if(!n)return; let q=parseInt(prompt('الكمية',0)),p=parseFloat(prompt('السعر',0)); if(isNaN(q)||isNaN(p))return; db.inventory.push({id:Date.now(),name:n,qty:q,price:p,category:'عام'}); saveAll(); renderInventory(); notify('✅ تمت الإضافة'); }
         function editInventory(id){ let i=db.inventory.find(i=>i.id===id); if(!i)return; let n=prompt('الاسم الجديد',i.name); if(n)i.name=n; let q=parseInt(prompt('الكمية',i.qty)); if(!isNaN(q))i.qty=q; let p=parseFloat(prompt('السعر',i.price)); if(!isNaN(p))i.price=p; saveAll(); renderInventory(); notify('✅ تم التعديل'); }
         function deleteInventory(id){ if(confirm('حذف المنتج؟')){ db.inventory=db.inventory.filter(i=>i.id!==id); saveAll(); renderInventory(); notify('تم الحذف','danger'); } }
@@ -268,14 +288,9 @@
         function showAddRevenue(){ let t=prompt('نوع الإيراد'); if(!t)return; let a=parseFloat(prompt('المبلغ',0)); if(isNaN(a))return; db.revenues.push({id:Date.now(),type:t,amount:a,date:today()}); saveAll(); renderRevenues(); notify('✅ تمت الإضافة'); }
         function deleteRevenue(id){ if(confirm('حذف الإيراد؟')){ db.revenues=db.revenues.filter(r=>r.id!==id); saveAll(); renderRevenues(); notify('تم الحذف','danger'); } }
         function logout(){ if(confirm('تسجيل الخروج؟')){ localStorage.removeItem('semo_user'); location.reload(); } }
-        // تأكيد ربط التبويبات
-        document.querySelectorAll('.menu-item').forEach(item => {
-            if(!item.getAttribute('data-page')) return;
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                renderPage(item.getAttribute('data-page'));
-            });
-        });
+
+        // تنفيذ ربط الأحداث والتهيئة
+        bindMenuEvents();
         if(document.querySelector('.menu-item[data-page="dashboard"]')) renderPage('dashboard');
     </script>
 </body>
