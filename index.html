@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP V9 | دخول</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SEMO ERP | تسجيل الدخول</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; }
         body {
@@ -72,6 +72,8 @@
             border-radius: 40px;
             z-index: 1000;
             animation: slideDown 0.3s ease;
+            font-size: 14px;
+            font-weight: bold;
         }
         @keyframes slideDown {
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
@@ -95,22 +97,19 @@
         <span>📧 user@system.com | 🔑 123456 (مستخدم)</span>
     </div>
 
-    <button class="btn btn-demo" onclick="demoLogin()">🚀 دخول سريع – حساب تجريبي</button>
+    <button class="btn btn-demo" id="demoLoginBtn">🚀 دخول سريع – حساب تجريبي</button>
 
     <div class="divider">أو</div>
 
-    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-    <input type="password" id="loginPassword" placeholder="كلمة المرور">
-    <button class="btn btn-primary" onclick="login()">🔐 تسجيل الدخول</button>
-    <span class="link" onclick="showSignup()">➡️ إنشاء حساب جديد</span>
-    <a href="#" class="link" onclick="forgotPassword(event)">🔑 نسيت كلمة المرور؟</a>
+    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="off">
+    <button class="btn btn-primary" id="loginBtn">🔐 تسجيل الدخول</button>
+    <span class="link" id="signupBtn">➡️ إنشاء حساب جديد</span>
+    <a href="#" class="link" id="forgotBtn">🔑 نسيت كلمة المرور؟</a>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-<script>
+<script type="module">
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
         authDomain: "my-pos-system-11dee.firebaseapp.com",
@@ -121,108 +120,180 @@
         appId: "1:565195477080:web:1ffa21a34e28b47dddfa2d"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    let activeToast = null;
-    let redirecting = false;
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
+    // DOM Elements
+    const loginBtn = document.getElementById('loginBtn');
+    const demoBtn = document.getElementById('demoLoginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const forgotBtn = document.getElementById('forgotBtn');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+
+    // Helper functions
     function showToast(msg, type = 'success') {
-        if (activeToast) activeToast.remove();
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = msg;
         document.body.appendChild(toast);
-        activeToast = toast;
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function setLoading(loading) {
+        loginBtn.disabled = loading;
+        loginBtn.innerHTML = loading ? '<span class="spinner"></span> جاري...' : '🔐 تسجيل الدخول';
+    }
+
+    // Demo Login (Direct without Firebase)
+    demoBtn.onclick = () => {
+        localStorage.setItem('semo_user', JSON.stringify({
+            uid: 'demo_' + Date.now(),
+            email: 'demo@system.com',
+            name: 'مدير تجريبي',
+            role: 'admin',
+            companyId: null,
+            isActive: true
+        }));
+        showToast('✅ مرحباً بك! جاري التحويل...', 'success');
         setTimeout(() => {
-            if (toast) toast.remove();
-            if (activeToast === toast) activeToast = null;
-        }, 4000);
-    }
+            window.location.href = 'dashboard.html';
+        }, 1000);
+    };
 
-    function setLoading(btnId, loading) {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
-        btn.disabled = loading;
-        btn.innerHTML = loading ? '<span class="spinner"></span> جاري...' : '🔐 تسجيل الدخول';
-    }
+    // Normal Login with Firebase
+    loginBtn.onclick = async () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
 
-    function showSignup() {
-        const email = prompt('📧 أدخل البريد الإلكتروني للحساب الجديد:');
+        if (!email || !password) {
+            showToast('⚠️ أدخل البريد وكلمة المرور', 'error');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            if (!user.emailVerified) {
+                showToast('⚠️ يرجى تفعيل بريدك الإلكتروني أولاً', 'error');
+                await auth.signOut();
+                setLoading(false);
+                return;
+            }
+
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                showToast('❌ لم يتم العثور على بيانات المستخدم', 'error');
+                await auth.signOut();
+                setLoading(false);
+                return;
+            }
+
+            const userData = userDoc.data();
+            if (!userData.isActive) {
+                showToast('❌ تم تعطيل حسابك، تواصل مع المدير', 'error');
+                await auth.signOut();
+                setLoading(false);
+                return;
+            }
+
+            localStorage.setItem('semo_user', JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                name: userData.name,
+                role: userData.role,
+                companyId: userData.companyId
+            }));
+
+            showToast('✅ مرحباً بك! جاري التحويل...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+
+        } catch (error) {
+            console.error(error);
+            let msg = '❌ بيانات الدخول غير صحيحة';
+            if (error.code === 'auth/user-not-found') msg = '❌ المستخدم غير موجود';
+            if (error.code === 'auth/wrong-password') msg = '❌ كلمة المرور خاطئة';
+            if (error.code === 'auth/invalid-email') msg = '❌ البريد الإلكتروني غير صحيح';
+            showToast(msg, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Signup
+    signupBtn.onclick = async () => {
+        const email = prompt('📧 أدخل البريد الإلكتروني:');
         if (!email) return;
         const password = prompt('🔑 أدخل كلمة المرور (6 أحرف على الأقل):');
-        if (!password || password.length < 6) { showToast('⚠️ كلمة المرور 6 أحرف على الأقل', 'error'); return; }
+        if (!password || password.length < 6) {
+            showToast('⚠️ كلمة المرور 6 أحرف على الأقل', 'error');
+            return;
+        }
         const name = prompt('👤 اسم المستخدم:');
         if (!name) return;
-        const role = confirm('👑 هل هذا المستخدم مدير؟ OK لمدير, Cancel لمستخدم عادي') ? 'admin' : 'user';
+        const role = confirm('👑 هل هذا المستخدم مدير؟ OK لمدير, Cancel لمستخدم') ? 'admin' : 'user';
 
-        setLoading('loginBtn', true);
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(async (cred) => {
-                await db.collection('users').doc(cred.user.uid).set({
-                    uid: cred.user.uid,
-                    email: email,
-                    name: name,
-                    role: role,
-                    isActive: true,
-                    companyId: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                await cred.user.sendEmailVerification();
-                showToast('✅ تم إنشاء الحساب! تحقق من بريدك ثم سجل الدخول', 'success');
-            })
-            .catch(err => { showToast('❌ ' + err.message, 'error'); })
-            .finally(() => setLoading('loginBtn', false));
-    }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
 
-    function login() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-        if (!email || !password) { showToast('⚠️ أدخل البريد وكلمة المرور', 'error'); return; }
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                email: email,
+                name: name,
+                role: role,
+                isActive: true,
+                companyId: null,
+                createdAt: new Date().toISOString()
+            });
 
-        setLoading('loginBtn', true);
-        auth.signInWithEmailAndPassword(email, password)
-            .then(async (cred) => {
-                const user = cred.user;
-                if (!user.emailVerified) { showToast('⚠️ يرجى تفعيل بريدك الإلكتروني أولاً', 'error'); auth.signOut(); return; }
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists) { showToast('❌ لم يتم العثور على بيانات المستخدم', 'error'); auth.signOut(); return; }
-                const userData = userDoc.data();
-                if (!userData.isActive) { showToast('❌ تم تعطيل حسابك، تواصل مع المدير', 'error'); auth.signOut(); return; }
-                localStorage.setItem('semo_user', JSON.stringify({ uid: user.uid, email: user.email, name: userData.name, role: userData.role, companyId: userData.companyId }));
-                showToast('✅ مرحباً بك! جاري التحويل...', 'success');
-                redirecting = true;
-                setTimeout(() => window.location.href = 'dashboard.html', 1500);
-            })
-            .catch(err => {
-                let msg = '❌ بيانات الدخول غير صحيحة';
-                if (err.code === 'auth/user-not-found') msg = '❌ المستخدم غير موجود';
-                if (err.code === 'auth/wrong-password') msg = '❌ كلمة المرور خاطئة';
-                showToast(msg, 'error');
-            })
-            .finally(() => setLoading('loginBtn', false));
-    }
+            await user.sendEmailVerification();
+            showToast('✅ تم إنشاء الحساب! تحقق من بريدك ثم سجل الدخول', 'success');
+        } catch (error) {
+            console.error(error);
+            let msg = '❌ خطأ في إنشاء الحساب';
+            if (error.code === 'auth/email-already-in-use') msg = '❌ البريد مستخدم بالفعل';
+            showToast(msg, 'error');
+        }
+    };
 
-    function demoLogin() {
-        localStorage.setItem('semo_user', JSON.stringify({ uid: 'demo', email: 'demo@system.com', name: 'مدير تجريبي', role: 'admin', companyId: null }));
-        redirecting = true;
-        window.location.href = 'dashboard.html';
-    }
-
-    function forgotPassword(e) {
+    // Forgot Password
+    forgotBtn.onclick = async (e) => {
         e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
-        if (!email) { showToast('⚠️ أدخل بريدك الإلكتروني أولاً', 'error'); return; }
-        auth.sendPasswordResetEmail(email).then(() => showToast('📧 تم إرسال رابط إعادة التعيين', 'success')).catch(err => showToast('❌ ' + err.message, 'error'));
-    }
+        const email = loginEmail.value.trim();
+        if (!email) {
+            showToast('⚠️ أدخل بريدك الإلكتروني أولاً', 'error');
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showToast('📧 تم إرسال رابط إعادة التعيين إلى بريدك', 'success');
+        } catch (error) {
+            showToast('❌ ' + error.message, 'error');
+        }
+    };
 
+    // Auto redirect if already logged in (but prevent loop)
     let checked = false;
-    auth.onAuthStateChanged((user) => {
+    onAuthStateChanged(auth, (user) => {
         if (checked) return;
         checked = true;
-        if (user && user.emailVerified && !redirecting && window.location.pathname.includes('index.html')) {
-            redirecting = true;
+        const localUser = localStorage.getItem('semo_user');
+        if (user && user.emailVerified && localUser && !window.location.pathname.includes('dashboard.html')) {
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 500);
