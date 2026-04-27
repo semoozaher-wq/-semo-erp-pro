@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP | النظام المحاسبي المتكامل</title>
+    <title>SEMO ERP | لوحة التحكم</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', sans-serif; }
         body { background: #0f172a; color: #f8fafc; direction: rtl; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
         
         /* Header */
         .header {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: #1e293b;
             border: 1px solid #334155;
             border-radius: 20px;
             padding: 15px 25px;
@@ -22,9 +22,7 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .header h1 { font-size: 1.5rem; color: #38bdf8; }
-        .header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        
+        .header h1 { font-size: 1.4rem; color: #38bdf8; }
         .btn {
             padding: 8px 18px;
             border: none;
@@ -36,13 +34,13 @@
         }
         .btn-primary { background: #3b82f6; color: white; }
         .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
-        .btn-secondary { background: #334155; color: white; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-danger { background: #ef4444; color: white; }
         .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
         .btn-warning { background: #f59e0b; color: #1e293b; }
-        .btn-sm { padding: 4px 12px; font-size: 11px; }
+        .btn-secondary { background: #334155; color: white; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
         
+        /* Tabs */
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -64,10 +62,12 @@
         }
         .tab.active { background: #3b82f6; color: white; }
         
+        /* Content */
         .content { background: #1e293b; border-radius: 20px; padding: 20px; border: 1px solid #334155; }
         .section { display: none; }
         .section.active { display: block; }
         
+        /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -84,41 +84,31 @@
         .stat-card .value { font-size: 28px; font-weight: bold; color: #38bdf8; }
         .stat-card .label { font-size: 13px; color: #94a3b8; }
         
+        /* Tables */
         .table-wrapper { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #0f172a; padding: 12px; text-align: center; color: #94a3b8; border-bottom: 1px solid #334155; }
         td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #334155; }
         tr:hover td { background: #334155; }
         
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        input, select, textarea {
-            padding: 10px;
-            border-radius: 8px;
+        .card-box {
+            background: #1e293b;
             border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            font-family: inherit;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 12px 24px;
-            border-radius: 50px;
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -132,13 +122,36 @@
         .modal.show { display: flex; }
         .modal-content {
             background: #1e293b;
-            max-width: 600px;
+            max-width: 500px;
             width: 90%;
             border-radius: 20px;
             padding: 25px;
             border: 1px solid #334155;
         }
-        
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
         @media (max-width: 768px) {
             body { padding: 10px; }
             .tabs { border-radius: 15px; }
@@ -150,11 +163,10 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>📊 النظام المحاسبي المتكامل | SEMO ERP PRO</h1>
-        <div class="header-buttons">
-            <button class="btn btn-secondary" onclick="showSettings()">⚙️ إعدادات</button>
+        <h1>📊 SEMO ERP | النظام المحاسبي المتكامل</h1>
+        <div>
             <button class="btn btn-secondary" onclick="exportBackup()">💾 نسخة احتياطية</button>
-            <button class="btn btn-primary" onclick="showAnalytics()">📈 تحليل ذكي</button>
+            <button class="btn btn-secondary" onclick="showSettings()">⚙️ إعدادات</button>
             <button class="btn btn-danger" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
@@ -163,12 +175,19 @@
     <div class="content" id="contentContainer"></div>
 </div>
 
-<!-- Modals -->
-<div id="settingsModal" class="modal"><div class="modal-content"><h3>⚙️ إعدادات النظام</h3><div class="form-grid"><input type="text" id="companyName" placeholder="اسم الشركة"><input type="text" id="companyPhone" placeholder="الهاتف"><input type="email" id="companyEmail" placeholder="البريد الإلكتروني"></div><button class="btn btn-primary" onclick="saveSettings()">💾 حفظ</button><button class="btn btn-secondary" onclick="closeModal('settingsModal')">إلغاء</button></div></div>
-<div id="analyticsModal" class="modal"><div class="modal-content"><h3>📈 التحليل الذكي</h3><div id="analyticsContent"></div><button class="btn btn-secondary" onclick="closeModal('analyticsModal')">إغلاق</button></div></div>
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>⚙️ إعدادات</h3><button onclick="closeModal('settingsModal')" style="background:none;border:none;color:white;font-size:20px">✕</button></div>
+        <input type="text" id="companyName" placeholder="اسم الشركة">
+        <input type="text" id="companyPhone" placeholder="الهاتف">
+        <input type="email" id="companyEmail" placeholder="البريد">
+        <div class="modal-footer"><button class="btn btn-primary" onclick="saveSettings()">حفظ</button><button class="btn btn-secondary" onclick="closeModal('settingsModal')">إلغاء</button></div>
+    </div>
+</div>
 
 <script>
-// ==================== قاعدة البيانات ====================
+// ==================== DATA ====================
 let db = {
     inventory: JSON.parse(localStorage.getItem('semo_inventory')) || [],
     sales: JSON.parse(localStorage.getItem('semo_sales')) || [],
@@ -180,7 +199,21 @@ let db = {
     settings: JSON.parse(localStorage.getItem('semo_settings')) || {}
 };
 
-function saveAll() {
+// بيانات تجريبية أول مرة
+if(db.inventory.length === 0){
+    db.inventory = [
+        {id:1, name:'منتج 1', qty:50, price:100, category:'الكترونيات'},
+        {id:2, name:'منتج 2', qty:30, price:200, category:'ملابس'}
+    ];
+    db.clients = [
+        {id:1, name:'شركة الأمل', phone:'0111111111', totalPurchases:0, debt:0},
+        {id:2, name:'مؤسسة النور', phone:'0222222222', totalPurchases:0, debt:0}
+    ];
+    db.suppliers = [{id:1, name:'مورد 1', phone:'0333333333', product:'منتج 1', totalPurchases:0}];
+    saveAll();
+}
+
+function saveAll(){
     localStorage.setItem('semo_inventory', JSON.stringify(db.inventory));
     localStorage.setItem('semo_sales', JSON.stringify(db.sales));
     localStorage.setItem('semo_purchases', JSON.stringify(db.purchases));
@@ -191,52 +224,46 @@ function saveAll() {
     localStorage.setItem('semo_settings', JSON.stringify(db.settings));
 }
 
-function today() { return new Date().toLocaleDateString('ar-EG'); }
-function notify(msg, type='success') {
+function today(){ return new Date().toLocaleDateString('ar-EG'); }
+
+function notify(msg, type='success'){
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.style.background = type === 'success' ? '#10b981' : type === 'danger' ? '#ef4444' : '#f59e0b';
-    toast.style.color = type === 'warning' ? '#1e293b' : 'white';
     toast.innerHTML = msg;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(()=>toast.remove(), 3000);
 }
 
-// ==================== تبويبات ====================
-const sections = ['dashboard', 'inventory', 'sales', 'purchases', 'clients', 'suppliers', 'expenses', 'revenues', 'reports'];
+// ==================== TABS ====================
+const sections = ['dashboard','inventory','sales','purchases','clients','suppliers','expenses','revenues','reports'];
 const titles = {
-    dashboard: '🏠 الرئيسية',
-    inventory: '📦 المخزون',
-    sales: '🛒 المبيعات',
-    purchases: '📥 المشتريات',
-    clients: '👥 العملاء',
-    suppliers: '🏭 الموردين',
-    expenses: '💸 المصروفات',
-    revenues: '💰 الإيرادات',
-    reports: '📊 التقارير'
+    dashboard: '🏠 الرئيسية', inventory: '📦 المخزون', sales: '🛒 المبيعات',
+    purchases: '📥 المشتريات', clients: '👥 العملاء', suppliers: '🏭 الموردين',
+    expenses: '💸 المصروفات', revenues: '💰 الإيرادات', reports: '📊 التقارير'
 };
 
-function renderTabs() {
+function renderTabs(){
     const tabsDiv = document.getElementById('tabsContainer');
     tabsDiv.innerHTML = sections.map(s => `<div class="tab" data-tab="${s}">${titles[s]}</div>`).join('');
     document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.onclick = () => {
+            document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
             tab.classList.add('active');
             switchSection(tab.dataset.tab);
-        });
+        };
     });
-    if(document.querySelector('.tab')) document.querySelector('.tab').classList.add('active');
+    document.querySelector('.tab')?.classList.add('active');
     switchSection('dashboard');
 }
 
-function switchSection(section) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+function switchSection(section){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     let secDiv = document.getElementById(`section-${section}`);
     if(!secDiv) generateSection(section);
     secDiv = document.getElementById(`section-${section}`);
     if(secDiv) secDiv.classList.add('active');
-    if(section === 'dashboard') updateDashboard();
+    if(section === 'dashboard') renderDashboard();
     if(section === 'inventory') renderInventory();
     if(section === 'sales') renderSales();
     if(section === 'purchases') renderPurchases();
@@ -247,29 +274,29 @@ function switchSection(section) {
     if(section === 'reports') renderReports();
 }
 
-function generateSection(section) {
+function generateSection(section){
     const container = document.getElementById('contentContainer');
     let html = '';
-    if(section === 'dashboard') html = `<div class="stats-grid" id="statsGrid"></div><div id="lowStockAlert"></div><div class="stats-grid" id="chartsGrid" style="grid-template-columns:1fr 1fr;"></div>`;
-    else if(section === 'inventory') html = `<div><button class="btn btn-primary" onclick="showAddInventory()">➕ منتج جديد</button><input type="text" id="searchInv" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجراءات</th></tr></thead><tbody id="invTable"></tbody></table></div>`;
-    else if(section === 'sales') html = `<div><button class="btn btn-primary" onclick="showAddSale()">➕ فاتورة بيع</button><input type="text" id="searchSales" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="salesTable"></tbody></table></div>`;
-    else if(section === 'purchases') html = `<div><button class="btn btn-primary" onclick="showAddPurchase()">➕ أمر شراء</button><input type="text" id="searchPurchases" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجراءات</th></tr></thead><tbody id="purchasesTable"></tbody></table></div>`;
-    else if(section === 'clients') html = `<div><button class="btn btn-primary" onclick="showAddClient()">➕ عميل جديد</button><input type="text" id="searchClients" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>الرصيد</th><th>الإجراءات</th></tr></thead><tbody id="clientsTable"></tbody></table></div>`;
-    else if(section === 'suppliers') html = `<div><button class="btn btn-primary" onclick="showAddSupplier()">➕ مورد جديد</button><input type="text" id="searchSuppliers" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>المنتج</th><th>الإجراءات</th></tr></thead><tbody id="suppliersTable"></tbody></table></div>`;
-    else if(section === 'expenses') html = `<div><button class="btn btn-primary" onclick="showAddExpense()">➕ مصروف جديد</button><input type="text" id="searchExpenses" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"><tr><thead><tr><th>#</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الإجراءات</th></tr></thead><tbody id="expensesTable"></tbody></table></div>`;
-    else if(section === 'revenues') html = `<div><button class="btn btn-primary" onclick="showAddRevenue()">➕ إيراد جديد</button><input type="text" id="searchRevenues" placeholder="بحث..." style="width:200px;margin-top:10px"></div><div class="table-wrapper"></table><thead><tr><th>#</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الإجراءات</th></tr></thead><tbody id="revenuesTable"></tbody></table></div>`;
-    else if(section === 'reports') html = `<div id="reportSummary"></div><canvas id="reportChart" height="200"></canvas>`;
+    if(section === 'dashboard') html = `<div class="stats-grid" id="statsGrid"></div><div id="chartsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px"></div><div class="card-box"><div class="card-header">📋 آخر الفواتير</div><div class="table-wrapper"><table id="recentSalesTable"><thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'inventory') html = `<div class="card-box"><div class="card-header"><span>📦 المنتجات</span><button class="btn btn-success btn-sm" onclick="showAddInventory()">➕ منتج جديد</button></div><div class="table-wrapper"><table id="inventoryTable"><thead><tr><th>#</th><th>المنتج</th><th>الفئة</th><th>الكمية</th><th>السعر</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'sales') html = `<div class="card-box"><div class="card-header"><span>🛒 المبيعات</span><button class="btn btn-success btn-sm" onclick="showAddSale()">➕ فاتورة جديدة</button></div><div class="table-wrapper"><table id="salesTable"><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'purchases') html = `<div class="card-box"><div class="card-header"><span>📥 المشتريات</span><button class="btn btn-success btn-sm" onclick="showAddPurchase()">➕ أمر شراء</button></div><div class="table-wrapper"><table id="purchasesTable"><thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'clients') html = `<div class="card-box"><div class="card-header"><span>👥 العملاء</span><button class="btn btn-success btn-sm" onclick="showAddClient()">➕ عميل جديد</button></div><div class="table-wrapper"><table id="clientsTable"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي المشتريات</th><th>الدين</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'suppliers') html = `<div class="card-box"><div class="card-header"><span>🏭 الموردين</span><button class="btn btn-success btn-sm" onclick="showAddSupplier()">➕ مورد جديد</button></div><div class="table-wrapper"><table id="suppliersTable"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>المنتج</th><th>إجمالي المشتريات</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'expenses') html = `<div class="card-box"><div class="card-header"><span>💸 المصروفات</span><button class="btn btn-success btn-sm" onclick="showAddExpense()">➕ مصروف جديد</button></div><div class="table-wrapper"><table id="expensesTable"><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'revenues') html = `<div class="card-box"><div class="card-header"><span>💰 الإيرادات</span><button class="btn btn-success btn-sm" onclick="showAddRevenue()">➕ إيراد جديد</button></div><div class="table-wrapper"><table id="revenuesTable"><thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div></div>`;
+    else if(section === 'reports') html = `<div class="stats-grid" id="reportStats"></div><div class="card-box"><div class="card-header">📊 تقرير المبيعات</div><div class="table-wrapper"><table id="reportTable"><thead><tr><th>العميل</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody></tbody></table></div></div>`;
     container.innerHTML += `<div id="section-${section}" class="section">${html}</div>`;
 }
 
-// ==================== لوحة التحكم ====================
-function updateDashboard() {
+// ==================== RENDER FUNCTIONS ====================
+function renderDashboard(){
     const totalSales = db.sales.reduce((s,i)=>s+(i.total||0),0);
     const totalPurchases = db.purchases.reduce((s,i)=>s+(i.total||0),0);
     const totalExpenses = db.expenses.reduce((s,i)=>s+(i.amount||0),0);
     const totalRevenues = db.revenues.reduce((s,i)=>s+(i.amount||0),0);
     const profit = totalSales - totalPurchases - totalExpenses + totalRevenues;
-    const lowStock = db.inventory.filter(i => (i.qty||0) <= 5).length;
+    const lowStock = db.inventory.filter(i=>i.qty<=5).length;
     
     document.getElementById('statsGrid').innerHTML = `
         <div class="stat-card"><div class="value">${totalSales.toLocaleString()} ج</div><div class="label">إجمالي المبيعات</div></div>
@@ -282,352 +309,189 @@ function updateDashboard() {
         <div class="stat-card"><div class="value">${db.clients.length}</div><div class="label">العملاء</div></div>
     `;
     
-    document.getElementById('lowStockAlert').innerHTML = lowStock > 0 ? `<div class="stat-card" style="background:#f59e0b20;border-color:#f59e0b"><div class="value">⚠️ تنبيه</div><div class="label">${lowStock} منتج بحاجة لإعادة تخزين</div></div>` : '';
-    
-    drawCharts();
-}
-
-function drawCharts() {
-    const chartsDiv = document.getElementById('chartsGrid');
-    if(!chartsDiv) return;
-    chartsDiv.innerHTML = `<div style="background:#0f172a;border-radius:15px;padding:15px;"><canvas id="monthlyChart" height="200"></canvas></div><div style="background:#0f172a;border-radius:15px;padding:15px;"><canvas id="categoryChart" height="200"></canvas></div>`;
-    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    let monthly = Array(12).fill(0);
-    db.sales.forEach(s => { let d = new Date(s.date); if(!isNaN(d)) monthly[d.getMonth()] += s.total || 0; });
+    document.getElementById('chartsGrid').innerHTML = `<div style="background:#0f172a;border-radius:15px;padding:15px"><canvas id="monthlyChart" height="200"></canvas></div><div style="background:#0f172a;border-radius:15px;padding:15px"><canvas id="categoryChart" height="200"></canvas></div>`;
+    const months = ['يناير','فبراير','مارس','ابريل','مايو','يونيو'];
+    let monthly = Array(6).fill(0);
+    db.sales.forEach(s=>{ let d = new Date(s.date); if(!isNaN(d) && d.getMonth()<6) monthly[d.getMonth()] += s.total||0; });
     new Chart(document.getElementById('monthlyChart'), { type:'bar', data:{ labels:months, datasets:[{ label:'المبيعات', data:monthly, backgroundColor:'#3b82f6' }] }, options:{ responsive:true } });
     
     let categories = {};
-    db.inventory.forEach(i => { let c = i.category || 'عام'; categories[c] = (categories[c]||0) + (i.qty||0)*(i.price||0); });
+    db.inventory.forEach(i=>{ let c = i.category||'عام'; categories[c] = (categories[c]||0) + (i.qty||0)*(i.price||0); });
     new Chart(document.getElementById('categoryChart'), { type:'doughnut', data:{ labels:Object.keys(categories), datasets:[{ data:Object.values(categories), backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444'] }] }, options:{ responsive:true } });
+    
+    const tbody = document.querySelector('#recentSalesTable tbody');
+    if(tbody) tbody.innerHTML = db.sales.slice(0,5).map(s=>`<tr><td>${s.date}</td><td>${s.clientName}</td><td>${s.total} ج</td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td></tr>`).join('');
 }
 
-// ==================== دوال المخزون ====================
-function renderInventory() {
-    const search = document.getElementById('searchInv')?.value.toLowerCase() || '';
-    const filtered = db.inventory.filter(i => (i.name || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('invTable');
-    if(tbody) tbody.innerHTML = filtered.map((i,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${i.name}</td>
-        <td>${i.qty}</td>
-        <td>${i.price} ج</td>
-        <td><button class="btn btn-warning btn-sm" onclick="editInventory(${i.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteInventory(${i.id})">🗑️</button></td>
-     `).join('');
+function renderInventory(){
+    const tbody = document.querySelector('#inventoryTable tbody');
+    if(tbody) tbody.innerHTML = db.inventory.map((i,idx)=>`<tr><td>${idx+1}</td><td>${i.name}</td><td>${i.category||'-'}</td><td>${i.qty}</td><td>${i.price} ج</td><td><button class="btn btn-warning btn-sm" onclick="editInventory(${i.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteInventory(${i.id})">🗑️</button></td></tr>`).join('');
 }
 
-function showAddInventory() {
-    let name = prompt('اسم المنتج:');
-    if(!name) return;
-    let qty = parseInt(prompt('الكمية:', '0'));
-    let price = parseFloat(prompt('السعر:', '0'));
-    if(isNaN(qty)||isNaN(price)) return;
-    db.inventory.push({ id: Date.now(), name, qty, price, category: 'عام' });
-    saveAll();
-    renderInventory();
-    updateDashboard();
-    notify('✅ تمت الإضافة');
+function renderSales(){
+    const tbody = document.querySelector('#salesTable tbody');
+    if(tbody) tbody.innerHTML = db.sales.map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.date}</td><td>${s.clientName}</td><td>${s.total} ج</td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td><button class="btn btn-danger btn-sm" onclick="deleteSale(${s.id})">🗑️</button></td></tr>`).join('');
 }
 
-function editInventory(id){
-    let item = db.inventory.find(i=>i.id===id);
-    if(!item) return;
-    let newName = prompt('اسم المنتج الجديد:', item.name);
-    if(newName) item.name = newName;
-    let newQty = parseInt(prompt('الكمية الجديدة:', item.qty));
-    if(!isNaN(newQty)) item.qty = newQty;
-    let newPrice = parseFloat(prompt('السعر الجديد:', item.price));
-    if(!isNaN(newPrice)) item.price = newPrice;
-    saveAll();
-    renderInventory();
-    updateDashboard();
-    notify('✅ تم التعديل');
+function renderPurchases(){
+    const tbody = document.querySelector('#purchasesTable tbody');
+    if(tbody) tbody.innerHTML = db.purchases.map((p,idx)=>`<tr><td>${idx+1}</td><td>${p.date}</td><td>${p.supplier}</td><td>${p.product}</td><td>${p.qty}</td><td>${p.price} ج</td><td>${p.total} ج</td><td><button class="btn btn-danger btn-sm" onclick="deletePurchase(${p.id})">🗑️</button></td></tr>`).join('');
 }
 
-function deleteInventory(id){
-    if(confirm('حذف المنتج؟')) { db.inventory = db.inventory.filter(i=>i.id!==id); saveAll(); renderInventory(); updateDashboard(); notify('تم الحذف','danger'); }
+function renderClients(){
+    const tbody = document.querySelector('#clientsTable tbody');
+    if(tbody) tbody.innerHTML = db.clients.map((c,idx)=>`<tr><td>${idx+1}</td><td>${c.name}</td><td>${c.phone||'-'}</td><td>${(c.totalPurchases||0).toLocaleString()} ج</td><td style="color:${(c.debt||0)>0?'#ef4444':'#10b981'}">${(c.debt||0).toLocaleString()} ج</td><td><button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`).join('');
 }
 
-// ==================== المبيعات ====================
-function renderSales() {
-    const search = document.getElementById('searchSales')?.value.toLowerCase() || '';
-    const filtered = db.sales.filter(s => (s.clientName || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('salesTable');
-    if(tbody) tbody.innerHTML = filtered.map((s,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${s.date}</td>
-        <td>${s.clientName}</td>
-        <td>${s.total} ج</td>
-        <td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 8px;border-radius:20px">${s.status}</span></td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteSale(${s.id})">🗑️</button></td>
-     `).join('');
+function renderSuppliers(){
+    const tbody = document.querySelector('#suppliersTable tbody');
+    if(tbody) tbody.innerHTML = db.suppliers.map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.name}</td><td>${s.phone||'-'}</td><td>${s.product||'-'}</td><td>${(s.totalPurchases||0).toLocaleString()} ج</td><td><button class="btn btn-danger btn-sm" onclick="deleteSupplier(${s.id})">🗑️</button></td></tr>`).join('');
 }
 
-function showAddSale() {
-    let client = prompt('اسم العميل:');
-    if(!client) return;
-    let total = parseFloat(prompt('المبلغ الإجمالي:', '0'));
-    if(isNaN(total)) return;
-    let status = confirm('مدفوع؟ اضغط OK للمدفوع، Cancel للآجل') ? 'مدفوع' : 'آجل';
-    db.sales.push({ id: Date.now(), clientName: client, total, paid: status==='مدفوع'?total:0, status, date: today() });
-    saveAll();
-    renderSales();
-    updateDashboard();
-    notify('✅ تمت الإضافة');
+function renderExpenses(){
+    const tbody = document.querySelector('#expensesTable tbody');
+    if(tbody) tbody.innerHTML = db.expenses.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.date}</td><td>${e.type}</td><td>${e.amount} ج</td><td><button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`).join('');
 }
 
-function deleteSale(id){
-    if(confirm('حذف البيع؟')) { db.sales = db.sales.filter(s=>s.id!==id); saveAll(); renderSales(); updateDashboard(); notify('تم الحذف','danger'); }
+function renderRevenues(){
+    const tbody = document.querySelector('#revenuesTable tbody');
+    if(tbody) tbody.innerHTML = db.revenues.map((r,idx)=>`<tr><td>${idx+1}</td><td>${r.date}</td><td>${r.type}</td><td>${r.amount} ج</td><td><button class="btn btn-danger btn-sm" onclick="deleteRevenue(${r.id})">🗑️</button></td></tr>`).join('');
 }
 
-// ==================== المشتريات ====================
-function renderPurchases() {
-    const search = document.getElementById('searchPurchases')?.value.toLowerCase() || '';
-    const filtered = db.purchases.filter(p => (p.supplier || '').toLowerCase().includes(search) || (p.product || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('purchasesTable');
-    if(tbody) tbody.innerHTML = filtered.map((p,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${p.supplier}</td>
-        <td>${p.product}</td>
-        <td>${p.qty}</td>
-        <td>${p.price} ج</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deletePurchase(${p.id})">🗑️</button></td>
-     `).join('');
-}
-
-function showAddPurchase() {
-    let supplier = prompt('اسم المورد:');
-    if(!supplier) return;
-    let product = prompt('اسم المنتج:');
-    if(!product) return;
-    let qty = parseInt(prompt('الكمية:', '1'));
-    let price = parseFloat(prompt('السعر:', '0'));
-    if(isNaN(qty)||isNaN(price)) return;
-    db.purchases.push({ id: Date.now(), supplier, product, qty, price, total: qty*price, date: today() });
-    let existingProduct = db.inventory.find(i=>i.name === product);
-    if(existingProduct) existingProduct.qty = (existingProduct.qty||0) + qty;
-    else db.inventory.push({ id: Date.now(), name: product, qty, price, category: 'مشتريات' });
-    saveAll();
-    renderPurchases();
-    renderInventory();
-    updateDashboard();
-    notify('✅ تمت الإضافة وتحديث المخزون');
-}
-
-function deletePurchase(id){
-    if(confirm('حذف الشراء؟')) { db.purchases = db.purchases.filter(p=>p.id!==id); saveAll(); renderPurchases(); updateDashboard(); notify('تم الحذف','danger'); }
-}
-
-// ==================== العملاء ====================
-function renderClients() {
-    const search = document.getElementById('searchClients')?.value.toLowerCase() || '';
-    const filtered = db.clients.filter(c => (c.name || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('clientsTable');
-    if(tbody) tbody.innerHTML = filtered.map((c,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${c.name}</td>
-        <td>${c.phone||'-'}</td>
-        <td>${(c.debt||0)} ج</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">🗑️</button></td>
-     `).join('');
-}
-
-function showAddClient() {
-    let name = prompt('اسم العميل:');
-    if(!name) return;
-    let phone = prompt('رقم الهاتف (اختياري):', '');
-    db.clients.push({ id: Date.now(), name, phone, debt: 0 });
-    saveAll();
-    renderClients();
-    notify('✅ تمت الإضافة');
-}
-
-function deleteClient(id){
-    if(confirm('حذف العميل؟')) { db.clients = db.clients.filter(c=>c.id!==id); saveAll(); renderClients(); notify('تم الحذف','danger'); }
-}
-
-// ==================== الموردين ====================
-function renderSuppliers() {
-    const search = document.getElementById('searchSuppliers')?.value.toLowerCase() || '';
-    const filtered = db.suppliers.filter(s => (s.name || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('suppliersTable');
-    if(tbody) tbody.innerHTML = filtered.map((s,idx)=>`<tr>
-        <td>${idx+1}<tr>
-        <td>${s.name}</td>
-        <td>${s.phone||'-'}</td>
-        <td>${s.product||'-'}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteSupplier(${s.id})">🗑️</button></td>
-     `).join('');
-}
-
-function showAddSupplier() {
-    let name = prompt('اسم المورد:');
-    if(!name) return;
-    let phone = prompt('رقم الهاتف (اختياري):', '');
-    let product = prompt('المنتج المورد (اختياري):', '');
-    db.suppliers.push({ id: Date.now(), name, phone, product });
-    saveAll();
-    renderSuppliers();
-    notify('✅ تمت الإضافة');
-}
-
-function deleteSupplier(id){
-    if(confirm('حذف المورد؟')) { db.suppliers = db.suppliers.filter(s=>s.id!==id); saveAll(); renderSuppliers(); notify('تم الحذف','danger'); }
-}
-
-// ==================== المصروفات والإيرادات ====================
-function renderExpenses() {
-    const search = document.getElementById('searchExpenses')?.value.toLowerCase() || '';
-    const filtered = db.expenses.filter(e => (e.type || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('expensesTable');
-    if(tbody) tbody.innerHTML = filtered.map((e,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${e.type}</td>
-        <td>${e.amount} ج</td>
-        <td>${e.date}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">🗑️</button></td>
-     `).join('');
-}
-
-function showAddExpense() {
-    let type = prompt('نوع المصروف:');
-    if(!type) return;
-    let amount = parseFloat(prompt('المبلغ:', '0'));
-    if(isNaN(amount)) return;
-    db.expenses.push({ id: Date.now(), type, amount, date: today() });
-    saveAll();
-    renderExpenses();
-    updateDashboard();
-    notify('✅ تمت الإضافة');
-}
-
-function deleteExpense(id){
-    if(confirm('حذف المصروف؟')) { db.expenses = db.expenses.filter(e=>e.id!==id); saveAll(); renderExpenses(); updateDashboard(); notify('تم الحذف','danger'); }
-}
-
-function renderRevenues() {
-    const search = document.getElementById('searchRevenues')?.value.toLowerCase() || '';
-    const filtered = db.revenues.filter(r => (r.type || '').toLowerCase().includes(search));
-    const tbody = document.getElementById('revenuesTable');
-    if(tbody) tbody.innerHTML = filtered.map((r,idx)=>`<tr>
-        <td>${idx+1}</td>
-        <td>${r.type}</td>
-        <td>${r.amount} ج</td>
-        <td>${r.date}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteRevenue(${r.id})">🗑️</button></td>
-     `).join('');
-}
-
-function showAddRevenue() {
-    let type = prompt('نوع الإيراد:');
-    if(!type) return;
-    let amount = parseFloat(prompt('المبلغ:', '0'));
-    if(isNaN(amount)) return;
-    db.revenues.push({ id: Date.now(), type, amount, date: today() });
-    saveAll();
-    renderRevenues();
-    updateDashboard();
-    notify('✅ تمت الإضافة');
-}
-
-function deleteRevenue(id){
-    if(confirm('حذف الإيراد؟')) { db.revenues = db.revenues.filter(r=>r.id!==id); saveAll(); renderRevenues(); updateDashboard(); notify('تم الحذف','danger'); }
-}
-
-// ==================== التقارير ====================
-function renderReports() {
+function renderReports(){
     const totalSales = db.sales.reduce((s,i)=>s+(i.total||0),0);
     const totalPurchases = db.purchases.reduce((s,i)=>s+(i.total||0),0);
     const totalExpenses = db.expenses.reduce((s,i)=>s+(i.amount||0),0);
     const totalRevenues = db.revenues.reduce((s,i)=>s+(i.amount||0),0);
     const profit = totalSales - totalPurchases - totalExpenses + totalRevenues;
-    const summaryDiv = document.getElementById('reportSummary');
-    if(summaryDiv) summaryDiv.innerHTML = `<div class="stats-grid">
+    document.getElementById('reportStats').innerHTML = `
         <div class="stat-card"><div class="value">${totalSales.toLocaleString()} ج</div><div class="label">المبيعات</div></div>
         <div class="stat-card"><div class="value">${totalPurchases.toLocaleString()} ج</div><div class="label">المشتريات</div></div>
         <div class="stat-card"><div class="value">${totalExpenses.toLocaleString()} ج</div><div class="label">المصروفات</div></div>
         <div class="stat-card"><div class="value">${totalRevenues.toLocaleString()} ج</div><div class="label">الإيرادات</div></div>
         <div class="stat-card"><div class="value" style="color:${profit>=0?'#10b981':'#ef4444'}">${profit.toLocaleString()} ج</div><div class="label">صافي الربح</div></div>
-    </div>`;
-    
-    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    let monthly = Array(12).fill(0);
-    db.sales.forEach(s => { let d = new Date(s.date); if(!isNaN(d)) monthly[d.getMonth()] += s.total || 0; });
-    const ctx = document.getElementById('reportChart');
-    if(ctx) new Chart(ctx, { type:'line', data:{ labels:months, datasets:[{ label:'المبيعات الشهرية', data:monthly, borderColor:'#3b82f6' }] }, options:{ responsive:true } });
+    `;
+    const tbody = document.querySelector('#reportTable tbody');
+    if(tbody) tbody.innerHTML = db.sales.map(s=>`<tr><td>${s.clientName}</td><td>${s.total} ج</td><td><span style="background:${s.status==='مدفوع'?'#10b981':'#f59e0b'};padding:2px 12px;border-radius:20px">${s.status}</span></td><td>${s.date}</td></tr>`).join('');
 }
 
-// ==================== وظائف عامة ====================
-function showModal(id) { document.getElementById(id).classList.add('show'); }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function showSettings() { showModal('settingsModal'); }
-function saveSettings() {
+// ==================== CRUD ====================
+function showAddInventory(){
+    let name = prompt('اسم المنتج:'); if(!name) return;
+    let qty = parseInt(prompt('الكمية:',0)); let price = parseFloat(prompt('السعر:',0));
+    if(isNaN(qty)||isNaN(price)) return;
+    db.inventory.push({id:Date.now(), name, qty, price, category:'عام'});
+    saveAll(); renderInventory(); notify('✅ تمت الإضافة');
+}
+function editInventory(id){
+    let item = db.inventory.find(i=>i.id===id);
+    if(!item) return;
+    let newName = prompt('الاسم الجديد:',item.name); if(newName) item.name = newName;
+    let newQty = parseInt(prompt('الكمية الجديدة:',item.qty)); if(!isNaN(newQty)) item.qty = newQty;
+    let newPrice = parseFloat(prompt('السعر الجديد:',item.price)); if(!isNaN(newPrice)) item.price = newPrice;
+    saveAll(); renderInventory(); notify('✅ تم التعديل');
+}
+function deleteInventory(id){
+    if(confirm('حذف المنتج؟')){ db.inventory = db.inventory.filter(i=>i.id!==id); saveAll(); renderInventory(); notify('تم الحذف','danger'); }
+}
+
+function showAddSale(){
+    let client = prompt('اسم العميل:'); if(!client) return;
+    let total = parseFloat(prompt('المبلغ:',0)); if(isNaN(total)) return;
+    let status = confirm('مدفوع؟ OK نعم') ? 'مدفوع' : 'آجل';
+    db.sales.push({id:Date.now(), clientName:client, total, status, date:today()});
+    let existing = db.clients.find(c=>c.name===client);
+    if(existing){ existing.totalPurchases = (existing.totalPurchases||0)+total; if(status==='آجل') existing.debt = (existing.debt||0)+total; }
+    else { db.clients.push({id:Date.now(), name:client, phone:'', totalPurchases:total, debt:status==='آجل'?total:0}); }
+    saveAll(); renderSales(); notify('✅ تمت الإضافة');
+}
+function deleteSale(id){
+    if(confirm('حذف البيع؟')){ db.sales = db.sales.filter(s=>s.id!==id); saveAll(); renderSales(); notify('تم الحذف','danger'); }
+}
+
+function showAddPurchase(){
+    let supplier = prompt('اسم المورد:'); if(!supplier) return;
+    let product = prompt('اسم المنتج:'); if(!product) return;
+    let qty = parseInt(prompt('الكمية:',1)); let price = parseFloat(prompt('السعر:',0));
+    if(isNaN(qty)||isNaN(price)) return;
+    let total = qty*price;
+    db.purchases.push({id:Date.now(), supplier, product, qty, price, total, date:today()});
+    let existingProduct = db.inventory.find(i=>i.name===product);
+    if(existingProduct) existingProduct.qty += qty;
+    else db.inventory.push({id:Date.now(), name:product, qty, price, category:'مشتريات'});
+    let existingSupplier = db.suppliers.find(s=>s.name===supplier);
+    if(existingSupplier) existingSupplier.totalPurchases = (existingSupplier.totalPurchases||0)+total;
+    else db.suppliers.push({id:Date.now(), name:supplier, phone:'', product:product, totalPurchases:total});
+    saveAll(); renderPurchases(); renderInventory(); notify('✅ تمت الإضافة وتحديث المخزون');
+}
+function deletePurchase(id){
+    if(confirm('حذف الشراء؟')){ db.purchases = db.purchases.filter(p=>p.id!==id); saveAll(); renderPurchases(); notify('تم الحذف','danger'); }
+}
+
+function showAddClient(){
+    let name = prompt('اسم العميل:'); if(!name) return;
+    let phone = prompt('رقم الهاتف:','');
+    db.clients.push({id:Date.now(), name, phone, totalPurchases:0, debt:0});
+    saveAll(); renderClients(); notify('✅ تمت الإضافة');
+}
+function deleteClient(id){
+    if(confirm('حذف العميل؟')){ db.clients = db.clients.filter(c=>c.id!==id); saveAll(); renderClients(); notify('تم الحذف','danger'); }
+}
+
+function showAddSupplier(){
+    let name = prompt('اسم المورد:'); if(!name) return;
+    let phone = prompt('رقم الهاتف:',''); let product = prompt('المنتج:','');
+    db.suppliers.push({id:Date.now(), name, phone, product, totalPurchases:0});
+    saveAll(); renderSuppliers(); notify('✅ تمت الإضافة');
+}
+function deleteSupplier(id){
+    if(confirm('حذف المورد؟')){ db.suppliers = db.suppliers.filter(s=>s.id!==id); saveAll(); renderSuppliers(); notify('تم الحذف','danger'); }
+}
+
+function showAddExpense(){
+    let type = prompt('نوع المصروف:'); if(!type) return;
+    let amount = parseFloat(prompt('المبلغ:',0)); if(isNaN(amount)) return;
+    db.expenses.push({id:Date.now(), type, amount, date:today()});
+    saveAll(); renderExpenses(); notify('✅ تمت الإضافة');
+}
+function deleteExpense(id){
+    if(confirm('حذف المصروف؟')){ db.expenses = db.expenses.filter(e=>e.id!==id); saveAll(); renderExpenses(); notify('تم الحذف','danger'); }
+}
+
+function showAddRevenue(){
+    let type = prompt('نوع الإيراد:'); if(!type) return;
+    let amount = parseFloat(prompt('المبلغ:',0)); if(isNaN(amount)) return;
+    db.revenues.push({id:Date.now(), type, amount, date:today()});
+    saveAll(); renderRevenues(); notify('✅ تمت الإضافة');
+}
+function deleteRevenue(id){
+    if(confirm('حذف الإيراد؟')){ db.revenues = db.revenues.filter(r=>r.id!==id); saveAll(); renderRevenues(); notify('تم الحذف','danger'); }
+}
+
+function exportBackup(){
+    const data = JSON.stringify(db);
+    const blob = new Blob([data], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `backup_${today()}.json`; a.click();
+    notify('✅ تم التصدير');
+}
+
+function showSettings(){ document.getElementById('settingsModal').classList.add('show'); }
+function saveSettings(){
     db.settings.companyName = document.getElementById('companyName').value;
     db.settings.companyPhone = document.getElementById('companyPhone').value;
     db.settings.companyEmail = document.getElementById('companyEmail').value;
-    saveAll();
-    closeModal('settingsModal');
-    notify('✅ تم حفظ الإعدادات');
+    saveAll(); closeModal('settingsModal'); notify('✅ تم الحفظ');
 }
-function showAnalytics() {
-    const totalSales = db.sales.reduce((s,i)=>s+(i.total||0),0);
-    const profit = totalSales - db.purchases.reduce((s,i)=>s+(i.total||0),0) - db.expenses.reduce((s,i)=>s+(i.amount||0),0) + db.revenues.reduce((s,i)=>s+(i.amount||0),0);
-    const contentDiv = document.getElementById('analyticsContent');
-    if(contentDiv) contentDiv.innerHTML = `<div class="stats-grid">
-        <div class="stat-card"><div class="value">${totalSales.toLocaleString()} ج</div><div class="label">إجمالي المبيعات</div></div>
-        <div class="stat-card"><div class="value" style="color:${profit>=0?'#10b981':'#ef4444'}">${profit.toLocaleString()} ج</div><div class="label">صافي الربح</div></div>
-        <div class="stat-card"><div class="value">${db.clients.length}</div><div class="label">العملاء</div></div>
-        <div class="stat-card"><div class="value">${db.suppliers.length}</div><div class="label">الموردين</div></div>
-    </div>`;
-    showModal('analyticsModal');
-}
-function exportBackup() {
-    const backup = JSON.stringify(db);
-    const blob = new Blob([backup], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup_${today()}.json`;
-    a.click();
-    notify('✅ تم تصدير النسخة الاحتياطية');
-}
-function logout() {
-    if(confirm('تسجيل الخروج؟')) {
-        localStorage.removeItem('semo_user');
-        window.location.href = 'index.html';
-    }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function logout(){
+    if(confirm('تسجيل الخروج؟')){ localStorage.removeItem('semo_user'); location.href = 'index.html'; }
 }
 
-// ==================== ربط أحداث البحث ====================
-function bindSearchEvents() {
-    const searchInv = document.getElementById('searchInv');
-    if(searchInv) searchInv.addEventListener('input', renderInventory);
-    const searchSales = document.getElementById('searchSales');
-    if(searchSales) searchSales.addEventListener('input', renderSales);
-    const searchPurchases = document.getElementById('searchPurchases');
-    if(searchPurchases) searchPurchases.addEventListener('input', renderPurchases);
-    const searchClients = document.getElementById('searchClients');
-    if(searchClients) searchClients.addEventListener('input', renderClients);
-    const searchSuppliers = document.getElementById('searchSuppliers');
-    if(searchSuppliers) searchSuppliers.addEventListener('input', renderSuppliers);
-    const searchExpenses = document.getElementById('searchExpenses');
-    if(searchExpenses) searchExpenses.addEventListener('input', renderExpenses);
-    const searchRevenues = document.getElementById('searchRevenues');
-    if(searchRevenues) searchRevenues.addEventListener('input', renderRevenues);
-}
-
-// ==================== التهيئة ====================
-function init() {
-    if(db.inventory.length === 0) {
-        db.inventory = [{ id: 1, name: 'منتج تجريبي', qty: 100, price: 50, category: 'عام' }];
-        db.clients = [{ id: 1, name: 'عميل تجريبي', phone: '', debt: 0 }];
-        db.suppliers = [{ id: 1, name: 'مورد تجريبي', phone: '', product: '' }];
-        saveAll();
-    }
-    renderTabs();
-    bindSearchEvents();
-}
-
-init();
+// ==================== INIT ====================
+renderTabs();
 </script>
 </body>
 </html>
