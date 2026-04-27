@@ -26,59 +26,20 @@
         }
         .logo { width: 70px; height: 70px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; font-weight: bold; color: white; }
         h1 { color: #6366f1; margin-bottom: 10px; }
-        .demo-box {
-            background: rgba(99,102,241,0.15);
-            border: 1px solid #6366f1;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: right;
-        }
+        .demo-box { background: rgba(99,102,241,0.15); border: 1px solid #6366f1; border-radius: 15px; padding: 15px; margin: 20px 0; text-align: right; }
         .demo-box p { color: #6366f1; font-weight: bold; margin-bottom: 8px; }
         .demo-box span { color: #94a3b8; display: block; font-size: 13px; margin: 5px 0; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 40px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            outline: none;
-        }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 40px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
         input:focus { border-color: #6366f1; }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-primary { background: #6366f1; color: white; }
         .btn-primary:hover { background: #4f46e5; }
         .btn-demo { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; margin-bottom: 15px; }
         .link { color: #94a3b8; cursor: pointer; font-size: 13px; display: block; margin-top: 15px; }
         .link:hover { color: #6366f1; }
         .divider { margin: 15px 0; color: #64748b; font-size: 13px; }
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 40px;
-            z-index: 1000;
-            animation: slideDown 0.3s ease;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 40px; z-index: 1000; animation: slideDown 0.3s ease; font-size: 14px; font-weight: bold; }
+        @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .toast.success { background: #10b981; color: white; }
         .toast.error { background: #ef4444; color: white; }
         .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
@@ -88,19 +49,11 @@
 <body>
 <div class="login-card">
     <div class="logo">S</div>
-    <h1>SEMO ERP PRO V9</h1>
+    <h1>SEMO ERP PRO</h1>
     <p style="color: #94a3b8;">النظام المتكامل لإدارة المؤسسات</p>
-
-    <div class="demo-box">
-        <p>🚀 حسابات تجريبية جاهزة</p>
-        <span>📧 admin@system.com | 🔑 123456 (مدير)</span>
-        <span>📧 user@system.com | 🔑 123456 (مستخدم)</span>
-    </div>
-
+    <div class="demo-box"><p>🚀 حسابات تجريبية جاهزة</p><span>📧 admin@system.com | 🔑 123456 (مدير)</span><span>📧 user@system.com | 🔑 123456 (مستخدم)</span></div>
     <button class="btn btn-demo" id="demoLoginBtn" onclick="demoLogin()">🚀 دخول سريع – حساب تجريبي</button>
-
     <div class="divider">أو</div>
-
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="off">
     <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="off">
     <button class="btn btn-primary" id="loginBtn" onclick="login()">🔐 تسجيل الدخول</button>
@@ -108,13 +61,10 @@
     <a href="#" class="link" id="forgotBtn" onclick="forgotPassword(event)">🔑 نسيت كلمة المرور؟</a>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
 <script>
-    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
         authDomain: "my-pos-system-11dee.firebaseapp.com",
@@ -124,13 +74,11 @@
         messagingSenderId: "565195477080",
         appId: "1:565195477080:web:1ffa21a34e28b47dddfa2d"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let activeToast = null;
-    let redirecting = false;
+    let activeToast = null, redirecting = false;
 
     function showToast(msg, type = 'success') {
         if (activeToast) activeToast.remove();
@@ -139,15 +87,11 @@
         toast.textContent = msg;
         document.body.appendChild(toast);
         activeToast = toast;
-        setTimeout(() => {
-            if (toast) toast.remove();
-            if (activeToast === toast) activeToast = null;
-        }, 4000);
+        setTimeout(() => { if (toast) toast.remove(); if (activeToast === toast) activeToast = null; }, 4000);
     }
 
-    function setLoading(btnId, loading) {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
+    function setLoading(loading) {
+        const btn = document.getElementById('loginBtn');
         btn.disabled = loading;
         btn.innerHTML = loading ? '<span class="spinner"></span> جاري...' : '🔐 تسجيل الدخول';
     }
@@ -160,32 +104,25 @@
         const name = prompt('👤 اسم المستخدم:');
         if (!name) return;
         const role = confirm('👑 هل هذا المستخدم مدير؟ OK لمدير, Cancel لمستخدم عادي') ? 'admin' : 'user';
-
-        setLoading('loginBtn', true);
+        setLoading(true);
         auth.createUserWithEmailAndPassword(email, password)
             .then(async (cred) => {
                 await db.collection('users').doc(cred.user.uid).set({
-                    uid: cred.user.uid,
-                    email: email,
-                    name: name,
-                    role: role,
-                    isActive: true,
-                    companyId: null,
+                    uid: cred.user.uid, email, name, role, isActive: true, companyId: null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 await cred.user.sendEmailVerification();
                 showToast('✅ تم إنشاء الحساب! تحقق من بريدك ثم سجل الدخول', 'success');
             })
             .catch(err => { showToast('❌ ' + err.message, 'error'); })
-            .finally(() => setLoading('loginBtn', false));
+            .finally(() => setLoading(false));
     }
 
     function login() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
         if (!email || !password) { showToast('⚠️ أدخل البريد وكلمة المرور', 'error'); return; }
-
-        setLoading('loginBtn', true);
+        setLoading(true);
         auth.signInWithEmailAndPassword(email, password)
             .then(async (cred) => {
                 const user = cred.user;
@@ -194,7 +131,7 @@
                 if (!userDoc.exists) { showToast('❌ لم يتم العثور على بيانات المستخدم', 'error'); auth.signOut(); return; }
                 const userData = userDoc.data();
                 if (!userData.isActive) { showToast('❌ تم تعطيل حسابك، تواصل مع المدير', 'error'); auth.signOut(); return; }
-                localStorage.setItem('semo_user', JSON.stringify({ uid: user.uid, email: user.email, name: userData.name, role: userData.role, companyId: userData.companyId }));
+                localStorage.setItem('semo_user', JSON.stringify({ uid: user.uid, email, name: userData.name, role: userData.role, companyId: userData.companyId }));
                 showToast('✅ مرحباً بك! جاري التحويل...', 'success');
                 redirecting = true;
                 setTimeout(() => window.location.href = 'dashboard.html', 1500);
@@ -205,7 +142,7 @@
                 if (err.code === 'auth/wrong-password') msg = '❌ كلمة المرور خاطئة';
                 showToast(msg, 'error');
             })
-            .finally(() => setLoading('loginBtn', false));
+            .finally(() => setLoading(false));
     }
 
     function demoLogin() {
@@ -228,9 +165,7 @@
         const localUser = localStorage.getItem('semo_user');
         if (user && user.emailVerified && localUser && !redirecting && window.location.pathname.includes('index.html')) {
             redirecting = true;
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 500);
+            setTimeout(() => window.location.href = 'dashboard.html', 500);
         }
     });
 </script>
