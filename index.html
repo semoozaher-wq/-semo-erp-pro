@@ -86,7 +86,7 @@
 <body>
 <div class="login-card">
     <div class="logo">S</div>
-    <h1>SEMO ERP PRO</h1>
+    <h1>SEMO ERP PRO V8</h1>
     <p style="color: #94a3b8;">نظام متكامل لإدارة المؤسسات</p>
 
     <div class="demo-box">
@@ -111,7 +111,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // ==================== إعدادات Firebase (من مشروعك) ====================
     const firebaseConfig = {
         apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
         authDomain: "my-pos-system-11dee.firebaseapp.com",
@@ -127,6 +126,7 @@
     const db = firebase.firestore();
 
     let activeToast = null;
+    let redirecting = false;
 
     function showToast(msg, type = 'success') {
         if (activeToast) activeToast.remove();
@@ -192,6 +192,7 @@
                 if (!userData.isActive) { showToast('❌ تم تعطيل حسابك، تواصل مع المدير', 'error'); auth.signOut(); return; }
                 localStorage.setItem('semo_user', JSON.stringify({ uid: user.uid, email: user.email, name: userData.name, role: userData.role, companyId: userData.companyId }));
                 showToast('✅ مرحباً بك! جاري التحويل...', 'success');
+                redirecting = true;
                 setTimeout(() => window.location.href = 'dashboard.html', 1500);
             })
             .catch(err => {
@@ -205,6 +206,7 @@
 
     function demoLogin() {
         localStorage.setItem('semo_user', JSON.stringify({ uid: 'demo', email: 'demo@system.com', name: 'مدير تجريبي', role: 'admin', companyId: null }));
+        redirecting = true;
         window.location.href = 'dashboard.html';
     }
 
@@ -215,7 +217,18 @@
         auth.sendPasswordResetEmail(email).then(() => showToast('📧 تم إرسال رابط إعادة التعيين', 'success')).catch(err => showToast('❌ ' + err.message, 'error'));
     }
 
-    if (localStorage.getItem('semo_user')) window.location.href = 'dashboard.html';
+    // منع الحلقة غير المنتهية - التحقق من الجلسة مرة واحدة فقط
+    let checked = false;
+    auth.onAuthStateChanged((user) => {
+        if (checked) return;
+        checked = true;
+        if (user && user.emailVerified && !redirecting && window.location.pathname.includes('index.html')) {
+            redirecting = true;
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
+        }
+    });
 </script>
 </body>
 </html>
