@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SEMO ERP | نظام مؤسسي متكامل</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEMO ERP | النظام المحاسبي المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -24,7 +24,6 @@
             overflow-x: hidden;
         }
 
-        /* خلفية متحركة */
         body::before {
             content: '';
             position: absolute;
@@ -59,7 +58,6 @@
 
         .glass-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 35px 60px -15px rgba(0,0,0,0.6);
             border-color: rgba(59,130,246,0.5);
         }
 
@@ -78,7 +76,6 @@
             justify-content: center;
             margin: 0 auto 20px;
             font-size: 42px;
-            box-shadow: 0 10px 25px -5px rgba(59,130,246,0.4);
             animation: float 3s ease-in-out infinite;
         }
 
@@ -107,21 +104,12 @@
             border-radius: 20px;
             padding: 15px 20px;
             margin: 25px 0;
-            transition: all 0.3s;
-        }
-
-        .demo-box:hover {
-            background: rgba(245,158,11,0.25);
-            transform: scale(1.02);
         }
 
         .demo-title {
             color: #f59e0b;
             font-weight: 700;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .demo-account {
@@ -149,7 +137,6 @@
 
         .input-group {
             margin-bottom: 20px;
-            position: relative;
         }
 
         .input-group input {
@@ -168,10 +155,6 @@
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-
-        .input-group input::placeholder {
-            color: #64748b;
         }
 
         .btn {
@@ -193,7 +176,6 @@
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
-            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
         }
 
         .btn-primary:hover {
@@ -205,12 +187,10 @@
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
             margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(245,158,11,0.3);
         }
 
         .btn-demo:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(245,158,11,0.4);
         }
 
         .divider {
@@ -222,21 +202,15 @@
             font-size: 13px;
         }
 
-        .divider::before,
-        .divider::after {
+        .divider::before, .divider::after {
             content: '';
             flex: 1;
             height: 1px;
             background: #334155;
         }
 
-        .divider::before {
-            margin-left: 15px;
-        }
-
-        .divider::after {
-            margin-right: 15px;
-        }
+        .divider::before { margin-left: 15px; }
+        .divider::after { margin-right: 15px; }
 
         .shortcut {
             text-align: center;
@@ -256,100 +230,58 @@
     </style>
 </head>
 <body>
-    <div class="login-container fade-in">
-        <div class="glass-card">
-            <div class="logo-area">
-                <div class="logo-icon">📊</div>
-                <h1>SEMO ERP</h1>
-                <p class="subtitle">نظام إدارة المؤسسات المتكامل</p>
-            </div>
-
-            <div class="demo-box">
-                <div class="demo-title">
-                    <span>🚀</span> حسابات تجريبية جاهزة
-                </div>
-                <div class="demo-account">
-                    <span>📧 admin@system.com</span>
-                    <span>🔑 123456</span>
-                    <span class="badge">مدير</span>
-                </div>
-                <div class="demo-account">
-                    <span>📧 manager@system.com</span>
-                    <span>🔑 123456</span>
-                    <span class="badge">مدير مالي</span>
-                </div>
-                <div class="demo-account">
-                    <span>📧 user@system.com</span>
-                    <span>🔑 123456</span>
-                    <span class="badge">مستخدم</span>
-                </div>
-            </div>
-
-            <button class="btn btn-demo" onclick="directLogin()">
-                🚀 دخول سريع – حساب مدير
-            </button>
-
-            <div class="divider">أو</div>
-
-            <div class="input-group">
-                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="admin@system.com">
-            </div>
-            <div class="input-group">
-                <input type="password" id="loginPassword" placeholder="كلمة المرور" value="123456">
-            </div>
-
-            <button class="btn btn-primary" onclick="manualLogin()">
-                🔐 تسجيل الدخول
-            </button>
-
-            <div class="shortcut">
-                ⏎ اضغط Enter للدخول السريع
-            </div>
+<div class="login-container fade-in">
+    <div class="glass-card">
+        <div class="logo-area">
+            <div class="logo-icon">📊</div>
+            <h1>SEMO ERP PRO</h1>
+            <p class="subtitle">النظام المحاسبي المتكامل للمؤسسات</p>
         </div>
+
+        <div class="demo-box">
+            <div class="demo-title">🚀 حسابات تجريبية جاهزة</div>
+            <div class="demo-account"><span>📧 admin@semo.com</span><span>🔑 123456</span><span class="badge">مدير</span></div>
+            <div class="demo-account"><span>📧 finance@semo.com</span><span>🔑 123456</span><span class="badge">محاسب</span></div>
+            <div class="demo-account"><span>📧 user@semo.com</span><span>🔑 123456</span><span class="badge">مستخدم</span></div>
+        </div>
+
+        <button class="btn btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب مدير</button>
+        <div class="divider">أو</div>
+
+        <div class="input-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="admin@semo.com"></div>
+        <div class="input-group"><input type="password" id="loginPassword" placeholder="كلمة المرور" value="123456"></div>
+
+        <button class="btn btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
+        <div class="shortcut">⏎ اضغط Enter للدخول السريع</div>
     </div>
+</div>
 
-    <script>
-        // حسابات تجريبية
-        const DEMO_USERS = {
-            admin: { email: "admin@system.com", password: "123456", name: "مدير النظام", role: "admin", avatar: "👑" },
-            manager: { email: "manager@system.com", password: "123456", name: "مدير مالي", role: "financial_manager", avatar: "💰" },
-            user: { email: "user@system.com", password: "123456", name: "مستخدم عادي", role: "user", avatar: "👤" }
-        };
+<script>
+    const DEMO_USERS = {
+        admin: { email: "admin@semo.com", password: "123456", name: "مدير النظام", role: "admin", avatar: "👑" },
+        finance: { email: "finance@semo.com", password: "123456", name: "محاسب", role: "accountant", avatar: "💰" },
+        user: { email: "user@semo.com", password: "123456", name: "مستخدم", role: "user", avatar: "👤" }
+    };
 
-        function directLogin() {
-            localStorage.setItem('semo_user', JSON.stringify(DEMO_USERS.admin));
-            localStorage.setItem('semo_token', 'demo-token-' + Date.now());
+    function directLogin() {
+        localStorage.setItem('semo_user', JSON.stringify(DEMO_USERS.admin));
+        window.location.href = 'dashboard.html';
+    }
+
+    function manualLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const user = Object.values(DEMO_USERS).find(u => u.email === email && u.password === password);
+        if (user) {
+            localStorage.setItem('semo_user', JSON.stringify(user));
             window.location.href = 'dashboard.html';
+        } else {
+            alert('❌ البريد أو كلمة المرور غير صحيحة');
         }
+    }
 
-        function manualLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            
-            const user = Object.values(DEMO_USERS).find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                localStorage.setItem('semo_user', JSON.stringify(user));
-                localStorage.setItem('semo_token', 'demo-token-' + Date.now());
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة');
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') directLogin();
-        });
-
-        // التحقق من جلسة سابقة
-        if (localStorage.getItem('semo_user')) {
-            window.location.href = 'dashboard.html';
-        }
-
-        // تسجيل Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW not registered'));
-        }
-    </script>
+    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') directLogin(); });
+    if (localStorage.getItem('semo_user')) window.location.href = 'dashboard.html';
+</script>
 </body>
 </html>
