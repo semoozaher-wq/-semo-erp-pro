@@ -3,285 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP | النظام المحاسبي المتكامل</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>SEMO ERP - Full System</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <script src="https://jsdelivr.net"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-            z-index: 0;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .login-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .glass-card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 45px 35px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59,130,246,0.5);
-        }
-
-        .logo-area {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .logo-icon {
-            width: 85px;
-            height: 85px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 42px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        h1 {
-            font-size: 32px;
-            background: linear-gradient(135deg, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            font-size: 14px;
-        }
-
-        .demo-box {
-            background: rgba(245,158,11,0.15);
-            border: 1px solid #f59e0b;
-            border-radius: 20px;
-            padding: 15px 20px;
-            margin: 25px 0;
-        }
-
-        .demo-title {
-            color: #f59e0b;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .demo-account {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(245,158,11,0.3);
-            font-size: 13px;
-            color: #cbd5e1;
-        }
-
-        .demo-account:last-child {
-            border-bottom: none;
-        }
-
-        .demo-account .badge {
-            background: #f59e0b;
-            color: #1e293b;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 16px 20px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid #334155;
-            border-radius: 60px;
-            font-size: 16px;
-            color: #f8fafc;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59,130,246,0.4);
-        }
-
-        .btn-demo {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        .btn-demo:hover {
-            transform: translateY(-2px);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 25px 0;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #334155;
-        }
-
-        .divider::before { margin-left: 15px; }
-        .divider::after { margin-right: 15px; }
-
-        .shortcut {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease;
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#3b82f6;--success:#10b981;--danger:#ef4444;--bg:#0f172a;--card:#1e293b}
+        body{font-family:'Cairo',sans-serif;background:var(--bg);color:#fff;direction:rtl}
+        .sidebar{width:260px;background:var(--card);position:fixed;right:0;top:0;height:100vh;padding:20px;overflow-y:auto}
+        .main-content{margin-right:260px;padding:20px}
+        .menu-item{padding:12px;margin:5px 0;border-radius:12px;cursor:pointer;display:flex;gap:10px}
+        .menu-item:hover,.menu-item.active{background:var(--primary)}
+        .btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:bold; transition: 0.3s}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-success{background:var(--success);color:#fff}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px}
+        .stat-card{background:var(--card);border-radius:16px;padding:15px;cursor:pointer;border-right:3px solid var(--primary)}
+        .card-box{background:var(--card);border-radius:16px;padding:20px;margin-bottom:20px}
+        .data-table{width:100%;border-collapse:collapse}
+        .data-table th,.data-table td{padding:12px;text-align:right;border-bottom:1px solid #334155}
+        .badge{padding:4px 10px;border-radius:20px;font-size:12px}
+        .badge-success{background:rgba(16,185,129,0.2);color:#34d399}
+        .badge-warning{background:rgba(245,158,11,0.2);color:#fbbf24}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center}
+        .modal.show{display:flex}
+        .modal-content{background:var(--card);border-radius:20px;max-width:500px;width:90%;padding:20px}
+        input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-family:'Cairo'}
+        @media(max-width:768px){.sidebar{transform:translateX(100%)}.sidebar.open{transform:translateX(0)}.main-content{margin-right:0}}
     </style>
 </head>
 <body>
-<div class="login-container fade-in">
-    <div class="glass-card">
-        <div class="logo-area">
-            <div class="logo-icon">📊</div>
-            <h1>SEMO ERP PRO</h1>
-            <p class="subtitle">النظام المحاسبي المتكامل للمؤسسات</p>
-        </div>
 
-        <div class="demo-box">
-            <div class="demo-title">🚀 حسابات تجريبية جاهزة</div>
-            <div class="demo-account"><span>📧 admin@semo.com</span><span>🔑 123456</span><span class="badge">مدير</span></div>
-            <div class="demo-account"><span>📧 finance@semo.com</span><span>🔑 123456</span><span class="badge">محاسب</span></div>
-            <div class="demo-account"><span>📧 user@semo.com</span><span>🔑 123456</span><span class="badge">مستخدم</span></div>
-        </div>
+<div class="sidebar" id="sidebar">
+    <h2 style="text-align:center; margin-bottom:20px; color:var(--primary)">SEMO ERP</h2>
+    <div class="menu-item active" onclick="switchPage('dashboard', this)">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="switchPage('inventory', this)">📦 المخزون</div>
+    <div class="menu-item" onclick="switchPage('sales', this)">🛒 المبيعات</div>
+    <div class="menu-item" onclick="switchPage('clients', this)">👥 العملاء</div>
+    <div class="menu-item" onclick="logout()">🚪 خروج</div>
+</div>
 
-        <button class="btn btn-demo" onclick="directLogin()">🚀 دخول سريع – حساب مدير</button>
-        <div class="divider">أو</div>
+<div class="main-content">
+    <div id="pageContent"></div>
+</div>
 
-        <div class="input-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="admin@semo.com"></div>
-        <div class="input-group"><input type="password" id="loginPassword" placeholder="كلمة المرور" value="123456"></div>
-
-        <button class="btn btn-primary" onclick="manualLogin()">🔐 تسجيل الدخول</button>
-        <div class="shortcut">⏎ اضغط Enter للدخول السريع</div>
-    </div>
+<div id="detailsModal" class="modal" onclick="if(event.target===this)closeModal('detailsModal')">
+    <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script>
-    const DEMO_USERS = {
-        admin: { email: "admin@semo.com", password: "123456", name: "مدير النظام", role: "admin", avatar: "👑" },
-        finance: { email: "finance@semo.com", password: "123456", name: "محاسب", role: "accountant", avatar: "💰" },
-        user: { email: "user@semo.com", password: "123456", name: "مستخدم", role: "user", avatar: "👤" }
-    };
+// 1. قاعدة البيانات المحلية
+let db = {
+    inventory: JSON.parse(localStorage.getItem('semo_inventory')) || [],
+    sales: JSON.parse(localStorage.getItem('semo_sales')) || [],
+    clients: JSON.parse(localStorage.getItem('semo_clients')) || [],
+    expenses: JSON.parse(localStorage.getItem('semo_expenses')) || [],
+    revenues: JSON.parse(localStorage.getItem('semo_revenues')) || [],
+    settings: JSON.parse(localStorage.getItem('semo_settings')) || {currencySymbol:'ج.م'}
+};
 
-    function directLogin() {
-        localStorage.setItem('semo_user', JSON.stringify(DEMO_USERS.admin));
-        window.location.href = 'dashboard.html';
+// 2. وظائف الحفظ والتنسيق
+function saveAll() {
+    localStorage.setItem('semo_inventory', JSON.stringify(db.inventory));
+    localStorage.setItem('semo_sales', JSON.stringify(db.sales));
+    localStorage.setItem('semo_clients', JSON.stringify(db.clients));
+    localStorage.setItem('semo_expenses', JSON.stringify(db.expenses));
+    localStorage.setItem('semo_revenues', JSON.stringify(db.revenues));
+}
+
+function formatCurrency(a) { return (a || 0).toLocaleString() + ' ' + db.settings.currencySymbol; }
+
+function showNotification(m, t) {
+    let d = document.createElement('div');
+    d.style.cssText = `position:fixed;bottom:20px;left:20px;padding:12px 20px;border-radius:30px;background:${t==='success'?'#10b981':'#ef4444'};color:#fff;z-index:1100`;
+    d.innerHTML = m;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 3000);
+}
+
+function openModal(i) { document.getElementById(i).classList.add('show'); }
+function closeModal(i) { document.getElementById(i).classList.remove('show'); }
+
+// 3. محرك الصفحات
+function switchPage(page, element) {
+    if(element) {
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
     }
-
-    function manualLogin() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-        const user = Object.values(DEMO_USERS).find(u => u.email === email && u.password === password);
-        if (user) {
-            localStorage.setItem('semo_user', JSON.stringify(user));
-            window.location.href = 'dashboard.html';
-        } else {
-            alert('❌ البريد أو كلمة المرور غير صحيحة');
-        }
+    
+    if(page === 'dashboard') renderDashboard();
+    else if(page === 'inventory') renderInventory();
+    else {
+        document.getElementById('pageContent').innerHTML = `<div class="card-box"><h2>صفحة ${page} قيد الإنشاء</h2></div>`;
     }
+}
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') directLogin(); });
-    if (localStorage.getItem('semo_user')) window.location.href = 'dashboard.html';
+// 4. عرض لوحة التحكم (الرئيسية)
+function renderDashboard() {
+    let totalSales = db.sales.reduce((s, i) => s + (i.total || 0), 0);
+    let lowStock = db.inventory.filter(i => (i.qty || 0) <= 5).length;
+
+    document.getElementById('pageContent').innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card" onclick="switchPage('sales')"><div style="font-size:24px;font-weight:bold">${formatCurrency(totalSales)}</div><div>💰 المبيعات</div></div>
+            <div class="stat-card" onclick="switchPage('inventory')"><div style="font-size:24px;font-weight:bold">${db.inventory.length}</div><div>📦 المنتجات</div></div>
+            <div class="stat-card" onclick="switchPage('inventory')"><div style="font-size:24px;font-weight:bold;color:${lowStock>0?'#fbbf24':'#34d399'}">${lowStock}</div><div>⚠️ نواقص</div></div>
+        </div>
+        <div class="card-box"><h3>📊 نظرة عامة</h3><canvas id="monthlyChart" height="100"></canvas></div>
+    `;
+    
+    // رسم بياني بسيط
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: { labels: ['يناير','فبراير','مارس','أبريل'], datasets: [{label: 'المبيعات', data: [1000, 2000, 1500, totalSales], backgroundColor: '#3b82f6'}]}
+    });
+}
+
+// 5. إدارة المخزون
+function renderInventory() {
+    document.getElementById('pageContent').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2>📦 المخزون</h2>
+            <button class="btn btn-success" onclick="openAddProductModal()">+ إضافة منتج</button>
+        </div>
+        <div class="card-box">
+            <table class="data-table">
+                <thead><tr><th>الاسم</th><th>الكمية</th><th>السعر</th><th>حذف</th></tr></thead>
+                <tbody>
+                    ${db.inventory.map(item => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td><span class="badge ${item.qty <= 5 ? 'badge-warning' : 'badge-success'}">${item.qty}</span></td>
+                            <td>${formatCurrency(item.price)}</td>
+                            <td><button class="btn" style="background:#ef4444" onclick="deleteProduct(${item.id})">🗑️</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+function openAddProductModal() {
+    document.getElementById('modalContent').innerHTML = `
+        <h3>➕ منتج جديد</h3>
+        <input type="text" id="pName" placeholder="اسم المنتج">
+        <input type="number" id="pQty" placeholder="الكمية">
+        <input type="number" id="pPrice" placeholder="السعر">
+        <button class="btn btn-success" style="width:100%" onclick="saveNewProduct()">حفظ</button>
+    `;
+    openModal('detailsModal');
+}
+
+function saveNewProduct() {
+    let name = document.getElementById('pName').value;
+    let qty = parseInt(document.getElementById('pQty').value);
+    let price = parseFloat(document.getElementById('pPrice').value);
+    if(name && qty >= 0) {
+        db.inventory.push({id: Date.now(), name, qty, price});
+        saveAll();
+        closeModal('detailsModal');
+        renderInventory();
+        showNotification('تمت الإضافة', 'success');
+    }
+}
+
+function deleteProduct(id) {
+    if(confirm('حذف؟')) {
+        db.inventory = db.inventory.filter(p => p.id !== id);
+        saveAll();
+        renderInventory();
+    }
+}
+
+// تشغيل عند البداية
+window.onload = () => {
+    if(db.inventory.length === 0) {
+        db.inventory = [{id:1, name:'عينة منتج', qty:10, price:100}];
+        saveAll();
+    }
+    renderDashboard();
+};
+
+function logout(){ alert('تم الخروج'); }
 </script>
 </body>
 </html>
