@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO CLOUD - نظام سحابي متكامل</title>
+    <title>SEMO ERP CLOUD - النظام السحابي المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
@@ -40,7 +39,6 @@
         
         console.log("✅ Firebase connected");
         
-        // تشغيل التطبيق بعد تحميل Firebase
         if(window.initApp) window.initApp();
     </script>
     
@@ -65,7 +63,6 @@
             color: var(--t);
             font-family: 'Cairo', sans-serif;
             direction: rtl;
-            display: flex;
             min-height: 100vh;
         }
         
@@ -266,6 +263,13 @@
             width: 90%;
             max-width: 500px;
         }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        .badge-success { background: rgba(16,185,129,0.2); color: #34d399; }
+        .badge-warning { background: rgba(245,158,11,0.2); color: #fbbf24; }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(100%); width: 260px; }
             .sidebar.open { transform: translateX(0); }
@@ -279,227 +283,566 @@
 <div id="loginPage" class="login-page">
     <div class="login-card">
         <h1>SEMO CLOUD</h1>
-        <p>نظام الإدارة السحابي المتكامل</p>
-        <input type="email" id="email" placeholder="البريد الإلكتروني">
-        <input type="password" id="password" placeholder="كلمة المرور">
+        <p>نظام المحاسبة السحابي المتكامل</p>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
         <button id="authBtn" onclick="handleAuth()">دخول للنظام</button>
         <div id="loginError" class="error-msg"></div>
         <p class="toggle-auth" onclick="toggleAuthMode()" id="toggleText">ليس لديك حساب؟ إنشاء حساب جديد</p>
     </div>
 </div>
 
-<!-- شاشة النظام الرئيسي -->
+<!-- التطبيق -->
 <div id="appSystem" style="display: none;">
-    <aside class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="user-card">
             <div style="width:45px; height:45px; background:#3b82f6; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px;">👤</div>
             <div>
-                <h4 id="userDisplayName">مستخدم</h4>
-                <p id="userEmailDisplay" style="font-size:10px; opacity:0.6;"></p>
+                <h4 id="userName">مستخدم</h4>
+                <p id="userEmail" style="font-size:10px; opacity:0.6;"></p>
             </div>
         </div>
+        
         <div class="menu-title">الرئيسية</div>
         <div class="menu-item active" onclick="sp('dash', this)">🏠 لوحة التحكم</div>
+        
         <div class="menu-title">المخازن والبيع</div>
-        <div class="menu-item" onclick="sp('inv', this)">📦 المخزون السحابي</div>
-        <div class="menu-item" onclick="sp('sales', this)">🛒 المبيعات الحية</div>
+        <div class="menu-item" onclick="sp('inv', this)">📦 المخزون</div>
+        <div class="menu-item" onclick="sp('sales', this)">🛒 المبيعات</div>
+        <div class="menu-item" onclick="sp('purchases', this)">📥 المشتريات</div>
+        
         <div class="menu-title">المالية</div>
-        <div class="menu-item" onclick="sp('exp', this)">💸 المصروفات</div>
-        <div style="margin-top:50px;" class="menu-item" onclick="logout()">🚪 تسجيل الخروج</div>
-    </aside>
-    <main class="main">
-        <div id="pageContent"></div>
-    </main>
+        <div class="menu-item" onclick="sp('expenses', this)">💸 المصروفات</div>
+        <div class="menu-item" onclick="sp('revenues', this)">💰 الإيرادات</div>
+        <div class="menu-item" onclick="sp('debts', this)">⏳ الديون</div>
+        
+        <div class="menu-title">جهات الاتصال</div>
+        <div class="menu-item" onclick="sp('clients', this)">👥 العملاء</div>
+        <div class="menu-item" onclick="sp('suppliers', this)">🏭 الموردين</div>
+        
+        <div class="menu-title">النظام</div>
+        <div class="menu-item" onclick="exportData()">💾 نسخة احتياطية</div>
+        <div class="menu-item" onclick="logout()" style="color:#ef4444">🚪 تسجيل الخروج</div>
+    </div>
+    
+    <div class="main">
+        <div id="content"></div>
+    </div>
 </div>
 
-<div id="modal" class="modal" onclick="if(event.target===this)cm()">
-    <div class="modal-content" id="mBody"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()">
+    <div class="modal-content" id="modalBody"></div>
 </div>
 
 <script>
+// ========== المتغيرات ==========
 let authMode = 'login';
-let currentUid = null;
-let cloudData = { inv: [], sales: [], exp: [] };
+let currentUser = null;
+let db = {
+    inv: [],
+    sales: [],
+    purchases: [],
+    expenses: [],
+    revenues: [],
+    clients: [],
+    suppliers: []
+};
 
-// --- نظام الـ Authentication السحابي ---
+// ========== دوال المصادقة ==========
 window.handleAuth = async function() {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('password').value;
-    const err = document.getElementById('loginError');
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
     
     try {
-        let res;
+        let userCredential;
         if(authMode === 'login') {
-            res = await window.signInWithEmailAndPassword(window.auth, email, pass);
+            userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
         } else {
-            res = await window.createUserWithEmailAndPassword(window.auth, email, pass);
-            // تهيئة بيانات للمستخدم الجديد
-            await window.set(window.ref(window.db, 'users/' + res.user.uid), { inv: {}, sales: {}, exp: {} });
+            userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+            await window.set(window.ref(window.db, `users/${userCredential.user.uid}/data`), {
+                inv: [],
+                sales: [],
+                purchases: [],
+                expenses: [],
+                revenues: [],
+                clients: [],
+                suppliers: []
+            });
         }
-        startSystem(res.user);
-    } catch (e) {
-        err.style.display = 'block';
-        err.innerText = "خطأ: " + e.message;
+        startApp(userCredential.user);
+    } catch(error) {
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = '❌ ' + error.message;
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
     }
 };
 
 window.toggleAuthMode = function() {
     authMode = authMode === 'login' ? 'signup' : 'login';
-    document.getElementById('authBtn').innerText = authMode === 'login' ? 'دخول للنظام' : 'إنشاء حساب جديد';
-    document.getElementById('toggleText').innerText = authMode === 'login' ? 'ليس لديك حساب؟ إنشاء حساب جديد' : 'لديك حساب بالفعل؟ سجل دخولك';
-};
-
-// --- تشغيل النظام وربط الـ Realtime Data ---
-function startSystem(user) {
-    currentUid = user.uid;
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('appSystem').style.display = 'block';
-    document.getElementById('userDisplayName').innerText = user.email.split('@')[0];
-    document.getElementById('userEmailDisplay').innerText = user.email;
-
-    // مراقبة البيانات حياً من Firebase
-    const dataRef = window.ref(window.db, 'users/' + currentUid);
-    window.onValue(dataRef, (snapshot) => {
-        const data = snapshot.val();
-        if(data) {
-            cloudData.inv = data.inv ? Object.entries(data.inv).map(([id, val]) => ({...val, id})) : [];
-            cloudData.sales = data.sales ? Object.entries(data.sales).map(([id, val]) => ({...val, id})) : [];
-            cloudData.exp = data.exp ? Object.entries(data.exp).map(([id, val]) => ({...val, id})) : [];
-        }
-        if(document.querySelector('.menu-item.active')?.innerText.includes('الرئيسية')) {
-            renderDash();
-        } else if(document.querySelector('.menu-item.active')?.innerText.includes('المخزون')) {
-            renderInv();
-        } else if(document.querySelector('.menu-item.active')?.innerText.includes('المبيعات')) {
-            renderSales();
-        } else if(document.querySelector('.menu-item.active')?.innerText.includes('المصروفات')) {
-            renderExp();
-        } else {
-            renderDash();
-        }
-    });
-}
-
-// --- الدوال المحاسبية السحابية ---
-window.sp = function(p, el) {
-    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-    if(el) el.classList.add('active');
-    if(p === 'dash') renderDash();
-    if(p === 'inv') renderInv();
-    if(p === 'sales') renderSales();
-    if(p === 'exp') renderExp();
-};
-
-function renderDash() {
-    let sTot = cloudData.sales.reduce((a, b) => a + b.tot, 0);
-    let pTot = cloudData.sales.reduce((a, b) => a + b.prof, 0);
-    let eTot = cloudData.exp.reduce((a, b) => a + b.amt, 0);
-
-    document.getElementById('pageContent').innerHTML = `
-        <h1 style="margin-bottom:20px">لوحة التحكم السحابية</h1>
-        <div class="stats-grid">
-            <div class="stat-card" onclick="sp('sales')"><h3>💰 إجمالي المبيعات</h3><div class="stat-value">${sTot.toLocaleString()}</div></div>
-            <div class="stat-card" onclick="sp('sales')" style="border-color:var(--s)"><h3>📈 صافي الأرباح</h3><div class="stat-value" style="color:var(--s)">${(pTot - eTot).toLocaleString()}</div></div>
-            <div class="stat-card" onclick="sp('exp')" style="border-color:var(--d)"><h3>💸 المصروفات</h3><div class="stat-value">${eTot.toLocaleString()}</div></div>
-            <div class="stat-card" onclick="sp('inv')"><h3>📦 عدد المنتجات</h3><div class="stat-value">${cloudData.inv.length}</div></div>
-        </div>
-        <div class="card"><h3>📋 آخر المبيعات (Live)</h3>
-        <table><thead><tr><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
-        <tbody>${cloudData.sales.slice(-5).reverse().map(s=>`<tr><td style="text-align:center">${s.d || ''}</td><td style="text-align:center">${s.n}</td><td style="text-align:center">${s.q}</td><td style="text-align:center">${s.tot.toLocaleString()}</td></tr>`).join('')}</tbody></table></div>
-    `;
-}
-
-function renderInv() {
-    document.getElementById('pageContent').innerHTML = `
-        <div class="card"><div class="card-header"><h2>📦 المخزون</h2><button class="btn btn-primary" onclick="openInvM()">+ إضافة صنف</button></div>
-        <div class="table-wrapper"><table><thead><tr><th>#</th><th>الصنف</th><th>التكلفة</th><th>البيع</th><th>الكمية</th><th></th></tr></thead>
-        <tbody>${cloudData.inv.map((i,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${i.n}</strong></td><td style="text-align:center">${i.c}</td><td style="text-align:center">${i.p}</td><td style="text-align:center">${i.q}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="deleteInv('${i.id}')">🗑️</button></td></tr>`).join('')}</tbody><tr></div></div>
-    `;
-}
-
-window.openInvM = function() {
-    document.getElementById('mBody').innerHTML = `<h3>➕ منتج جديد</h3><input id="in" placeholder="الاسم"><input id="ic" type="number" placeholder="سعر التكلفة"><input id="ip" type="number" placeholder="سعر البيع"><input id="iq" type="number" placeholder="الكمية"><button class="btn btn-success" style="width:100%" onclick="saveInv()">💾 حفظ في السحابة</button>`;
-    document.getElementById('modal').classList.add('show');
-};
-
-window.saveInv = async function() {
-    const name = document.getElementById('in').value;
-    if(!name) { alert('❌ يرجى كتابة اسم المنتج'); return; }
-    const data = { n: name, c: parseFloat(document.getElementById('ic').value) || 0, p: parseFloat(document.getElementById('ip').value) || 0, q: parseInt(document.getElementById('iq').value) || 0 };
-    const newRef = window.push(window.ref(window.db, `users/${currentUid}/inv`));
-    await window.set(newRef, data);
-    cm();
-    alert('✅ تمت الإضافة بنجاح');
-};
-
-window.deleteInv = async function(id) {
-    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
-        await window.set(window.ref(window.db, `users/${currentUid}/inv/${id}`), null);
-        alert('🗑️ تم الحذف');
+    const btn = document.getElementById('authBtn');
+    const toggle = document.getElementById('toggleText');
+    if(authMode === 'login') {
+        btn.innerText = 'دخول للنظام';
+        toggle.innerText = 'ليس لديك حساب؟ إنشاء حساب جديد';
+    } else {
+        btn.innerText = 'إنشاء حساب جديد';
+        toggle.innerText = 'لديك حساب بالفعل؟ سجل دخولك';
     }
 };
 
-function renderSales() {
-    document.getElementById('pageContent').innerHTML = `
-        <h2>🛒 فاتورة بيع جديدة</h2>
-        <div class="card">
-            <select id="si">${cloudData.inv.map(i=>`<option value="${i.id}">${i.n} (متوفر: ${i.q}) - ${i.p} ج.م</option>`)}</select>
-            <input id="sq" type="number" value="1" placeholder="الكمية">
-            <input id="sclient" placeholder="اسم العميل">
-            <button class="btn btn-success" style="width:100%" onclick="doSale()">💰 تأكيد البيع وخصم المخزن</button>
+// ========== تشغيل التطبيق ==========
+async function startApp(user) {
+    currentUser = user;
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appSystem').style.display = 'block';
+    document.getElementById('userName').innerHTML = user.email.split('@')[0];
+    document.getElementById('userEmail').innerHTML = user.email;
+    
+    // تحميل البيانات
+    const userRef = window.ref(window.db, `users/${user.uid}/data`);
+    const snapshot = await window.get(userRef);
+    if(snapshot.exists()) {
+        const data = snapshot.val();
+        db.inv = data.inv || [];
+        db.sales = data.sales || [];
+        db.purchases = data.purchases || [];
+        db.expenses = data.expenses || [];
+        db.revenues = data.revenues || [];
+        db.clients = data.clients || [];
+        db.suppliers = data.suppliers || [];
+    }
+    
+    // بيانات تجريبية
+    if(db.inv.length === 0) {
+        db.inv = [
+            {id: 1, name: 'مكتب خشبي', cost: 500, price: 800, qty: 15},
+            {id: 2, name: 'كرسي دوار', cost: 300, price: 550, qty: 25},
+            {id: 3, name: 'طابعة HP', cost: 1200, price: 1800, qty: 5},
+            {id: 4, name: 'شاشة 24 بوصة', cost: 2000, price: 3200, qty: 8}
+        ];
+        db.clients = [
+            {id: 101, name: 'شركة الأهرام', phone: '01001112223'},
+            {id: 102, name: 'مؤسسة النور', phone: '01002223334'}
+        ];
+        db.suppliers = [
+            {id: 201, name: 'معرض القاهرة', phone: '01555556667'},
+            {id: 202, name: 'شركة التقنية', phone: '01556667778'}
+        ];
+        db.expenses = [
+            {id: 301, date: new Date().toLocaleDateString(), name: 'إيجار المحل', amount: 5000}
+        ];
+        await saveToCloud();
+    }
+    
+    // مراقبة التغييرات
+    window.onValue(userRef, (snapshot) => {
+        if(snapshot.exists()) {
+            const data = snapshot.val();
+            db.inv = data.inv || [];
+            db.sales = data.sales || [];
+            db.purchases = data.purchases || [];
+            db.expenses = data.expenses || [];
+            db.revenues = data.revenues || [];
+            db.clients = data.clients || [];
+            db.suppliers = data.suppliers || [];
+            renderDashboard();
+        }
+    });
+    
+    renderDashboard();
+}
+
+async function saveToCloud() {
+    if(currentUser) {
+        await window.set(window.ref(window.db, `users/${currentUser.uid}/data`), {
+            inv: db.inv,
+            sales: db.sales,
+            purchases: db.purchases,
+            expenses: db.expenses,
+            revenues: db.revenues,
+            clients: db.clients,
+            suppliers: db.suppliers
+        });
+    }
+}
+
+// ========== التنقل ==========
+window.sp = function(page, el) {
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    if(el) el.classList.add('active');
+    if(page === 'dash') renderDashboard();
+    else if(page === 'inv') renderInventory();
+    else if(page === 'sales') renderSales();
+    else if(page === 'purchases') renderPurchases();
+    else if(page === 'expenses') renderExpenses();
+    else if(page === 'revenues') renderRevenues();
+    else if(page === 'debts') renderDebts();
+    else if(page === 'clients') renderClients();
+    else if(page === 'suppliers') renderSuppliers();
+};
+
+// ========== 1. Dashboard ==========
+function renderDashboard() {
+    let totalSales = db.sales.reduce((a,b)=>a+b.total, 0);
+    let totalPurchases = db.purchases.reduce((a,b)=>a+b.total, 0);
+    let totalExpenses = db.expenses.reduce((a,b)=>a+b.amount, 0);
+    let totalRevenues = db.revenues.reduce((a,b)=>a+b.amount, 0);
+    let profit = totalSales - totalPurchases - totalExpenses + totalRevenues;
+    let lowStock = db.inv.filter(i=>i.qty <= 5).length;
+    
+    document.getElementById('content').innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card" onclick="sp('sales')"><h3>💰 إجمالي المبيعات</h3><div class="stat-value">${totalSales.toLocaleString()}</div></div>
+            <div class="stat-card" onclick="sp('expenses')" style="border-color:#10b981"><h3>📈 صافي الربح</h3><div class="stat-value" style="color:#10b981">${profit.toLocaleString()}</div></div>
+            <div class="stat-card" onclick="sp('expenses')" style="border-color:#ef4444"><h3>💸 المصروفات</h3><div class="stat-value">${totalExpenses.toLocaleString()}</div></div>
+            <div class="stat-card" onclick="sp('inventory')"><h3>📦 المنتجات</h3><div class="stat-value">${db.inv.length}</div></div>
+            <div class="stat-card" onclick="sp('inventory')" style="border-color:#f59e0b"><h3>⚠️ منتجات منخفضة</h3><div class="stat-value">${lowStock}</div></div>
+            <div class="stat-card" onclick="sp('clients')"><h3>👥 العملاء</h3><div class="stat-value">${db.clients.length}</div></div>
         </div>
-        <div class="card"><h3>📋 سجل الفواتير</h3><div class="table-wrapper"><table><thead><td><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
-        <tbody>${cloudData.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.n}</td><td style="text-align:center">${s.cli || '-'}</td><td style="text-align:center">${s.q}</td><td style="text-align:center">${s.tot.toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
+        <div class="card"><h3>📋 آخر المبيعات</h3><div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
+        <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${s.total.toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
     `;
 }
 
-window.doSale = async function() {
-    let id = document.getElementById('si').value;
-    let q = parseInt(document.getElementById('sq').value);
-    let client = document.getElementById('sclient').value || 'زبون نقدي';
-    let prod = cloudData.inv.find(i=>i.id === id);
-    if(prod && prod.q >= q) {
-        // تحديث المخزن في السحابة
-        await window.set(window.ref(window.db, `users/${currentUid}/inv/${id}/q`), prod.q - q);
-        // تسجيل البيع
-        const saleData = { n: prod.n, cli: client, q: q, tot: q * prod.p, prof: q * (prod.p - prod.c), d: new Date().toLocaleDateString('ar-EG') };
-        await window.push(window.ref(window.db, `users/${currentUid}/sales`), saleData);
-        alert('✅ تمت العملية وحفظها سحابياً');
-        renderSales();
-    } else alert('❌ الكمية غير كافية!');
-};
-
-function renderExp() {
-    document.getElementById('pageContent').innerHTML = `
-        <div class="card"><div class="card-header"><h2>💸 المصروفات</h2><button class="btn btn-danger" onclick="openExpM()">+ تسجيل مصروف</button></div>
-        <div class="table-wrapper"><table><thead><td><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></thead>
-        <tbody>${cloudData.exp.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.d}</td><td style="text-align:center">${e.n}</td><td style="text-align:center">${e.amt.toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
+// ========== 2. Inventory ==========
+function renderInventory() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><div class="card-header"><h2>📦 المخزون</h2><button class="btn btn-primary" onclick="openProductModal()">+ منتج جديد</button></div>
+        <input type="text" id="searchInv" placeholder="🔍 بحث..." style="width:100%; padding:12px; margin-bottom:15px" onkeyup="filterInventory()">
+        <div class="table-wrapper"><table id="invTable"><thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody id="invList"></tbody></table></div></div>
     `;
+    refreshInventory();
 }
 
-window.openExpM = function() {
-    document.getElementById('mBody').innerHTML = `<h3>➕ مصروف جديد</h3><input id="en" placeholder="البيان (مثال: كهرباء، إيجار)"><input id="ea" type="number" placeholder="المبلغ"><button class="btn btn-danger" style="width:100%" onclick="addExp()">💾 حفظ</button>`;
+function refreshInventory() {
+    let search = document.getElementById('searchInv')?.value.toLowerCase() || '';
+    let filtered = db.inv.filter(i => i.name.toLowerCase().includes(search));
+    document.getElementById('invList').innerHTML = filtered.map((i, idx) => `
+        <tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${i.name}</strong></td>
+        <td style="text-align:center">${(i.cost||0).toLocaleString()}</td><td style="text-align:center">${(i.price||0).toLocaleString()}</td>
+        <td style="text-align:center" class="${i.qty<=5?'badge-warning':''}">${i.qty}</td>
+        <td style="text-align:center">${i.qty<=5?'⚠️ منخفض':'متوفر'}</td>
+        <td style="text-align:center"><button class="btn btn-primary" style="padding:5px" onclick="editProduct(${i.id})">✏️</button><button class="btn btn-danger" style="padding:5px" onclick="deleteProduct(${i.id})">🗑️</button></td>
+        </tr>`).join('');
+}
+function filterInventory() { refreshInventory(); }
+
+function openProductModal(id=null) {
+    let i = id ? db.inv.find(x=>x.id==id) : {name:'', cost:0, price:0, qty:0};
+    document.getElementById('modalBody').innerHTML = `
+        <h3>${id?'✏️ تعديل منتج':'➕ إضافة منتج'}</h3>
+        <input type="text" id="prodName" value="${i.name}" placeholder="اسم المنتج">
+        <input type="number" id="prodCost" value="${i.cost}" placeholder="سعر الشراء">
+        <input type="number" id="prodPrice" value="${i.price}" placeholder="سعر البيع">
+        <input type="number" id="prodQty" value="${i.qty}" placeholder="الكمية">
+        <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="saveProduct(${id})">💾 حفظ</button>
+    `;
     document.getElementById('modal').classList.add('show');
-};
+}
 
-window.addExp = async function() {
-    let name = document.getElementById('en').value;
-    let amount = parseFloat(document.getElementById('ea').value);
+async function saveProduct(id) {
+    let name = document.getElementById('prodName').value;
+    if(!name) { alert('❌ يرجى كتابة اسم المنتج'); return; }
+    let newProduct = {
+        id: id || Date.now(),
+        name: name,
+        cost: parseFloat(document.getElementById('prodCost').value) || 0,
+        price: parseFloat(document.getElementById('prodPrice').value) || 0,
+        qty: parseInt(document.getElementById('prodQty').value) || 0
+    };
+    if(id) {
+        let idx = db.inv.findIndex(x=>x.id==id);
+        db.inv[idx] = newProduct;
+    } else {
+        db.inv.push(newProduct);
+    }
+    await saveToCloud();
+    closeModal();
+    renderInventory();
+    alert(`✅ ${id?'تم التعديل':'تمت الإضافة'} بنجاح`);
+}
+
+function editProduct(id) { openProductModal(id); }
+async function deleteProduct(id) {
+    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+        db.inv = db.inv.filter(p=>p.id!==id);
+        await saveToCloud();
+        renderInventory();
+        alert('🗑️ تم الحذف');
+    }
+}
+
+// ========== 3. Sales ==========
+function renderSales() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><h2>🛒 فاتورة جديدة</h2>
+        <select id="saleProduct">${db.inv.map(p=>`<option value="${p.id}">${p.name} (متوفر: ${p.qty}) - ${p.price}</option>`)}</select>
+        <select id="saleClient">${db.clients.map(c=>`<option value="${c.name}">${c.name}</option>`)}<option>زبون نقدي</option></select>
+        <input type="number" id="saleQty" value="1" placeholder="الكمية">
+        <select id="saleStatus"><option value="مدفوع">مدفوع</option><option value="آجل">آجل</option></select>
+        <button class="btn btn-success" style="width:100%" onclick="doSale()">💰 إتمام البيع</button></div>
+        <div class="card"><h3>📋 سجل الفواتير</h3><div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th><th>طباعة</th></tr></thead>
+        <tbody>${db.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${s.total.toLocaleString()}</td><td style="text-align:center"><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td><td style="text-align:center"><button class="btn btn-primary" style="padding:5px" onclick="printInvoice(${s.id})">🖨️</button></td></tr>`).join('')}</tbody></td></div></div>
+    `;
+}
+
+async function doSale() {
+    let productId = parseInt(document.getElementById('saleProduct').value);
+    let product = db.inv.find(p=>p.id===productId);
+    let qty = parseInt(document.getElementById('saleQty').value);
+    if(product && product.qty >= qty) {
+        product.qty -= qty;
+        let sale = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString('ar-EG'),
+            product: product.name,
+            client: document.getElementById('saleClient').value,
+            qty: qty,
+            total: qty * product.price,
+            profit: qty * (product.price - product.cost),
+            status: document.getElementById('saleStatus').value,
+            paid: document.getElementById('saleStatus').value === 'مدفوع' ? qty * product.price : 0
+        };
+        db.sales.push(sale);
+        await saveToCloud();
+        renderSales();
+        alert(`✅ تم البيع بنجاح\nالمنتج: ${product.name}\nالكمية: ${qty}\nالإجمالي: ${(qty * product.price).toLocaleString()}`);
+    } else {
+        alert(`❌ الكمية غير كافية\nالمتوفر: ${product?.qty || 0}`);
+    }
+}
+
+function printInvoice(id) {
+    let sale = db.sales.find(s=>s.id===id);
+    if(!sale) return;
+    let printWindow = window.open('', '_blank');
+    printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>فاتورة #${sale.id}</title><style>body{font-family:Cairo;padding:40px;direction:rtl}</style></head><body><div style="text-align:center"><h1 style="color:#3b82f6">SEMO CLOUD</h1><h2>فاتورة #${sale.id}</h2><p>التاريخ: ${sale.date}</p></div><hr><table style="width:100%;border-collapse:collapse"><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr><tr><td style="text-align:center">${sale.product}</td><td style="text-align:center">${sale.qty}</td><td style="text-align:center">${(sale.total/sale.qty).toLocaleString()}</td><td style="text-align:center">${sale.total.toLocaleString()}</td></tr></table><h3 style="text-align:center">الإجمالي: ${sale.total.toLocaleString()}</h3><hr><div style="text-align:center"><p>شكراً لتعاملكم معنا</p></div><script>window.print();<\/script></body></html>`);
+    printWindow.document.close();
+}
+
+// ========== 4. Purchases ==========
+function renderPurchases() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><h2>📥 مشتريات (توريد للمخزن)</h2>
+        <select id="purchaseProduct">${db.inv.map(p=>`<option value="${p.id}">${p.name}</option>`)}</select>
+        <select id="purchaseSupplier">${db.suppliers.map(s=>`<option value="${s.name}">${s.name}</option>`)}</select>
+        <input type="number" id="purchaseQty" placeholder="الكمية المشتراة">
+        <input type="number" id="purchasePrice" placeholder="سعر الشراء الجديد (اختياري)">
+        <button class="btn btn-primary" style="width:100%" onclick="doPurchase()">✅ تحديث المخزن</button></div>
+        <div class="card"><h3>📋 سجل المشتريات</h3><div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>المورد</th><th>الإجمالي</th></tr></thead>
+        <tbody>${db.purchases.slice().reverse().map((p,idx)=>`<td><td style="text-align:center">${idx+1}</td><td style="text-align:center">${p.date}</td><td style="text-align:center">${p.product}</td><td style="text-align:center">${p.qty}</td><td style="text-align:center">${p.supplier}</td><td style="text-align:center">${(p.total || 0).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
+    `;
+}
+
+async function doPurchase() {
+    let productId = parseInt(document.getElementById('purchaseProduct').value);
+    let product = db.inv.find(p=>p.id===productId);
+    let qty = parseInt(document.getElementById('purchaseQty').value);
+    let price = parseFloat(document.getElementById('purchasePrice').value);
+    if(product && qty > 0) {
+        product.qty += qty;
+        if(price > 0) product.cost = price;
+        db.purchases.push({
+            id: Date.now(),
+            date: new Date().toLocaleDateString('ar-EG'),
+            product: product.name,
+            qty: qty,
+            supplier: document.getElementById('purchaseSupplier').value,
+            price: price || product.cost,
+            total: qty * (price || product.cost)
+        });
+        await saveToCloud();
+        renderPurchases();
+        alert(`✅ تم توريد ${qty} من ${product.name} بنجاح`);
+    } else {
+        alert('❌ يرجى إدخال كمية صحيحة');
+    }
+}
+
+// ========== 5. Expenses ==========
+function renderExpenses() {
+    let total = db.expenses.reduce((a,b)=>a+b.amount, 0);
+    document.getElementById('content').innerHTML = `
+        <div class="card"><div class="card-header"><h2>💸 المصروفات (${total.toLocaleString()})</h2><button class="btn btn-danger" onclick="openExpenseModal()">+ إضافة</button></div>
+        <div class="table-wrapper"><table><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></tr></thead>
+        <tbody>${db.expenses.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.date}</td><td style="text-align:center">${e.name}</td><td style="text-align:center">${e.amount.toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
+    `;
+}
+
+function openExpenseModal() {
+    document.getElementById('modalBody').innerHTML = `<h3>➕ إضافة مصروف</h3><input type="text" id="expName" placeholder="البيان"><input type="number" id="expAmount" placeholder="المبلغ"><button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="addExpense()">💾 حفظ</button>`;
+    document.getElementById('modal').classList.add('show');
+}
+
+async function addExpense() {
+    let name = document.getElementById('expName').value;
+    let amount = parseFloat(document.getElementById('expAmount').value);
     if(!name) { alert('❌ يرجى كتابة البيان'); return; }
-    const data = { n: name, amt: amount, d: new Date().toLocaleDateString('ar-EG') };
-    await window.push(window.ref(window.db, `users/${currentUid}/exp`), data);
-    cm();
-    alert('✅ تمت الإضافة');
-};
+    if(isNaN(amount)) { alert('❌ يرجى كتابة المبلغ'); return; }
+    db.expenses.push({id: Date.now(), date: new Date().toLocaleDateString('ar-EG'), name: name, amount: amount});
+    await saveToCloud();
+    closeModal();
+    renderExpenses();
+    alert('✅ تمت إضافة المصروف');
+}
 
-// أدوات
-function cm() { document.getElementById('modal').classList.remove('show'); }
-window.logout = async function() { await window.auth.signOut(); location.reload(); };
+// ========== 6. Revenues ==========
+function renderRevenues() {
+    let total = db.revenues.reduce((a,b)=>a+b.amount, 0);
+    document.getElementById('content').innerHTML = `
+        <div class="card"><div class="card-header"><h2>💰 الإيرادات (${total.toLocaleString()})</h2><button class="btn btn-success" onclick="openRevenueModal()">+ إضافة</button></div>
+        <div class="table-wrapper"></table><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></tr></thead>
+        <tbody>${db.revenues.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.date}</td><td style="text-align:center">${r.name}</td><td style="text-align:center">${r.amount.toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>
+    `;
+}
+
+function openRevenueModal() {
+    document.getElementById('modalBody').innerHTML = `<h3>➕ إضافة إيراد</h3><input type="text" id="revName" placeholder="البيان"><input type="number" id="revAmount" placeholder="المبلغ"><button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addRevenue()">💾 حفظ</button>`;
+    document.getElementById('modal').classList.add('show');
+}
+
+async function addRevenue() {
+    let name = document.getElementById('revName').value;
+    let amount = parseFloat(document.getElementById('revAmount').value);
+    if(!name) { alert('❌ يرجى كتابة البيان'); return; }
+    if(isNaN(amount)) { alert('❌ يرجى كتابة المبلغ'); return; }
+    db.revenues.push({id: Date.now(), date: new Date().toLocaleDateString('ar-EG'), name: name, amount: amount});
+    await saveToCloud();
+    closeModal();
+    renderRevenues();
+    alert('✅ تمت إضافة الإيراد');
+}
+
+// ========== 7. Debts ==========
+function renderDebts() {
+    let debts = db.sales.filter(s=>s.status === 'آجل');
+    let totalDebts = debts.reduce((a,b)=>a+(b.total - (b.paid||0)), 0);
+    document.getElementById('content').innerHTML = `
+        <div class="card"><h2>⏳ الديون المستحقة (${totalDebts.toLocaleString()})</h2>
+        <div class="table-wrapper"><table><thead></td><th>#</th><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>تحصيل</th></tr></thead>
+        <tbody>${debts.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.total.toLocaleString()}</td><td style="text-align:center">${(s.paid||0).toLocaleString()}</td><td style="text-align:center" style="color:#ef4444">${(s.total - (s.paid||0)).toLocaleString()}</td><td style="text-align:center"><button class="btn btn-success" style="padding:5px" onclick="collectDebt(${s.id})">💰 تحصيل</button></td></tr>`).join('')}</tbody></table></div></div>
+    `;
+}
+
+async function collectDebt(id) {
+    let sale = db.sales.find(s=>s.id===id);
+    if(sale) {
+        let remaining = sale.total - (sale.paid || 0);
+        let amount = parseFloat(prompt(`المبلغ المراد تحصيله من ${sale.client}\nالمتبقي: ${remaining.toLocaleString()}`, remaining));
+        if(!isNaN(amount) && amount > 0) {
+            sale.paid = (sale.paid || 0) + amount;
+            if(sale.paid >= sale.total) sale.status = 'مدفوع';
+            await saveToCloud();
+            renderDebts();
+            renderDashboard();
+            alert(`✅ تم تحصيل ${amount.toLocaleString()}`);
+        }
+    }
+}
+
+// ========== 8. Clients ==========
+function renderClients() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><div class="card-header"><h2>👥 العملاء</h2><button class="btn btn-primary" onclick="openClientModal()">+ عميل جديد</button></div>
+        <div class="table-wrapper"><table><thead></tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي مشترياته</th><th></th></tr></thead>
+        <tbody>${db.clients.map((c,idx) => {
+            let total = db.sales.filter(s=>s.client===c.name).reduce((a,b)=>a+b.total, 0);
+            return `<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${c.name}</strong></td><td style="text-align:center">${c.phone || '-'}</td><td style="text-align:center">${total.toLocaleString()}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`;
+        }).join('')}</tbody></table></div></div>
+    `;
+}
+
+function openClientModal() {
+    document.getElementById('modalBody').innerHTML = `<h3>➕ إضافة عميل</h3><input type="text" id="clientName" placeholder="اسم العميل"><input type="text" id="clientPhone" placeholder="رقم الهاتف"><button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addClient()">💾 حفظ</button>`;
+    document.getElementById('modal').classList.add('show');
+}
+
+async function addClient() {
+    let name = document.getElementById('clientName').value;
+    if(!name) { alert('❌ يرجى كتابة اسم العميل'); return; }
+    db.clients.push({id: Date.now(), name: name, phone: document.getElementById('clientPhone').value || '-'});
+    await saveToCloud();
+    closeModal();
+    renderClients();
+    alert(`✅ تمت إضافة العميل: ${name}`);
+}
+
+async function deleteClient(id) {
+    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+        db.clients = db.clients.filter(c=>c.id!==id);
+        await saveToCloud();
+        renderClients();
+        alert('🗑️ تم الحذف');
+    }
+}
+
+// ========== 9. Suppliers ==========
+function renderSuppliers() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><div class="card-header"><h2>🏭 الموردين</h2><button class="btn btn-primary" onclick="openSupplierModal()">+ مورد جديد</button></div>
+        <div class="table-wrapper"><table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th></th></tr></thead>
+        <tbody>${db.suppliers.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${s.name}</strong></td><td style="text-align:center">${s.phone || '-'}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="deleteSupplier(${s.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>
+    `;
+}
+
+function openSupplierModal() {
+    document.getElementById('modalBody').innerHTML = `<h3>➕ إضافة مورد</h3><input type="text" id="supplierName" placeholder="اسم المورد"><input type="text" id="supplierPhone" placeholder="رقم الهاتف"><button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addSupplier()">💾 حفظ</button>`;
+    document.getElementById('modal').classList.add('show');
+}
+
+async function addSupplier() {
+    let name = document.getElementById('supplierName').value;
+    if(!name) { alert('❌ يرجى كتابة اسم المورد'); return; }
+    db.suppliers.push({id: Date.now(), name: name, phone: document.getElementById('supplierPhone').value || '-'});
+    await saveToCloud();
+    closeModal();
+    renderSuppliers();
+    alert(`✅ تمت إضافة المورد: ${name}`);
+}
+
+async function deleteSupplier(id) {
+    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+        db.suppliers = db.suppliers.filter(s=>s.id!==id);
+        await saveToCloud();
+        renderSuppliers();
+        alert('🗑️ تم الحذف');
+    }
+}
+
+// ========== أدوات ==========
+async function exportData() {
+    let exportData = {
+        inventory: db.inv,
+        sales: db.sales,
+        purchases: db.purchases,
+        expenses: db.expenses,
+        revenues: db.revenues,
+        clients: db.clients,
+        suppliers: db.suppliers,
+        exportedAt: new Date().toLocaleString('ar-EG')
+    };
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    let a = document.createElement('a');
+    a.href = dataStr;
+    a.download = `SEMO_Backup_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.json`;
+    a.click();
+    alert('✅ تم تصدير النسخة الاحتياطية');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+}
+
+window.logout = async function() {
+    await window.auth.signOut();
+    location.reload();
+};
 
 window.initApp = function() {
     window.auth.onAuthStateChanged(user => {
-        if(user) startSystem(user);
-        else document.getElementById('loginPage').style.display = 'flex';
+        if(user) startApp(user);
     });
 };
 </script>
