@@ -1,749 +1,175 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP CLOUD - نظام سحابي متكامل</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
-            authDomain: "my-pos-system-11dee.firebaseapp.com",
-            databaseURL: "https://my-pos-system-11dee-default-rtdb.firebaseio.com",
-            projectId: "my-pos-system-11dee",
-            storageBucket: "my-pos-system-11dee.firebasestorage.app",
-            messagingSenderId: "565195477080",
-            appId: "1:565195477080:web:1ffa21a34e28b47dddfa2d"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const database = getDatabase(app);
-
-        window.auth = auth;
-        window.db = database;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.ref = ref;
-        window.set = set;
-        window.get = get;
-        window.child = child;
-        window.push = push;
-        window.onValue = onValue;
-        
-        console.log("✅ Firebase connected");
-    </script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        :root {
-            --p: #3b82f6;
-            --s: #10b981;
-            --d: #ef4444;
-            --w: #f59e0b;
-            --bg: #0f172a;
-            --c: #1e293b;
-            --t: #f8fafc;
-            --b: #334155;
-        }
-        body {
-            background: var(--bg);
-            color: var(--t);
-            font-family: 'Cairo', sans-serif;
-            direction: rtl;
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* الشريط الجانبي */
-        .sidebar {
-            width: 280px;
-            background: var(--c);
-            padding: 25px 20px;
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            border-left: 1px solid var(--b);
-            z-index: 100;
-        }
-        
-        /* المحتوى الرئيسي */
-        .main {
-            margin-right: 280px;
-            padding: 30px;
-            width: calc(100% - 280px);
-        }
-        
-        /* البطاقات */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--c);
-            padding: 20px;
-            border-radius: 20px;
-            border-right: 4px solid var(--p);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-card h3 {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-        }
-        
-        /* الكروت */
-        .card {
-            background: var(--c);
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid var(--b);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        /* الجداول */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid var(--b);
-        }
-        th {
-            color: var(--p);
-        }
-        
-        /* الأزرار */
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-primary { background: var(--p); color: #fff; }
-        .btn-success { background: var(--s); color: #fff; }
-        .btn-danger { background: var(--d); color: #fff; }
-        
-        /* المدخلات */
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: var(--bg);
-            border: 1px solid var(--b);
-            color: #fff;
-            border-radius: 10px;
-        }
-        
-        /* القائمة */
-        .menu-item {
-            padding: 12px 15px;
-            margin: 5px 0;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.3s;
-        }
-        .menu-item:hover, .menu-item.active {
-            background: var(--p);
-        }
-        .menu-title {
-            font-size: 11px;
-            color: var(--p);
-            margin: 15px 0 5px;
-            font-weight: bold;
-        }
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px;
-            background: var(--bg);
-            border-radius: 16px;
-            margin-bottom: 25px;
-        }
-        
-        /* شاشة الدخول */
-        .login-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .login-card {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid #334155;
-        }
-        .login-card input, .login-card select {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #fff;
-            border-radius: 12px;
-        }
-        .login-card button {
-            width: 100%;
-            padding: 15px;
-            background: #3b82f6;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .toggle-auth {
-            margin-top: 15px;
-            color: #3b82f6;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        /* النافذة */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1100;
-        }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: var(--c);
-            padding: 30px;
-            border-radius: 25px;
-            width: 90%;
-            max-width: 500px;
-        }
-        
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-        }
-        .badge-success { background: rgba(16,185,129,0.2); color: #34d399; }
-        .badge-warning { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(100%);
-                width: 260px;
+<!-- تكملة الـ CSS و الـ HTML المقطوع -->
+        <style>
+            .badge-success { background: rgba(16,185,129,0.2); color: #34d399; }
+            .badge-warning { background: rgba(245,158,11,0.2); color: #fbbf24; }
+            .badge-danger { background: rgba(239,68,68,0.2); color: #f87171; }
+            
+            @media (max-width: 992px) {
+                .sidebar { transform: translateX(100%); }
+                .sidebar.open { transform: translateX(0); }
+                .main { margin-right: 0; width: 100%; }
             }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main {
-                margin-right: 0;
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
+        </style>
+    </head>
+    <body>
 
-<!-- شاشة الدخول -->
-<div id="loginPage" class="login-page">
-    <div class="login-card">
-        <div style="font-size: 60px;">☁️📊</div>
-        <h1 style="color: #3b82f6; margin: 20px 0;">SEMO ERP CLOUD</h1>
-        <select id="currencySelect">
-            <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
-            <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
-        </select>
-        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="loginPassword" placeholder="كلمة المرور">
-        <button onclick="doLogin()">دخول</button>
-        <div class="toggle-auth" onclick="showRegister()">ليس لديك حساب؟ سجل الآن</div>
-        <div id="loginError" class="error-msg" style="color:#f87171; margin-top:15px; display:none;"></div>
-        <div style="margin-top:20px; font-size:12px; opacity:0.7;">☁️ نظام سحابي - بياناتك محفوظة على السحابة</div>
+    <!-- شاشة الدخول -->
+    <div id="loginScreen" class="login-page">
+        <div class="login-card">
+            <h1 style="color:var(--p); margin-bottom:10px;">SEMO CLOUD</h1>
+            <p style="font-size:12px; margin-bottom:20px; opacity:0.7">نظام المحاسبة السحابي المتكامل</p>
+            <input type="email" id="email" placeholder="البريد الإلكتروني">
+            <input type="password" id="password" placeholder="كلمة المرور">
+            <button id="authBtn" onclick="handleAuth()">دخول للنظام</button>
+            <p class="toggle-auth" onclick="toggleAuthMode()" id="toggleText">ليس لديك حساب؟ إنشاء حساب جديد</p>
+        </div>
     </div>
-</div>
 
-<!-- شاشة التسجيل -->
-<div id="registerPage" class="login-page" style="display: none;">
-    <div class="login-card">
-        <div style="font-size: 60px;">☁️📊</div>
-        <h1 style="color: #3b82f6; margin: 20px 0;">إنشاء حساب جديد</h1>
-        <select id="regCurrencySelect">
-            <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
-            <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
-        </select>
-        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="regPassword" placeholder="كلمة المرور">
-        <input type="text" id="regName" placeholder="الاسم">
-        <button onclick="doRegister()">إنشاء حساب</button>
-        <div class="toggle-auth" onclick="showLogin()">لديك حساب؟ سجل دخول</div>
-        <div id="registerError" style="color:#f87171; margin-top:15px; display:none;"></div>
-    </div>
-</div>
-
-<!-- التطبيق -->
-<div id="app" style="display: none;">
-    <div class="sidebar" id="sidebar">
-        <h2 style="text-align:center; color:var(--p);">SEMO CLOUD</h2>
-        <div class="user-card">
-            <div class="user-avatar" style="font-size: 30px;">👑</div>
-            <div class="user-info">
-                <h4 id="userName">مدير النظام</h4>
-                <p id="userEmail"></p>
+    <!-- واجهة النظام -->
+    <div id="appSystem" style="display:none;">
+        <aside class="sidebar">
+            <div class="user-card">
+                <div style="width:45px; height:45px; background:var(--p); border-radius:12px; display:flex; align-items:center; justify-content:center;">👤</div>
+                <div>
+                    <h4 id="displayUser">مستخدم</h4>
+                    <p style="font-size:10px; opacity:0.7">متصل سحابياً ✅</p>
+                </div>
             </div>
-        </div>
-        <div class="menu-title">الرئيسية</div>
-        <div class="menu-item active" onclick="sp('dash', this)">🏠 لوحة التحكم</div>
-        
-        <div class="menu-title">المخازن</div>
-        <div class="menu-item" onclick="sp('inv', this)">📦 المخزون</div>
-        <div class="menu-item" onclick="sp('sales', this)">🛒 المبيعات</div>
-        <div class="menu-item" onclick="sp('pur', this)">📥 المشتريات</div>
-        
-        <div class="menu-title">المالية</div>
-        <div class="menu-item" onclick="sp('exp', this)">💸 المصروفات</div>
-        <div class="menu-item" onclick="sp('rev', this)">💰 الإيرادات</div>
-        <div class="menu-item" onclick="sp('debt', this)">⏳ الديون</div>
-        
-        <div class="menu-title">جهات الاتصال</div>
-        <div class="menu-item" onclick="sp('cli', this)">👥 العملاء</div>
-        <div class="menu-item" onclick="sp('sup', this)">🏭 الموردين</div>
-        
-        <div class="menu-title">النظام</div>
-        <div class="menu-item" onclick="exportData()">💾 نسخة احتياطية</div>
-        <div class="menu-item" onclick="logout()">🚪 تسجيل خروج</div>
+
+            <div class="menu-title">الرئيسية</div>
+            <div class="menu-item active" onclick="sp('dash', this)">🏠 الرئيسية</div>
+            
+            <div class="menu-title">العمليات</div>
+            <div class="menu-item" onclick="sp('inv', this)">📦 المخزون</div>
+            <div class="menu-item" onclick="sp('sales', this)">🛒 المبيعات</div>
+            <div class="menu-item" onclick="sp('pur', this)">🚚 المشتريات</div>
+            
+            <div class="menu-title">المالية</div>
+            <div class="menu-item" onclick="sp('exp', this)">💸 المصروفات</div>
+            <div class="menu-item" onclick="sp('debt', this)">⏳ الديون</div>
+            
+            <div class="menu-title">أدوات</div>
+            <div class="menu-item" onclick="logout()" style="color:var(--d)">🚪 تسجيل الخروج</div>
+        </aside>
+
+        <main class="main">
+            <div id="pageContent"></div>
+        </main>
     </div>
-    
-    <div class="main">
-        <div id="content"></div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal" onclick="if(event.target===this)cm()">
+        <div class="modal-content" id="mBody"></div>
     </div>
-</div>
 
-<div id="modal" class="modal" onclick="if(event.target===this)cm()">
-    <div class="modal-content" id="mBody"></div>
-</div>
+    <script>
+        // --- متغيرات الحالة ---
+        let authMode = 'login';
+        let currentUserId = null;
+        let dbData = { inv: [], sales: [], exp: [], cli: [], sup: [] };
 
-<script type="module">
-// ========== العملة ==========
-let currencySymbol = 'ج.م';
-let currentUserId = null;
-let currentUserEmail = null;
-
-function formatMoney(amount) {
-    return (amount || 0).toLocaleString() + ' ' + currencySymbol;
-}
-
-// ========== البيانات المؤقتة ==========
-let localData = {
-    inv: [],
-    sales: [],
-    pur: [],
-    exp: [],
-    rev: [],
-    cli: [],
-    sup: []
-};
-
-// ========== دوال Firebase ==========
-async function loadUserData(userId) {
-    try {
-        const snapshot = await get(child(ref(window.db), `${userId}/inventory`));
-        if(snapshot.exists()) localData.inv = Object.values(snapshot.val());
-        else localData.inv = [];
-        
-        const salesSnapshot = await get(child(ref(window.db), `${userId}/sales`));
-        if(salesSnapshot.exists()) localData.sales = Object.values(salesSnapshot.val());
-        else localData.sales = [];
-        
-        const expSnapshot = await get(child(ref(window.db), `${userId}/expenses`));
-        if(expSnapshot.exists()) localData.exp = Object.values(expSnapshot.val());
-        else localData.exp = [];
-        
-        const revSnapshot = await get(child(ref(window.db), `${userId}/revenues`));
-        if(revSnapshot.exists()) localData.rev = Object.values(revSnapshot.val());
-        else localData.rev = [];
-        
-        const cliSnapshot = await get(child(ref(window.db), `${userId}/clients`));
-        if(cliSnapshot.exists()) localData.cli = Object.values(cliSnapshot.val());
-        else localData.cli = [];
-        
-        const supSnapshot = await get(child(ref(window.db), `${userId}/suppliers`));
-        if(supSnapshot.exists()) localData.sup = Object.values(supSnapshot.val());
-        else localData.sup = [];
-        
-        // بيانات تجريبية إذا كانت فارغة
-        if(localData.inv.length === 0) {
-            localData.inv = [
-                {id:1, n:'مكتب خشبي', c:500, p:800, q:15},
-                {id:2, n:'كرسي دوار', c:300, p:550, q:25},
-                {id:3, n:'طابعة HP', c:1200, p:1800, q:5},
-                {id:4, n:'شاشة 24 بوصة', c:2000, p:3200, q:8}
-            ];
-            localData.cli = [
-                {id:101, n:'شركة الأهرام', p:'01001112223'},
-                {id:102, n:'مؤسسة النور', p:'01002223334'}
-            ];
-            localData.sup = [
-                {id:201, n:'معرض القاهرة', p:'01555556667'},
-                {id:202, n:'شركة التقنية', p:'01556667778'}
-            ];
-            await saveAllToFirebase(userId);
+        // --- نظام الـ Authentication ---
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                if(authMode === 'login') {
+                    const res = await window.signInWithEmailAndPassword(window.auth, email, password);
+                    startSystem(res.user);
+                } else {
+                    const res = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                    await window.set(window.ref(window.db, 'users/' + res.user.uid), { email: email, created: Date.now() });
+                    startSystem(res.user);
+                }
+            } catch (err) { alert("خطأ: " + err.message); }
         }
-        
-        renderDash();
-    } catch(error) {
-        console.error("خطأ في التحميل:", error);
-    }
-}
 
-async function saveToFirebase(userId, collection, data) {
-    await set(ref(window.db, `${userId}/${collection}`), data);
-}
-
-async function saveAllToFirebase(userId) {
-    await saveToFirebase(userId, 'inventory', localData.inv);
-    await saveToFirebase(userId, 'sales', localData.sales);
-    await saveToFirebase(userId, 'purchases', localData.pur);
-    await saveToFirebase(userId, 'expenses', localData.exp);
-    await saveToFirebase(userId, 'revenues', localData.rev);
-    await saveToFirebase(userId, 'clients', localData.cli);
-    await saveToFirebase(userId, 'suppliers', localData.sup);
-}
-
-// ========== دوال المصادقة ==========
-window.doLogin = async function() {
-    let email = document.getElementById('loginEmail').value;
-    let password = document.getElementById('loginPassword').value;
-    let curSelect = document.getElementById('currencySelect');
-    let errorDiv = document.getElementById('loginError');
-    
-    try {
-        const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
-        currentUserId = userCredential.user.uid;
-        currentUserEmail = userCredential.user.email;
-        currencySymbol = curSelect.value === 'EGP' ? 'ج.م' : 'د.ل';
-        
-        localStorage.setItem('semo_cloud_user', JSON.stringify({uid: currentUserId, email: currentUserEmail}));
-        localStorage.setItem('semo_cloud_currency', currencySymbol);
-        
-        await loadUserData(currentUserId);
-        
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('userName').innerHTML = email.split('@')[0];
-        document.getElementById('userEmail').innerHTML = email;
-        
-    } catch(error) {
-        errorDiv.style.display = 'block';
-        errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/invalid-credential).' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : error.message);
-    }
-};
-
-window.doRegister = async function() {
-    let email = document.getElementById('regEmail').value;
-    let password = document.getElementById('regPassword').value;
-    let name = document.getElementById('regName').value;
-    let curSelect = document.getElementById('regCurrencySelect');
-    let errorDiv = document.getElementById('registerError');
-    
-    try {
-        const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
-        currentUserId = userCredential.user.uid;
-        currentUserEmail = userCredential.user.email;
-        currencySymbol = curSelect.value === 'EGP' ? 'ج.م' : 'د.ل';
-        
-        localStorage.setItem('semo_cloud_user', JSON.stringify({uid: currentUserId, email: currentUserEmail}));
-        localStorage.setItem('semo_cloud_currency', currencySymbol);
-        
-        await loadUserData(currentUserId);
-        
-        document.getElementById('registerPage').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('userName').innerHTML = name || email.split('@')[0];
-        document.getElementById('userEmail').innerHTML = email;
-        
-    } catch(error) {
-        errorDiv.style.display = 'block';
-        errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/email-already-in-use).' ? 'البريد الإلكتروني مستخدم بالفعل' : error.message);
-    }
-};
-
-window.showRegister = function() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('registerPage').style.display = 'flex';
-};
-
-window.showLogin = function() {
-    document.getElementById('registerPage').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'flex';
-};
-
-window.logout = async function() {
-    await window.auth.signOut();
-    localStorage.removeItem('semo_cloud_user');
-    localStorage.removeItem('semo_cloud_currency');
-    currentUserId = null;
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'flex';
-};
-
-// استعادة الجلسة
-let savedUser = localStorage.getItem('semo_cloud_user');
-let savedCur = localStorage.getItem('semo_cloud_currency');
-if(savedUser && savedCur) {
-    let user = JSON.parse(savedUser);
-    currentUserId = user.uid;
-    currentUserEmail = user.email;
-    currencySymbol = savedCur;
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('userName').innerHTML = user.email?.split('@')[0] || 'مستخدم';
-    document.getElementById('userEmail').innerHTML = user.email;
-    loadUserData(currentUserId);
-}
-
-// ========== التنقل ==========
-window.sp = function(p, el) {
-    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-    if(el) el.classList.add('active');
-    if(p === 'dash') renderDash();
-    else if(p === 'inv') renderInv();
-    else if(p === 'sales') renderSales();
-    else if(p === 'pur') renderPur();
-    else if(p === 'exp') renderExp();
-    else if(p === 'rev') renderRev();
-    else if(p === 'debt') renderDebt();
-    else if(p === 'cli') renderPeople('cli', 'العملاء');
-    else if(p === 'sup') renderPeople('sup', 'الموردين');
-};
-
-// ========== 1. الرئيسية ==========
-function renderDash() {
-    let sVal = localData.sales.reduce((a,b)=>a+b.tot, 0);
-    let eVal = localData.exp.reduce((a,b)=>a+b.amt, 0);
-    let rVal = localData.rev.reduce((a,b)=>a+b.amt, 0);
-    let profit = sVal - eVal + rVal;
-    let low = localData.inv.filter(i=>i.q <= 5).length;
-    
-    document.getElementById('content').innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card" onclick="sp('sales')"><h3>💰 المبيعات</h3><div class="stat-value">${formatMoney(sVal)}</div></div>
-            <div class="stat-card" onclick="sp('exp')" style="border-color:#ef4444"><h3>💸 المصروفات</h3><div class="stat-value">${formatMoney(eVal)}</div></div>
-            <div class="stat-card" onclick="sp('rev')" style="border-color:#10b981"><h3>💰 الإيرادات</h3><div class="stat-value">${formatMoney(rVal)}</div></div>
-            <div class="stat-card" onclick="sp('sales')" style="border-color:#10b981"><h3>📈 صافي الربح</h3><div class="stat-value" style="color:${profit>=0?'#10b981':'#ef4444'}">${formatMoney(profit)}</div></div>
-            <div class="stat-card" onclick="sp('inv')"><h3>📦 المنتجات</h3><div class="stat-value">${localData.inv.length}</div></div>
-            <div class="stat-card" onclick="sp('inv')" style="border-color:#f59e0b"><h3>⚠️ منتجات منخفضة</h3><div class="stat-value">${low}</div></div>
-            <div class="stat-card" onclick="sp('cli')"><h3>👥 العملاء</h3><div class="stat-value">${localData.cli.length}</div></div>
-        </div>
-        <div class="card"><h3>📋 آخر المبيعات</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead>
-        <tbody>${localData.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>
-    `;
-}
-
-// ========== 2. المخزون ==========
-function renderInv() {
-    document.getElementById('content').innerHTML = `
-        <div class="card">
-            <div class="card-header"><h2>📦 المخزون</h2><button class="btn btn-primary" onclick="openInvM()">+ منتج جديد</button></div>
-            <input type="text" id="searchInv" placeholder="بحث..." style="width:100%;padding:10px;margin-bottom:15px" onkeyup="filterInv()">
-            <table id="invTable"><thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th></th></tr></thead>
-            <tbody id="invList"></tbody></table>
-        </div>
-    `;
-    refreshInv();
-}
-
-function refreshInv() {
-    let search = document.getElementById('searchInv')?.value.toLowerCase() || '';
-    let filtered = localData.inv.filter(i => i.n.toLowerCase().includes(search));
-    document.getElementById('invList').innerHTML = filtered.map((i,idx)=>`
-        <tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${i.n}</strong></td>
-        <td style="text-align:center">${formatMoney(i.c)}</td><td style="text-align:center">${formatMoney(i.p)}</td>
-        <td style="text-align:center" class="${i.q<=5?'badge-warning':''}">${i.q}</td>
-        <td style="text-align:center">${i.q<=5?'⚠️ منخفض':'متوفر'}</td>
-        <td style="text-align:center"><button class="btn btn-primary" style="padding:5px" onclick="editInv(${i.id})">✏️</button><button class="btn btn-danger" style="padding:5px" onclick="delInv(${i.id})">🗑️</button></td>
-        </tr>`).join('');
-}
-function filterInv(){ refreshInv(); }
-
-function openInvM(id=null){
-    let i=id?localData.inv.find(x=>x.id==id):{n:'',c:0,p:0,q:0};
-    document.getElementById('mBody').innerHTML=`<h3>${id?'تعديل':'إضافة'} منتج</h3><input id="in" value="${i.n}" placeholder="الاسم"><input id="ic" type="number" value="${i.c}" placeholder="سعر الشراء"><input id="ip" type="number" value="${i.p}" placeholder="سعر البيع"><input id="iq" type="number" value="${i.q}" placeholder="الكمية"><button class="btn btn-success" style="width:100%" onclick="saveInv(${id})">حفظ</button>`;
-    document.getElementById('modal').classList.add('show');
-}
-
-async function saveInv(id){
-    let d={id:id||Date.now(), n:document.getElementById('in').value, c:parseFloat(document.getElementById('ic').value)||0, p:parseFloat(document.getElementById('ip').value)||0, q:parseInt(document.getElementById('iq').value)||0};
-    if(id) localData.inv=localData.inv.map(x=>x.id==id?d:x);
-    else localData.inv.push(d);
-    await saveToFirebase(currentUserId, 'inventory', localData.inv);
-    cm(); renderInv();
-}
-function editInv(id){ openInvM(id); }
-async function delInv(id){
-    if(confirm('حذف؟')){ localData.inv=localData.inv.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'inventory', localData.inv); renderInv(); }
-}
-
-// ========== 3. المبيعات ==========
-function renderSales(){
-    document.getElementById('content').innerHTML=`<div class="card"><h2>🛒 فاتورة جديدة</h2><select id="si">${localData.inv.map(i=>`<option value="${i.id}">${i.n} (${i.q})</option>`)}</select><select id="sc">${localData.cli.map(c=>`<option value="${c.n}">${c.n}</option>`)}<option>زبون نقدي</option></select><input id="sq" type="number" value="1" placeholder="الكمية"><select id="st"><option value="مدفوع">مدفوع</option><option value="آجل">آجل</option></select><button class="btn btn-success" style="width:100%" onclick="doSale()">إتمام البيع</button></div><div class="card"><h3>سجل الفواتير</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody>${localData.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${s.q}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>`;
-}
-
-async function doSale(){
-    let i=localData.inv.find(x=>x.id==parseInt(document.getElementById('si').value)), q=parseInt(document.getElementById('sq').value);
-    if(i && i.q>=q){
-        i.q-=q;
-        localData.sales.push({id:Date.now(), d:new Date().toLocaleDateString('ar-EG'), item:i.n, cli:document.getElementById('sc').value, q:q, tot:q*i.p, prof:q*(i.p-i.c), st:document.getElementById('st').value, paid:document.getElementById('st').value==='مدفوع'?q*i.p:0});
-        await saveToFirebase(currentUserId, 'inventory', localData.inv);
-        await saveToFirebase(currentUserId, 'sales', localData.sales);
-        renderSales();
-        alert('✅ تمت عملية البيع');
-    } else alert('الكمية غير كافية');
-}
-
-// ========== 4. المشتريات ==========
-function renderPur(){
-    document.getElementById('content').innerHTML=`<div class="card"><h2>📥 مشتريات</h2><select id="pi">${localData.inv.map(i=>`<option value="${i.id}">${i.n}</option>`)}</select><select id="ps">${localData.sup.map(s=>`<option value="${s.n}">${s.n}</option>`)}</select><input id="pq" type="number" placeholder="الكمية"><button class="btn btn-primary" style="width:100%" onclick="doPur()">توريد للمخزن</button></div>`;
-}
-async function doPur(){
-    let i=localData.inv.find(x=>x.id==parseInt(document.getElementById('pi').value)), q=parseInt(document.getElementById('pq').value);
-    if(i && q>0){ i.q+=q; localData.pur.push({d:new Date().toLocaleDateString(), n:i.n, q:q, s:document.getElementById('ps').value}); await saveToFirebase(currentUserId, 'inventory', localData.inv); alert('تم التوريد'); renderInv(); }
-    else alert('أدخل كمية صحيحة');
-}
-
-// ========== 5. المصروفات ==========
-function renderExp(){
-    let total=localData.exp.reduce((a,b)=>a+b.amt,0);
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💸 المصروفات (${formatMoney(total)})</h2><button class="btn btn-danger" onclick="openExpM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${localData.exp.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.d}</td><td style="text-align:center">${e.n}</td><td style="text-align:center">${formatMoney(e.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delExp(${e.id})">🗑️</button></td><tr>`).join('')}</tbody></table></div></div>`;
-}
-function openExpM(){
-    document.getElementById('mBody').innerHTML=`<h3>مصروف جديد</h3><input id="en" placeholder="البيان"><input id="ea" type="number" placeholder="المبلغ"><button class="btn btn-danger" style="width:100%" onclick="addExp()">حفظ</button>`;
-    document.getElementById('modal').classList.add('show');
-}
-async function addExp(){
-    let n=document.getElementById('en').value, a=parseFloat(document.getElementById('ea').value);
-    if(n && a){ localData.exp.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); await saveToFirebase(currentUserId, 'expenses', localData.exp); cm(); renderExp(); }
-    else alert('املأ البيانات');
-}
-async function delExp(id){
-    if(confirm('حذف؟')){ localData.exp=localData.exp.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'expenses', localData.exp); renderExp(); }
-}
-
-// ========== 6. الإيرادات ==========
-function renderRev(){
-    let total=localData.rev.reduce((a,b)=>a+b.amt,0);
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💰 الإيرادات (${formatMoney(total)})</h2><button class="btn btn-success" onclick="openRevM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${localData.rev.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.d}</td><td style="text-align:center">${r.n}</td><td style="text-align:center">${formatMoney(r.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delRev(${r.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
-}
-function openRevM(){
-    document.getElementById('mBody').innerHTML=`<h3>إيراد جديد</h3><input id="rn" placeholder="البيان"><input id="ra" type="number" placeholder="المبلغ"><button class="btn btn-success" style="width:100%" onclick="addRev()">حفظ</button>`;
-    document.getElementById('modal').classList.add('show');
-}
-async function addRev(){
-    let n=document.getElementById('rn').value, a=parseFloat(document.getElementById('ra').value);
-    if(n && a){ localData.rev.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); await saveToFirebase(currentUserId, 'revenues', localData.rev); cm(); renderRev(); }
-    else alert('املأ البيانات');
-}
-async function delRev(id){
-    if(confirm('حذف؟')){ localData.rev=localData.rev.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'revenues', localData.rev); renderRev(); }
-}
-
-// ========== 7. الديون ==========
-function renderDebt(){
-    let debts=localData.sales.filter(s=>s.st==='آجل');
-    let total=debts.reduce((a,b)=>a+(b.tot-(b.paid||0)),0);
-    document.getElementById('content').innerHTML=`<div class="card"><h2>⏳ الديون المستحقة (${formatMoney(total)})</h2><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>تحصيل</th></tr></thead><tbody>${debts.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center">${formatMoney(s.paid||0)}</td><td style="text-align:center" style="color:#ef4444">${formatMoney(s.tot-(s.paid||0))}</td><td style="text-align:center"><button class="btn btn-success" style="padding:5px" onclick="collectDebt(${s.id})">💰 تحصيل</button></td></tr>`).join('')}</tbody></table></div></div>`;
-}
-
-async function collectDebt(id){
-    let s=localData.sales.find(x=>x.id==id);
-    if(s){
-        let rem=s.tot-(s.paid||0);
-        let amt=parseFloat(prompt(`المبلغ المراد تحصيله من ${s.cli}\nالمتبقي: ${formatMoney(rem)}`, rem));
-        if(amt && amt>0){
-            s.paid=(s.paid||0)+amt;
-            if(s.paid>=s.tot) s.st='مدفوع';
-            await saveToFirebase(currentUserId, 'sales', localData.sales);
-            renderDebt();
-            renderDash();
-            alert(`✅ تم تحصيل ${formatMoney(amt)}`);
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            document.getElementById('authBtn').innerText = authMode === 'login' ? 'دخول للنظام' : 'إنشاء حساب جديد';
+            document.getElementById('toggleText').innerText = authMode === 'login' ? 'ليس لديك حساب؟ إنشاء حساب جديد' : 'لديك حساب بالفعل؟ سجل دخولك';
         }
-    }
-}
 
-// ========== 8. العملاء والموردين ==========
-function renderPeople(t, title){
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>👥 ${title}</h2><button class="btn btn-primary" onclick="openPersonM('${t}')">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th></th></tr></thead><tbody>${localData[t].map((x,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${x.n}</strong></td><td style="text-align:center">${x.p||'-'}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delPerson('${t}',${x.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
-}
-function openPersonM(t){
-    document.getElementById('mBody').innerHTML=`<h3>إضافة جديد</h3><input id="pn" placeholder="الاسم"><input id="pp" placeholder="الهاتف"><button class="btn btn-success" style="width:100%" onclick="addPerson('${t}')">حفظ</button>`;
-    document.getElementById('modal').classList.add('show');
-}
-async function addPerson(t){
-    let n=document.getElementById('pn').value, p=document.getElementById('pp').value;
-    if(n){ localData[t].push({id:Date.now(), n:n, p:p||'-'}); await saveToFirebase(currentUserId, t==='cli'?'clients':'suppliers', localData[t]); cm(); sp(t); }
-    else alert('أدخل الاسم');
-}
-async function delPerson(t,id){
-    if(confirm('حذف؟')){ localData[t]=localData[t].filter(x=>x.id!=id); await saveToFirebase(currentUserId, t==='cli'?'clients':'suppliers', localData[t]); sp(t); }
-}
+        // --- تشغيل النظام السحابي ---
+        function startSystem(user) {
+            currentUserId = user.uid;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appSystem').style.display = 'flex';
+            document.getElementById('displayUser').innerText = user.email.split('@')[0];
+            
+            // ربط البيانات حياً (Real-time) من Firebase
+            const userDbRef = window.ref(window.db, 'data/' + currentUserId);
+            window.onValue(userDbRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    dbData = {
+                        inv: data.inv ? Object.values(data.inv) : [],
+                        sales: data.sales ? Object.values(data.sales) : [],
+                        exp: data.exp ? Object.values(data.exp) : []
+                    };
+                    renderDash(); // تحديث الواجهة فوراً عند تغير البيانات
+                }
+            });
+        }
 
-// ========== أدوات ==========
-async function exportData(){
-    let d={inv:localData.inv, sales:localData.sales, exp:localData.exp, rev:localData.rev, cli:localData.cli, sup:localData.sup, exportedAt:new Date().toLocaleString()};
-    let a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d,null,2)); a.download=`SEMO_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); alert('✅ تم التصدير');
-}
-function cm(){ document.getElementById('modal').classList.remove('show'); }
-</script>
-</body>
-</html>
+        // --- وظائف الحفظ السحابي ---
+        function cloudPush(path, data) {
+            const listRef = window.ref(window.db, `data/${currentUserId}/${path}`);
+            const newRef = window.push(listRef);
+            data.id = newRef.key;
+            window.set(newRef, data);
+        }
+
+        // --- إدارة الصفحات ---
+        function sp(p, el) {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            if(el) el.classList.add('active');
+            if(p === 'dash') renderDash();
+            if(p === 'inv') renderInv();
+            if(p === 'sales') renderSales();
+            if(p === 'exp') renderExp();
+        }
+
+        // 1. الرئيسية
+        function renderDash() {
+            let sTot = dbData.sales.reduce((a,b)=>a+b.tot, 0);
+            let eTot = dbData.exp.reduce((a,b)=>a+b.amt, 0);
+            
+            document.getElementById('pageContent').innerHTML = `
+                <h1 style="margin-bottom:25px;">لوحة التحكم السحابية</h1>
+                <div class="stats-grid">
+                    <div class="stat-card"><h3>إجمالي المبيعات</h3><div class="stat-value">${sTot}</div></div>
+                    <div class="stat-card" style="border-color:var(--s)"><h3>صافي الربح</h3><div class="stat-value" style="color:var(--s)">${sTot - eTot}</div></div>
+                    <div class="stat-card" style="border-color:var(--d)"><h3>المصروفات</h3><div class="stat-value">${eTot}</div></div>
+                </div>
+                <div class="card"><h3>آخر العمليات</h3><table><thead><tr><th>التاريخ</th><th>البيان</th><th>المبلغ</th></tr></thead><tbody id="recentTable"></tbody></table></div>
+            `;
+        }
+
+        // 2. المخزون
+        function renderInv() {
+            document.getElementById('pageContent').innerHTML = `
+                <div class="card-header"><h2>📦 المخزون السحابي</h2><button class="btn btn-primary" onclick="openInvM()">+ صنف جديد</button></div>
+                <div class="card"><table><thead><tr><th>الصنف</th><th>السعر</th><th>الكمية</th></tr></thead>
+                <tbody>${dbData.inv.map(i=>`<tr><td>${i.n}</td><td>${i.p}</td><td>${i.q}</td></tr>`).join('')}</tbody></table></div>
+            `;
+        }
+
+        function openInvM() {
+            document.getElementById('mBody').innerHTML = `<h3>إضافة صنف</h3><input id="in" placeholder="الاسم"><input id="ip" type="number" placeholder="السعر"><input id="iq" type="number" placeholder="الكمية"><button class="btn btn-success" style="width:100%" onclick="saveInv()">حفظ سحابياً</button>`;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function saveInv() {
+            const data = { n: document.getElementById('in').value, p: parseFloat(document.getElementById('ip').value), q: parseInt(document.getElementById('iq').value) };
+            cloudPush('inv', data);
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // --- أدوات ---
+        function logout() { window.auth.signOut(); location.reload(); }
+        function cm() { document.getElementById('modal').classList.remove('show'); }
+    </script>
+    </body>
+    </html>
