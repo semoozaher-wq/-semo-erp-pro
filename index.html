@@ -3,9 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMO ERP - النظام المحاسبي المتكامل</title>
+    <title>SEMO ERP CLOUD - نظام سحابي متكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
+            authDomain: "my-pos-system-11dee.firebaseapp.com",
+            databaseURL: "https://my-pos-system-11dee-default-rtdb.firebaseio.com",
+            projectId: "my-pos-system-11dee",
+            storageBucket: "my-pos-system-11dee.firebasestorage.app",
+            messagingSenderId: "565195477080",
+            appId: "1:565195477080:web:1ffa21a34e28b47dddfa2d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        window.auth = auth;
+        window.db = database;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.ref = ref;
+        window.set = set;
+        window.get = get;
+        window.child = child;
+        window.push = push;
+        window.onValue = onValue;
+        
+        console.log("✅ Firebase connected");
+    </script>
     <style>
         * {
             margin: 0;
@@ -31,7 +63,7 @@
             min-height: 100vh;
         }
         
-        /* الشريط الجانبي - على اليمين جنب مش فوق */
+        /* الشريط الجانبي */
         .sidebar {
             width: 280px;
             background: var(--c);
@@ -45,14 +77,14 @@
             z-index: 100;
         }
         
-        /* المحتوى الرئيسي - ياخد المسافة الباقية */
+        /* المحتوى الرئيسي */
         .main {
             margin-right: 280px;
             padding: 30px;
             width: calc(100% - 280px);
         }
         
-        /* البطاقات والإحصائيات */
+        /* البطاقات */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -80,7 +112,7 @@
             font-weight: 800;
         }
         
-        /* الكروت والجداول */
+        /* الكروت */
         .card {
             background: var(--c);
             padding: 20px;
@@ -96,6 +128,8 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        
+        /* الجداول */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -136,7 +170,7 @@
             border-radius: 10px;
         }
         
-        /* القائمة الجانبية */
+        /* القائمة */
         .menu-item {
             padding: 12px 15px;
             margin: 5px 0;
@@ -166,7 +200,56 @@
             margin-bottom: 25px;
         }
         
-        /* النافذة المنبثقة */
+        /* شاشة الدخول */
+        .login-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .login-card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .login-card input, .login-card select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            border-radius: 12px;
+        }
+        .login-card button {
+            width: 100%;
+            padding: 15px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .toggle-auth {
+            margin-top: 15px;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        /* النافذة */
         .modal {
             display: none;
             position: fixed;
@@ -188,29 +271,6 @@
             max-width: 500px;
         }
         
-        /* شاشة الدخول */
-        .login-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .login-card {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-        
-        /* علامات */
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
@@ -239,27 +299,49 @@
 <!-- شاشة الدخول -->
 <div id="loginPage" class="login-page">
     <div class="login-card">
-        <div style="font-size: 60px;">📊</div>
-        <h1 style="color: #3b82f6; margin: 20px 0;">SEMO ERP PRO</h1>
+        <div style="font-size: 60px;">☁️📊</div>
+        <h1 style="color: #3b82f6; margin: 20px 0;">SEMO ERP CLOUD</h1>
         <select id="currencySelect">
             <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
             <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
         </select>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم">
-        <input type="password" id="loginPass" placeholder="كلمة المرور">
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
         <button onclick="doLogin()">دخول</button>
-        <div id="loginError" style="color: #f87171; margin-top: 15px; display: none;"></div>
-        <div style="margin-top: 20px; font-size: 12px;">admin / admin123</div>
+        <div class="toggle-auth" onclick="showRegister()">ليس لديك حساب؟ سجل الآن</div>
+        <div id="loginError" class="error-msg" style="color:#f87171; margin-top:15px; display:none;"></div>
+        <div style="margin-top:20px; font-size:12px; opacity:0.7;">☁️ نظام سحابي - بياناتك محفوظة على السحابة</div>
+    </div>
+</div>
+
+<!-- شاشة التسجيل -->
+<div id="registerPage" class="login-page" style="display: none;">
+    <div class="login-card">
+        <div style="font-size: 60px;">☁️📊</div>
+        <h1 style="color: #3b82f6; margin: 20px 0;">إنشاء حساب جديد</h1>
+        <select id="regCurrencySelect">
+            <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
+            <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
+        </select>
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="regPassword" placeholder="كلمة المرور">
+        <input type="text" id="regName" placeholder="الاسم">
+        <button onclick="doRegister()">إنشاء حساب</button>
+        <div class="toggle-auth" onclick="showLogin()">لديك حساب؟ سجل دخول</div>
+        <div id="registerError" style="color:#f87171; margin-top:15px; display:none;"></div>
     </div>
 </div>
 
 <!-- التطبيق -->
 <div id="app" style="display: none;">
     <div class="sidebar" id="sidebar">
-        <h2 style="text-align:center; color:var(--p);">SEMO ERP</h2>
+        <h2 style="text-align:center; color:var(--p);">SEMO CLOUD</h2>
         <div class="user-card">
             <div class="user-avatar" style="font-size: 30px;">👑</div>
-            <div class="user-info"><h4 id="userName">مدير النظام</h4><p id="userRole">مدير عام</p></div>
+            <div class="user-info">
+                <h4 id="userName">مدير النظام</h4>
+                <p id="userEmail"></p>
+            </div>
         </div>
         <div class="menu-title">الرئيسية</div>
         <div class="menu-item active" onclick="sp('dash', this)">🏠 لوحة التحكم</div>
@@ -292,100 +374,187 @@
     <div class="modal-content" id="mBody"></div>
 </div>
 
-<script>
-// العملة
+<script type="module">
+// ========== العملة ==========
 let currencySymbol = 'ج.م';
+let currentUserId = null;
+let currentUserEmail = null;
 
 function formatMoney(amount) {
     return (amount || 0).toLocaleString() + ' ' + currencySymbol;
 }
 
-// قاعدة البيانات
-let db = {
-    inv: JSON.parse(localStorage.getItem('erp_inv')) || [],
-    sales: JSON.parse(localStorage.getItem('erp_sales')) || [],
-    pur: JSON.parse(localStorage.getItem('erp_pur')) || [],
-    exp: JSON.parse(localStorage.getItem('erp_exp')) || [],
-    rev: JSON.parse(localStorage.getItem('erp_rev')) || [],
-    cli: JSON.parse(localStorage.getItem('erp_cli')) || [],
-    sup: JSON.parse(localStorage.getItem('erp_sup')) || []
+// ========== البيانات المؤقتة ==========
+let localData = {
+    inv: [],
+    sales: [],
+    pur: [],
+    exp: [],
+    rev: [],
+    cli: [],
+    sup: []
 };
 
-const save = () => {
-    Object.keys(db).forEach(k => localStorage.setItem('erp_'+k, JSON.stringify(db[k])));
-};
-
-// بيانات تجريبية
-if(db.inv.length === 0) {
-    db.inv = [
-        {id:1, n:'مكتب خشبي', c:500, p:800, q:15},
-        {id:2, n:'كرسي دوار', c:300, p:550, q:25},
-        {id:3, n:'طابعة HP', c:1200, p:1800, q:5},
-        {id:4, n:'شاشة 24 بوصة', c:2000, p:3200, q:8}
-    ];
-    db.cli = [
-        {id:101, n:'شركة الأهرام', p:'01001112223'},
-        {id:102, n:'مؤسسة النور', p:'01002223334'}
-    ];
-    db.sup = [
-        {id:201, n:'معرض القاهرة', p:'01555556667'},
-        {id:202, n:'شركة التقنية', p:'01556667778'}
-    ];
-    db.exp = [
-        {id:301, d:new Date().toLocaleDateString('ar-EG'), n:'إيجار المحل', amt:5000},
-        {id:302, d:new Date().toLocaleDateString('ar-EG'), n:'كهرباء', amt:800},
-        {id:303, d:new Date().toLocaleDateString('ar-EG'), n:'رواتب', amt:7500}
-    ];
-    db.rev = [
-        {id:401, d:new Date().toLocaleDateString('ar-EG'), n:'خدمات', amt:2500}
-    ];
-    let d = new Date().toLocaleDateString('ar-EG');
-    db.sales = [
-        {id:501, d:d, item:'مكتب خشبي', cli:'شركة الأهرام', q:2, tot:1600, prof:600, st:'مدفوع', paid:1600},
-        {id:502, d:d, item:'طابعة HP', cli:'مؤسسة النور', q:1, tot:1800, prof:600, st:'آجل', paid:0}
-    ];
-    save();
-}
-
-// تسجيل الدخول
-function doLogin() {
-    let user = document.getElementById('loginUser').value;
-    let pass = document.getElementById('loginPass').value;
-    let cur = document.getElementById('currencySelect').value;
-    
-    if(user === 'admin' && pass === 'admin123') {
-        currencySymbol = cur === 'EGP' ? 'ج.م' : 'د.ل';
-        localStorage.setItem('erp_logged', 'true');
-        localStorage.setItem('erp_cur', currencySymbol);
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('userName').innerHTML = 'مدير النظام';
+// ========== دوال Firebase ==========
+async function loadUserData(userId) {
+    try {
+        const snapshot = await get(child(ref(window.db), `${userId}/inventory`));
+        if(snapshot.exists()) localData.inv = Object.values(snapshot.val());
+        else localData.inv = [];
+        
+        const salesSnapshot = await get(child(ref(window.db), `${userId}/sales`));
+        if(salesSnapshot.exists()) localData.sales = Object.values(salesSnapshot.val());
+        else localData.sales = [];
+        
+        const expSnapshot = await get(child(ref(window.db), `${userId}/expenses`));
+        if(expSnapshot.exists()) localData.exp = Object.values(expSnapshot.val());
+        else localData.exp = [];
+        
+        const revSnapshot = await get(child(ref(window.db), `${userId}/revenues`));
+        if(revSnapshot.exists()) localData.rev = Object.values(revSnapshot.val());
+        else localData.rev = [];
+        
+        const cliSnapshot = await get(child(ref(window.db), `${userId}/clients`));
+        if(cliSnapshot.exists()) localData.cli = Object.values(cliSnapshot.val());
+        else localData.cli = [];
+        
+        const supSnapshot = await get(child(ref(window.db), `${userId}/suppliers`));
+        if(supSnapshot.exists()) localData.sup = Object.values(supSnapshot.val());
+        else localData.sup = [];
+        
+        // بيانات تجريبية إذا كانت فارغة
+        if(localData.inv.length === 0) {
+            localData.inv = [
+                {id:1, n:'مكتب خشبي', c:500, p:800, q:15},
+                {id:2, n:'كرسي دوار', c:300, p:550, q:25},
+                {id:3, n:'طابعة HP', c:1200, p:1800, q:5},
+                {id:4, n:'شاشة 24 بوصة', c:2000, p:3200, q:8}
+            ];
+            localData.cli = [
+                {id:101, n:'شركة الأهرام', p:'01001112223'},
+                {id:102, n:'مؤسسة النور', p:'01002223334'}
+            ];
+            localData.sup = [
+                {id:201, n:'معرض القاهرة', p:'01555556667'},
+                {id:202, n:'شركة التقنية', p:'01556667778'}
+            ];
+            await saveAllToFirebase(userId);
+        }
+        
         renderDash();
-    } else {
-        let err = document.getElementById('loginError');
-        err.style.display = 'block';
-        err.innerHTML = 'خطأ في اسم المستخدم أو كلمة المرور';
+    } catch(error) {
+        console.error("خطأ في التحميل:", error);
     }
 }
 
-function logout() {
-    localStorage.removeItem('erp_logged');
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
+async function saveToFirebase(userId, collection, data) {
+    await set(ref(window.db, `${userId}/${collection}`), data);
 }
 
-let savedCur = localStorage.getItem('erp_cur');
-if(savedCur === 'ج.م' || savedCur === 'د.ل') currencySymbol = savedCur;
+async function saveAllToFirebase(userId) {
+    await saveToFirebase(userId, 'inventory', localData.inv);
+    await saveToFirebase(userId, 'sales', localData.sales);
+    await saveToFirebase(userId, 'purchases', localData.pur);
+    await saveToFirebase(userId, 'expenses', localData.exp);
+    await saveToFirebase(userId, 'revenues', localData.rev);
+    await saveToFirebase(userId, 'clients', localData.cli);
+    await saveToFirebase(userId, 'suppliers', localData.sup);
+}
 
-if(localStorage.getItem('erp_logged') === 'true') {
+// ========== دوال المصادقة ==========
+window.doLogin = async function() {
+    let email = document.getElementById('loginEmail').value;
+    let password = document.getElementById('loginPassword').value;
+    let curSelect = document.getElementById('currencySelect');
+    let errorDiv = document.getElementById('loginError');
+    
+    try {
+        const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
+        currentUserId = userCredential.user.uid;
+        currentUserEmail = userCredential.user.email;
+        currencySymbol = curSelect.value === 'EGP' ? 'ج.م' : 'د.ل';
+        
+        localStorage.setItem('semo_cloud_user', JSON.stringify({uid: currentUserId, email: currentUserEmail}));
+        localStorage.setItem('semo_cloud_currency', currencySymbol);
+        
+        await loadUserData(currentUserId);
+        
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('userName').innerHTML = email.split('@')[0];
+        document.getElementById('userEmail').innerHTML = email;
+        
+    } catch(error) {
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/invalid-credential).' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : error.message);
+    }
+};
+
+window.doRegister = async function() {
+    let email = document.getElementById('regEmail').value;
+    let password = document.getElementById('regPassword').value;
+    let name = document.getElementById('regName').value;
+    let curSelect = document.getElementById('regCurrencySelect');
+    let errorDiv = document.getElementById('registerError');
+    
+    try {
+        const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+        currentUserId = userCredential.user.uid;
+        currentUserEmail = userCredential.user.email;
+        currencySymbol = curSelect.value === 'EGP' ? 'ج.م' : 'د.ل';
+        
+        localStorage.setItem('semo_cloud_user', JSON.stringify({uid: currentUserId, email: currentUserEmail}));
+        localStorage.setItem('semo_cloud_currency', currencySymbol);
+        
+        await loadUserData(currentUserId);
+        
+        document.getElementById('registerPage').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('userName').innerHTML = name || email.split('@')[0];
+        document.getElementById('userEmail').innerHTML = email;
+        
+    } catch(error) {
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/email-already-in-use).' ? 'البريد الإلكتروني مستخدم بالفعل' : error.message);
+    }
+};
+
+window.showRegister = function() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('registerPage').style.display = 'flex';
+};
+
+window.showLogin = function() {
+    document.getElementById('registerPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+};
+
+window.logout = async function() {
+    await window.auth.signOut();
+    localStorage.removeItem('semo_cloud_user');
+    localStorage.removeItem('semo_cloud_currency');
+    currentUserId = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+};
+
+// استعادة الجلسة
+let savedUser = localStorage.getItem('semo_cloud_user');
+let savedCur = localStorage.getItem('semo_cloud_currency');
+if(savedUser && savedCur) {
+    let user = JSON.parse(savedUser);
+    currentUserId = user.uid;
+    currentUserEmail = user.email;
+    currencySymbol = savedCur;
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    document.getElementById('userName').innerHTML = 'مدير النظام';
-    renderDash();
+    document.getElementById('userName').innerHTML = user.email?.split('@')[0] || 'مستخدم';
+    document.getElementById('userEmail').innerHTML = user.email;
+    loadUserData(currentUserId);
 }
 
-// التنقل
-function sp(p, el) {
+// ========== التنقل ==========
+window.sp = function(p, el) {
     document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
     if(el) el.classList.add('active');
     if(p === 'dash') renderDash();
@@ -397,15 +566,15 @@ function sp(p, el) {
     else if(p === 'debt') renderDebt();
     else if(p === 'cli') renderPeople('cli', 'العملاء');
     else if(p === 'sup') renderPeople('sup', 'الموردين');
-}
+};
 
-// 1. الرئيسية
+// ========== 1. الرئيسية ==========
 function renderDash() {
-    let sVal = db.sales.reduce((a,b)=>a+b.tot, 0);
-    let eVal = db.exp.reduce((a,b)=>a+b.amt, 0);
-    let rVal = db.rev.reduce((a,b)=>a+b.amt, 0);
+    let sVal = localData.sales.reduce((a,b)=>a+b.tot, 0);
+    let eVal = localData.exp.reduce((a,b)=>a+b.amt, 0);
+    let rVal = localData.rev.reduce((a,b)=>a+b.amt, 0);
     let profit = sVal - eVal + rVal;
-    let low = db.inv.filter(i=>i.q <= 5).length;
+    let low = localData.inv.filter(i=>i.q <= 5).length;
     
     document.getElementById('content').innerHTML = `
         <div class="stats-grid">
@@ -413,21 +582,21 @@ function renderDash() {
             <div class="stat-card" onclick="sp('exp')" style="border-color:#ef4444"><h3>💸 المصروفات</h3><div class="stat-value">${formatMoney(eVal)}</div></div>
             <div class="stat-card" onclick="sp('rev')" style="border-color:#10b981"><h3>💰 الإيرادات</h3><div class="stat-value">${formatMoney(rVal)}</div></div>
             <div class="stat-card" onclick="sp('sales')" style="border-color:#10b981"><h3>📈 صافي الربح</h3><div class="stat-value" style="color:${profit>=0?'#10b981':'#ef4444'}">${formatMoney(profit)}</div></div>
-            <div class="stat-card" onclick="sp('inv')"><h3>📦 المنتجات</h3><div class="stat-value">${db.inv.length}</div></div>
+            <div class="stat-card" onclick="sp('inv')"><h3>📦 المنتجات</h3><div class="stat-value">${localData.inv.length}</div></div>
             <div class="stat-card" onclick="sp('inv')" style="border-color:#f59e0b"><h3>⚠️ منتجات منخفضة</h3><div class="stat-value">${low}</div></div>
-            <div class="stat-card" onclick="sp('cli')"><h3>👥 العملاء</h3><div class="stat-value">${db.cli.length}</div></div>
+            <div class="stat-card" onclick="sp('cli')"><h3>👥 العملاء</h3><div class="stat-value">${localData.cli.length}</div></div>
         </div>
-        <div class="card"><h3>📋 آخر المبيعات</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>المبلغ</th></tr></thead>
-        <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${formatMoney(s.tot)}<td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>
+        <div class="card"><h3>📋 آخر المبيعات</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+        <tbody>${localData.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>
     `;
 }
 
-// 2. المخزون
+// ========== 2. المخزون ==========
 function renderInv() {
     document.getElementById('content').innerHTML = `
         <div class="card">
             <div class="card-header"><h2>📦 المخزون</h2><button class="btn btn-primary" onclick="openInvM()">+ منتج جديد</button></div>
-            <input type="text" id="searchInv" placeholder="بحث..." class="search-input" style="width:100%;padding:10px;margin-bottom:15px" onkeyup="filterInv()">
+            <input type="text" id="searchInv" placeholder="بحث..." style="width:100%;padding:10px;margin-bottom:15px" onkeyup="filterInv()">
             <table id="invTable"><thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th></th></tr></thead>
             <tbody id="invList"></tbody></table>
         </div>
@@ -437,7 +606,7 @@ function renderInv() {
 
 function refreshInv() {
     let search = document.getElementById('searchInv')?.value.toLowerCase() || '';
-    let filtered = db.inv.filter(i => i.n.toLowerCase().includes(search));
+    let filtered = localData.inv.filter(i => i.n.toLowerCase().includes(search));
     document.getElementById('invList').innerHTML = filtered.map((i,idx)=>`
         <tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${i.n}</strong></td>
         <td style="text-align:center">${formatMoney(i.c)}</td><td style="text-align:center">${formatMoney(i.p)}</td>
@@ -447,121 +616,131 @@ function refreshInv() {
         </tr>`).join('');
 }
 function filterInv(){ refreshInv(); }
+
 function openInvM(id=null){
-    let i=id?db.inv.find(x=>x.id==id):{n:'',c:0,p:0,q:0};
+    let i=id?localData.inv.find(x=>x.id==id):{n:'',c:0,p:0,q:0};
     document.getElementById('mBody').innerHTML=`<h3>${id?'تعديل':'إضافة'} منتج</h3><input id="in" value="${i.n}" placeholder="الاسم"><input id="ic" type="number" value="${i.c}" placeholder="سعر الشراء"><input id="ip" type="number" value="${i.p}" placeholder="سعر البيع"><input id="iq" type="number" value="${i.q}" placeholder="الكمية"><button class="btn btn-success" style="width:100%" onclick="saveInv(${id})">حفظ</button>`;
     document.getElementById('modal').classList.add('show');
 }
-function saveInv(id){
+
+async function saveInv(id){
     let d={id:id||Date.now(), n:document.getElementById('in').value, c:parseFloat(document.getElementById('ic').value)||0, p:parseFloat(document.getElementById('ip').value)||0, q:parseInt(document.getElementById('iq').value)||0};
-    if(id) db.inv=db.inv.map(x=>x.id==id?d:x); else db.inv.push(d);
-    save(); cm(); renderInv();
+    if(id) localData.inv=localData.inv.map(x=>x.id==id?d:x);
+    else localData.inv.push(d);
+    await saveToFirebase(currentUserId, 'inventory', localData.inv);
+    cm(); renderInv();
 }
 function editInv(id){ openInvM(id); }
-function delInv(id){
-    if(confirm('حذف؟')){ db.inv=db.inv.filter(x=>x.id!=id); save(); renderInv(); }
+async function delInv(id){
+    if(confirm('حذف؟')){ localData.inv=localData.inv.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'inventory', localData.inv); renderInv(); }
 }
 
-// 3. المبيعات
+// ========== 3. المبيعات ==========
 function renderSales(){
-    document.getElementById('content').innerHTML=`<div class="card"><h2>🛒 فاتورة جديدة</h2><select id="si">${db.inv.map(i=>`<option value="${i.id}">${i.n} (${i.q})</option>`)}</select><select id="sc">${db.cli.map(c=>`<option value="${c.n}">${c.n}</option>`)}<option>زبون نقدي</option></select><input id="sq" type="number" value="1" placeholder="الكمية"><select id="st"><option value="مدفوع">مدفوع</option><option value="آجل">آجل</option></select><button class="btn btn-success" style="width:100%" onclick="doSale()">إتمام البيع</button></div><div class="card"><h3>سجل الفواتير</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th></thead><tbody>${db.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${s.q}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>`;
+    document.getElementById('content').innerHTML=`<div class="card"><h2>🛒 فاتورة جديدة</h2><select id="si">${localData.inv.map(i=>`<option value="${i.id}">${i.n} (${i.q})</option>`)}</select><select id="sc">${localData.cli.map(c=>`<option value="${c.n}">${c.n}</option>`)}<option>زبون نقدي</option></select><input id="sq" type="number" value="1" placeholder="الكمية"><select id="st"><option value="مدفوع">مدفوع</option><option value="آجل">آجل</option></select><button class="btn btn-success" style="width:100%" onclick="doSale()">إتمام البيع</button></div><div class="card"><h3>سجل الفواتير</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody>${localData.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${s.q}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center"><span class="badge ${s.st==='مدفوع'?'badge-success':'badge-warning'}">${s.st}</span></td></tr>`).join('')}</tbody></table></div></div>`;
 }
-function doSale(){
-    let i=db.inv.find(x=>x.id==parseInt(document.getElementById('si').value)), q=parseInt(document.getElementById('sq').value);
+
+async function doSale(){
+    let i=localData.inv.find(x=>x.id==parseInt(document.getElementById('si').value)), q=parseInt(document.getElementById('sq').value);
     if(i && i.q>=q){
         i.q-=q;
-        db.sales.push({id:Date.now(), d:new Date().toLocaleDateString('ar-EG'), item:i.n, cli:document.getElementById('sc').value, q:q, tot:q*i.p, prof:q*(i.p-i.c), st:document.getElementById('st').value, paid:document.getElementById('st').value==='مدفوع'?q*i.p:0});
-        save(); renderSales(); alert('✅ تمت عملية البيع');
+        localData.sales.push({id:Date.now(), d:new Date().toLocaleDateString('ar-EG'), item:i.n, cli:document.getElementById('sc').value, q:q, tot:q*i.p, prof:q*(i.p-i.c), st:document.getElementById('st').value, paid:document.getElementById('st').value==='مدفوع'?q*i.p:0});
+        await saveToFirebase(currentUserId, 'inventory', localData.inv);
+        await saveToFirebase(currentUserId, 'sales', localData.sales);
+        renderSales();
+        alert('✅ تمت عملية البيع');
     } else alert('الكمية غير كافية');
 }
 
-// 4. المشتريات
+// ========== 4. المشتريات ==========
 function renderPur(){
-    document.getElementById('content').innerHTML=`<div class="card"><h2>📥 مشتريات</h2><select id="pi">${db.inv.map(i=>`<option value="${i.id}">${i.n}</option>`)}</select><select id="ps">${db.sup.map(s=>`<option value="${s.n}">${s.n}</option>`)}</select><input id="pq" type="number" placeholder="الكمية"><button class="btn btn-primary" style="width:100%" onclick="doPur()">توريد للمخزن</button></div>`;
+    document.getElementById('content').innerHTML=`<div class="card"><h2>📥 مشتريات</h2><select id="pi">${localData.inv.map(i=>`<option value="${i.id}">${i.n}</option>`)}</select><select id="ps">${localData.sup.map(s=>`<option value="${s.n}">${s.n}</option>`)}</select><input id="pq" type="number" placeholder="الكمية"><button class="btn btn-primary" style="width:100%" onclick="doPur()">توريد للمخزن</button></div>`;
 }
-function doPur(){
-    let i=db.inv.find(x=>x.id==parseInt(document.getElementById('pi').value)), q=parseInt(document.getElementById('pq').value);
-    if(i && q>0){ i.q+=q; db.pur.push({d:new Date().toLocaleDateString(), n:i.n, q:q, s:document.getElementById('ps').value}); save(); alert('تم التوريد'); renderInv(); }
+async function doPur(){
+    let i=localData.inv.find(x=>x.id==parseInt(document.getElementById('pi').value)), q=parseInt(document.getElementById('pq').value);
+    if(i && q>0){ i.q+=q; localData.pur.push({d:new Date().toLocaleDateString(), n:i.n, q:q, s:document.getElementById('ps').value}); await saveToFirebase(currentUserId, 'inventory', localData.inv); alert('تم التوريد'); renderInv(); }
     else alert('أدخل كمية صحيحة');
 }
 
-// 5. المصروفات
+// ========== 5. المصروفات ==========
 function renderExp(){
-    let total=db.exp.reduce((a,b)=>a+b.amt,0);
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💸 المصروفات (${formatMoney(total)})</h2><button class="btn btn-danger" onclick="openExpM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${db.exp.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.d}</td><td style="text-align:center">${e.n}</td><td style="text-align:center">${formatMoney(e.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delExp(${e.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+    let total=localData.exp.reduce((a,b)=>a+b.amt,0);
+    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💸 المصروفات (${formatMoney(total)})</h2><button class="btn btn-danger" onclick="openExpM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${localData.exp.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.d}</td><td style="text-align:center">${e.n}</td><td style="text-align:center">${formatMoney(e.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delExp(${e.id})">🗑️</button></td><tr>`).join('')}</tbody></table></div></div>`;
 }
 function openExpM(){
     document.getElementById('mBody').innerHTML=`<h3>مصروف جديد</h3><input id="en" placeholder="البيان"><input id="ea" type="number" placeholder="المبلغ"><button class="btn btn-danger" style="width:100%" onclick="addExp()">حفظ</button>`;
     document.getElementById('modal').classList.add('show');
 }
-function addExp(){
+async function addExp(){
     let n=document.getElementById('en').value, a=parseFloat(document.getElementById('ea').value);
-    if(n && a){ db.exp.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); save(); cm(); renderExp(); }
+    if(n && a){ localData.exp.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); await saveToFirebase(currentUserId, 'expenses', localData.exp); cm(); renderExp(); }
     else alert('املأ البيانات');
 }
-function delExp(id){
-    if(confirm('حذف؟')){ db.exp=db.exp.filter(x=>x.id!=id); save(); renderExp(); }
+async function delExp(id){
+    if(confirm('حذف؟')){ localData.exp=localData.exp.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'expenses', localData.exp); renderExp(); }
 }
 
-// 6. الإيرادات
+// ========== 6. الإيرادات ==========
 function renderRev(){
-    let total=db.rev.reduce((a,b)=>a+b.amt,0);
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💰 الإيرادات (${formatMoney(total)})</h2><button class="btn btn-success" onclick="openRevM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${db.rev.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.d}</td><td style="text-align:center">${r.n}</td><td style="text-align:center">${formatMoney(r.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delRev(${r.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+    let total=localData.rev.reduce((a,b)=>a+b.amt,0);
+    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>💰 الإيرادات (${formatMoney(total)})</h2><button class="btn btn-success" onclick="openRevM()">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${localData.rev.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.d}</td><td style="text-align:center">${r.n}</td><td style="text-align:center">${formatMoney(r.amt)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delRev(${r.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
 }
 function openRevM(){
     document.getElementById('mBody').innerHTML=`<h3>إيراد جديد</h3><input id="rn" placeholder="البيان"><input id="ra" type="number" placeholder="المبلغ"><button class="btn btn-success" style="width:100%" onclick="addRev()">حفظ</button>`;
     document.getElementById('modal').classList.add('show');
 }
-function addRev(){
+async function addRev(){
     let n=document.getElementById('rn').value, a=parseFloat(document.getElementById('ra').value);
-    if(n && a){ db.rev.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); save(); cm(); renderRev(); }
+    if(n && a){ localData.rev.push({id:Date.now(), d:new Date().toLocaleDateString(), n:n, amt:a}); await saveToFirebase(currentUserId, 'revenues', localData.rev); cm(); renderRev(); }
     else alert('املأ البيانات');
 }
-function delRev(id){
-    if(confirm('حذف؟')){ db.rev=db.rev.filter(x=>x.id!=id); save(); renderRev(); }
+async function delRev(id){
+    if(confirm('حذف؟')){ localData.rev=localData.rev.filter(x=>x.id!=id); await saveToFirebase(currentUserId, 'revenues', localData.rev); renderRev(); }
 }
 
-// 7. الديون
+// ========== 7. الديون ==========
 function renderDebt(){
-    let debts=db.sales.filter(s=>s.st==='آجل');
+    let debts=localData.sales.filter(s=>s.st==='آجل');
     let total=debts.reduce((a,b)=>a+(b.tot-(b.paid||0)),0);
     document.getElementById('content').innerHTML=`<div class="card"><h2>⏳ الديون المستحقة (${formatMoney(total)})</h2><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>تحصيل</th></tr></thead><tbody>${debts.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.d}</td><td style="text-align:center">${s.cli}</td><td style="text-align:center">${s.item}</td><td style="text-align:center">${formatMoney(s.tot)}</td><td style="text-align:center">${formatMoney(s.paid||0)}</td><td style="text-align:center" style="color:#ef4444">${formatMoney(s.tot-(s.paid||0))}</td><td style="text-align:center"><button class="btn btn-success" style="padding:5px" onclick="collectDebt(${s.id})">💰 تحصيل</button></td></tr>`).join('')}</tbody></table></div></div>`;
 }
 
-function collectDebt(id){
-    let s=db.sales.find(x=>x.id==id);
+async function collectDebt(id){
+    let s=localData.sales.find(x=>x.id==id);
     if(s){
         let rem=s.tot-(s.paid||0);
         let amt=parseFloat(prompt(`المبلغ المراد تحصيله من ${s.cli}\nالمتبقي: ${formatMoney(rem)}`, rem));
         if(amt && amt>0){
             s.paid=(s.paid||0)+amt;
             if(s.paid>=s.tot) s.st='مدفوع';
-            save(); renderDebt(); renderDash();
+            await saveToFirebase(currentUserId, 'sales', localData.sales);
+            renderDebt();
+            renderDash();
             alert(`✅ تم تحصيل ${formatMoney(amt)}`);
         }
     }
 }
 
-// 8. العملاء والموردين
+// ========== 8. العملاء والموردين ==========
 function renderPeople(t, title){
-    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>👥 ${title}</h2><button class="btn btn-primary" onclick="openPersonM('${t}')">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th></th></tr></thead><tbody>${db[t].map((x,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${x.n}</strong></td><td style="text-align:center">${x.p||'-'}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delPerson('${t}',${x.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
+    document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h2>👥 ${title}</h2><button class="btn btn-primary" onclick="openPersonM('${t}')">+ إضافة</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th></th></tr></thead><tbody>${localData[t].map((x,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${x.n}</strong></td><td style="text-align:center">${x.p||'-'}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px" onclick="delPerson('${t}',${x.id})">🗑️</button></td></tr>`).join('')}</tbody></table></div></div>`;
 }
 function openPersonM(t){
     document.getElementById('mBody').innerHTML=`<h3>إضافة جديد</h3><input id="pn" placeholder="الاسم"><input id="pp" placeholder="الهاتف"><button class="btn btn-success" style="width:100%" onclick="addPerson('${t}')">حفظ</button>`;
     document.getElementById('modal').classList.add('show');
 }
-function addPerson(t){
+async function addPerson(t){
     let n=document.getElementById('pn').value, p=document.getElementById('pp').value;
-    if(n){ db[t].push({id:Date.now(), n:n, p:p||'-'}); save(); cm(); sp(t); }
+    if(n){ localData[t].push({id:Date.now(), n:n, p:p||'-'}); await saveToFirebase(currentUserId, t==='cli'?'clients':'suppliers', localData[t]); cm(); sp(t); }
     else alert('أدخل الاسم');
 }
-function delPerson(t,id){
-    if(confirm('حذف؟')){ db[t]=db[t].filter(x=>x.id!=id); save(); sp(t); }
+async function delPerson(t,id){
+    if(confirm('حذف؟')){ localData[t]=localData[t].filter(x=>x.id!=id); await saveToFirebase(currentUserId, t==='cli'?'clients':'suppliers', localData[t]); sp(t); }
 }
 
-// أدوات
-function exportData(){
-    let d={inv:db.inv, sales:db.sales, exp:db.exp, rev:db.rev, cli:db.cli, sup:db.sup, exportedAt:new Date().toLocaleString()};
+// ========== أدوات ==========
+async function exportData(){
+    let d={inv:localData.inv, sales:localData.sales, exp:localData.exp, rev:localData.rev, cli:localData.cli, sup:localData.sup, exportedAt:new Date().toLocaleString()};
     let a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d,null,2)); a.download=`SEMO_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); alert('✅ تم التصدير');
 }
 function cm(){ document.getElementById('modal').classList.remove('show'); }
