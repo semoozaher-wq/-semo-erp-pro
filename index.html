@@ -5,18 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEMO ERP - نظام محاسبي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
+            authDomain: "my-pos-system-11dee.firebaseapp.com",
+            databaseURL: "https://my-pos-system-11dee-default-rtdb.firebaseio.com",
+            projectId: "my-pos-system-11dee",
+            storageBucket: "my-pos-system-11dee.firebasestorage.app",
+            messagingSenderId: "565195477080",
+            appId: "1:565195477080:web:1ffa21a34e28b47dddfa2d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        window.auth = auth;
+        window.db = database;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.ref = ref;
+        window.set = set;
+        window.get = get;
+        window.child = child;
+        
+        console.log("✅ Firebase connected");
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #0f172a;
-            color: #fff;
-            direction: rtl;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background: #0f172a; color: #fff; direction: rtl; }
         
         /* شاشة الدخول */
         .login-page {
@@ -71,15 +93,19 @@
             border-radius: 12px;
             font-size: 16px;
         }
+        .toggle-auth {
+            margin-top: 15px;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .toggle-auth:hover {
+            text-decoration: underline;
+        }
         
         /* التطبيق */
-        .app {
-            display: none;
-        }
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-        }
+        .app { display: none; }
+        .app-container { display: flex; min-height: 100vh; }
         
         /* الشريط الجانبي */
         .sidebar {
@@ -93,12 +119,7 @@
             overflow-y: auto;
             border-left: 1px solid #334155;
         }
-        .sidebar h2 {
-            text-align: center;
-            color: #3b82f6;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
+        .sidebar h2 { text-align: center; color: #3b82f6; margin-bottom: 30px; }
         .user-card {
             display: flex;
             align-items: center;
@@ -118,24 +139,10 @@
             justify-content: center;
             font-size: 24px;
         }
-        .user-info h4 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        .user-info p {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        .menu-group {
-            margin-bottom: 25px;
-        }
-        .menu-title {
-            font-size: 12px;
-            color: #3b82f6;
-            margin-bottom: 10px;
-            font-weight: bold;
-            padding-right: 10px;
-        }
+        .user-info h4 { font-size: 16px; margin-bottom: 5px; }
+        .user-info p { font-size: 12px; color: #94a3b8; }
+        .menu-group { margin-bottom: 25px; }
+        .menu-title { font-size: 12px; color: #3b82f6; margin-bottom: 10px; font-weight: bold; }
         .menu-item {
             padding: 12px 15px;
             margin: 5px 0;
@@ -144,23 +151,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: all 0.3s;
-            font-size: 14px;
+            transition: 0.3s;
         }
-        .menu-item:hover {
-            background: #3b82f6;
-            transform: translateX(-5px);
-        }
-        .menu-item.active {
-            background: #3b82f6;
-        }
+        .menu-item:hover, .menu-item.active { background: #3b82f6; transform: translateX(-5px); }
         
         /* المحتوى الرئيسي */
-        .main-content {
-            margin-right: 280px;
-            padding: 30px;
-            width: calc(100% - 280px);
-        }
+        .main-content { margin-right: 280px; padding: 30px; width: calc(100% - 280px); }
         
         /* البطاقات */
         .stats-grid {
@@ -175,20 +171,11 @@
             border-radius: 20px;
             border-right: 4px solid #3b82f6;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: 0.3s;
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-card h3 {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card h3 { font-size: 14px; opacity: 0.8; margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: 800; }
         
         /* الجداول */
         .card {
@@ -198,23 +185,9 @@
             margin-bottom: 20px;
             border: 1px solid #334155;
         }
-        .card h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #334155;
-        }
-        th {
-            color: #3b82f6;
-            font-weight: 600;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
+        th { color: #3b82f6; }
         
         /* الأزرار */
         .btn {
@@ -223,21 +196,10 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            transition: all 0.3s;
         }
-        .btn-primary {
-            background: #3b82f6;
-            color: #fff;
-        }
-        .btn-success {
-            background: #10b981;
-            color: #fff;
-        }
-        .btn-danger {
-            background: #ef4444;
-            color: #fff;
-        }
+        .btn-primary { background: #3b82f6; color: #fff; }
+        .btn-success { background: #10b981; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; }
         
         /* النوافذ المنبثقة */
         .modal {
@@ -252,9 +214,7 @@
             align-items: center;
             z-index: 1100;
         }
-        .modal.show {
-            display: flex;
-        }
+        .modal.show { display: flex; }
         .modal-content {
             background: #1e293b;
             padding: 30px;
@@ -270,29 +230,13 @@
             border: 1px solid #334155;
             color: #fff;
             border-radius: 10px;
-            font-size: 14px;
         }
         
-        /* استجابة للجوال */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                padding: 15px 10px;
-            }
-            .sidebar h2, .menu-item span, .user-info, .menu-title {
-                display: none;
-            }
-            .main-content {
-                margin-right: 70px;
-                padding: 15px;
-                width: calc(100% - 70px);
-            }
-            .user-card {
-                justify-content: center;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+            .sidebar { width: 70px; padding: 15px 10px; }
+            .sidebar h2, .menu-item span, .user-info, .menu-title { display: none; }
+            .main-content { margin-right: 70px; padding: 15px; width: calc(100% - 70px); }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -307,11 +251,29 @@
             <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
             <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
         </select>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم">
-        <input type="password" id="loginPass" placeholder="كلمة المرور">
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
         <button onclick="doLogin()">دخول</button>
+        <div class="toggle-auth" onclick="showRegister()">ليس لديك حساب؟ سجل الآن</div>
         <div id="loginError" style="color: #f87171; margin-top: 15px; display: none;"></div>
-        <div style="margin-top: 20px; font-size: 12px; opacity: 0.7;">admin / admin123</div>
+    </div>
+</div>
+
+<!-- شاشة التسجيل -->
+<div id="registerPage" class="login-page" style="display: none;">
+    <div class="login-card">
+        <div style="font-size: 60px;">📊</div>
+        <h1 style="color: #3b82f6; margin: 20px 0;">إنشاء حساب</h1>
+        <select id="regCurrencySelect">
+            <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
+            <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
+        </select>
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="regPassword" placeholder="كلمة المرور">
+        <input type="text" id="regName" placeholder="الاسم">
+        <button onclick="doRegister()">إنشاء حساب</button>
+        <div class="toggle-auth" onclick="showLogin()">لديك حساب؟ سجل دخول</div>
+        <div id="registerError" style="color: #f87171; margin-top: 15px; display: none;"></div>
     </div>
 </div>
 
@@ -359,366 +321,408 @@
     <div class="modal-content" id="modalBody"></div>
 </div>
 
-<script>
-// ========== العملة ==========
-let currencySymbol = 'ج.م';
-
-function setCurrency() {
-    let selected = document.getElementById('currencySelect').value;
-    if(selected === 'EGP') {
-        currencySymbol = 'ج.م';
-    } else if(selected === 'LYD') {
-        currencySymbol = 'د.ل';
-    }
-}
-
-function formatMoney(amount) {
-    return (amount || 0).toLocaleString() + ' ' + currencySymbol;
-}
-
-// ========== قاعدة البيانات ==========
-let db = {
-    products: JSON.parse(localStorage.getItem('semo_products')) || [],
-    sales: JSON.parse(localStorage.getItem('semo_sales')) || [],
-    expenses: JSON.parse(localStorage.getItem('semo_expenses')) || [],
-    clients: JSON.parse(localStorage.getItem('semo_clients')) || []
-};
-
-function saveData() {
-    localStorage.setItem('semo_products', JSON.stringify(db.products));
-    localStorage.setItem('semo_sales', JSON.stringify(db.sales));
-    localStorage.setItem('semo_expenses', JSON.stringify(db.expenses));
-    localStorage.setItem('semo_clients', JSON.stringify(db.clients));
-}
-
-// بيانات تجريبية
-if(db.products.length === 0) {
-    db.products = [
-        {id:1, name:'مكتب خشبي', cost:500, price:800, qty:15},
-        {id:2, name:'كرسي دوار', cost:300, price:550, qty:25},
-        {id:3, name:'طابعة HP', cost:1200, price:1800, qty:5},
-        {id:4, name:'شاشة 24 بوصة', cost:2000, price:3200, qty:8},
-        {id:5, name:'ماوس لاسلكي', cost:50, price:120, qty:40},
-        {id:6, name:'لوحة مفاتيح', cost:80, price:200, qty:35}
-    ];
-    db.clients = [
-        {id:101, name:'شركة الأهرام', phone:'01001112223'},
-        {id:102, name:'مؤسسة النور', phone:'01002223334'},
-        {id:103, name:'شركة الاتحاد', phone:'01003334445'},
-        {id:104, name:'محل الرحاب', phone:'01004445556'}
-    ];
-    db.expenses = [
-        {id:201, date:new Date().toLocaleDateString('ar-EG'), name:'إيجار المحل', amount:5000},
-        {id:202, date:new Date().toLocaleDateString('ar-EG'), name:'فواتير كهرباء', amount:800},
-        {id:203, date:new Date().toLocaleDateString('ar-EG'), name:'رواتب موظفين', amount:7500}
-    ];
-    let d = new Date().toLocaleDateString('ar-EG');
-    db.sales = [
-        {id:301, date:d, product:'مكتب خشبي', client:'شركة الأهرام', qty:2, total:1600},
-        {id:302, date:d, product:'طابعة HP', client:'مؤسسة النور', qty:1, total:1800},
-        {id:303, date:d, product:'شاشة 24 بوصة', client:'شركة الأهرام', qty:1, total:3200},
-        {id:304, date:d, product:'كرسي دوار', client:'محل الرحاب', qty:4, total:2200}
-    ];
-    saveData();
-}
-
-// ========== تسجيل الدخول ==========
-function doLogin() {
-    let user = document.getElementById('loginUser').value;
-    let pass = document.getElementById('loginPass').value;
+<script type="module">
+    // ========== العملة ==========
+    let currencySymbol = 'ج.م';
     
-    if(user === 'admin' && pass === 'admin123') {
-        setCurrency();
-        localStorage.setItem('semo_logged', 'true');
-        localStorage.setItem('semo_currency', currencySymbol);
+    function formatMoney(amount) {
+        return (amount || 0).toLocaleString() + ' ' + currencySymbol;
+    }
+    
+    // ========== قاعدة البيانات المحلية ==========
+    let db = {
+        products: JSON.parse(localStorage.getItem('semo_products')) || [],
+        sales: JSON.parse(localStorage.getItem('semo_sales')) || [],
+        expenses: JSON.parse(localStorage.getItem('semo_expenses')) || [],
+        clients: JSON.parse(localStorage.getItem('semo_clients')) || []
+    };
+    
+    function saveData() {
+        localStorage.setItem('semo_products', JSON.stringify(db.products));
+        localStorage.setItem('semo_sales', JSON.stringify(db.sales));
+        localStorage.setItem('semo_expenses', JSON.stringify(db.expenses));
+        localStorage.setItem('semo_clients', JSON.stringify(db.clients));
+    }
+    
+    // بيانات تجريبية
+    if(db.products.length === 0) {
+        db.products = [
+            {id:1, name:'مكتب خشبي', cost:500, price:800, qty:15},
+            {id:2, name:'كرسي دوار', cost:300, price:550, qty:25},
+            {id:3, name:'طابعة HP', cost:1200, price:1800, qty:5},
+            {id:4, name:'شاشة 24 بوصة', cost:2000, price:3200, qty:8},
+            {id:5, name:'ماوس لاسلكي', cost:50, price:120, qty:40},
+            {id:6, name:'لوحة مفاتيح', cost:80, price:200, qty:35}
+        ];
+        db.clients = [
+            {id:101, name:'شركة الأهرام', phone:'01001112223'},
+            {id:102, name:'مؤسسة النور', phone:'01002223334'},
+            {id:103, name:'شركة الاتحاد', phone:'01003334445'},
+            {id:104, name:'محل الرحاب', phone:'01004445556'}
+        ];
+        db.expenses = [
+            {id:201, date:new Date().toLocaleDateString('ar-EG'), name:'إيجار المحل', amount:5000},
+            {id:202, date:new Date().toLocaleDateString('ar-EG'), name:'فواتير كهرباء', amount:800},
+            {id:203, date:new Date().toLocaleDateString('ar-EG'), name:'رواتب موظفين', amount:7500}
+        ];
+        let d = new Date().toLocaleDateString('ar-EG');
+        db.sales = [
+            {id:301, date:d, product:'مكتب خشبي', client:'شركة الأهرام', qty:2, total:1600},
+            {id:302, date:d, product:'طابعة HP', client:'مؤسسة النور', qty:1, total:1800},
+            {id:303, date:d, product:'شاشة 24 بوصة', client:'شركة الأهرام', qty:1, total:3200},
+            {id:304, date:d, product:'كرسي دوار', client:'محل الرحاب', qty:4, total:2200}
+        ];
+        saveData();
+    }
+    
+    // ========== Firebase Auth Functions ==========
+    window.showRegister = function() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('registerPage').style.display = 'flex';
+    };
+    
+    window.showLogin = function() {
+        document.getElementById('registerPage').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+    };
+    
+    window.doLogin = async function() {
+        let email = document.getElementById('loginEmail').value;
+        let password = document.getElementById('loginPassword').value;
+        let errorDiv = document.getElementById('loginError');
+        let currencySelect = document.getElementById('currencySelect');
+        
+        try {
+            const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
+            currencySymbol = currencySelect.value === 'EGP' ? 'ج.م' : 'د.ل';
+            localStorage.setItem('semo_currency', currencySymbol);
+            localStorage.setItem('semo_logged', 'true');
+            localStorage.setItem('semo_user', JSON.stringify({name: userCredential.user.email.split('@')[0], email: email}));
+            
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('userName').innerHTML = userCredential.user.email.split('@')[0];
+            renderDashboard();
+        } catch (error) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/invalid-credential).' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : error.message);
+        }
+    };
+    
+    window.doRegister = async function() {
+        let email = document.getElementById('regEmail').value;
+        let password = document.getElementById('regPassword').value;
+        let name = document.getElementById('regName').value;
+        let currencySelect = document.getElementById('regCurrencySelect');
+        let errorDiv = document.getElementById('registerError');
+        
+        try {
+            const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+            currencySymbol = currencySelect.value === 'EGP' ? 'ج.م' : 'د.ل';
+            localStorage.setItem('semo_currency', currencySymbol);
+            localStorage.setItem('semo_logged', 'true');
+            localStorage.setItem('semo_user', JSON.stringify({name: name || email.split('@')[0], email: email}));
+            
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('userName').innerHTML = name || email.split('@')[0];
+            renderDashboard();
+        } catch (error) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '❌ ' + (error.message === 'Firebase: Error (auth/email-already-in-use).' ? 'البريد الإلكتروني مستخدم بالفعل' : error.message);
+        }
+    };
+    
+    window.logout = async function() {
+        await window.auth.signOut();
+        localStorage.removeItem('semo_logged');
+        localStorage.removeItem('semo_user');
+        localStorage.removeItem('semo_currency');
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+    };
+    
+    // استعادة العملة المحفوظة
+    let savedCurrency = localStorage.getItem('semo_currency');
+    if(savedCurrency === 'ج.م') currencySymbol = 'ج.م';
+    else if(savedCurrency === 'د.ل') currencySymbol = 'د.ل';
+    
+    if(localStorage.getItem('semo_logged') === 'true') {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        let user = JSON.parse(localStorage.getItem('semo_user'));
+        document.getElementById('userName').innerHTML = user?.name || 'مدير النظام';
         renderDashboard();
-    } else {
-        let err = document.getElementById('loginError');
-        err.style.display = 'block';
-        err.innerHTML = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
     }
-}
-
-function logout() {
-    localStorage.removeItem('semo_logged');
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-}
-
-let savedCurrency = localStorage.getItem('semo_currency');
-if(savedCurrency === 'ج.م') currencySymbol = 'ج.م';
-else if(savedCurrency === 'د.ل') currencySymbol = 'د.ل';
-
-if(localStorage.getItem('semo_logged') === 'true') {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    renderDashboard();
-}
-
-// ========== التنقل ==========
-function switchPage(page, el) {
-    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-    if(el) el.classList.add('active');
     
-    if(page === 'dashboard') renderDashboard();
-    else if(page === 'inventory') renderInventory();
-    else if(page === 'sales') renderSales();
-    else if(page === 'expenses') renderExpenses();
-    else if(page === 'clients') renderClients();
-}
-
-// ========== لوحة التحكم ==========
-function renderDashboard() {
-    let totalSales = db.sales.reduce((a,b)=>a+b.total, 0);
-    let totalExpenses = db.expenses.reduce((a,b)=>a+b.amount, 0);
-    let profit = totalSales - totalExpenses;
-    let lowStock = db.products.filter(p=>p.qty<=5).length;
-    
-    document.getElementById('pageContent').innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card" onclick="switchPage('sales')"><h3>💰 إجمالي المبيعات</h3><div class="stat-value">${formatMoney(totalSales)}</div></div>
-            <div class="stat-card" onclick="switchPage('expenses')" style="border-color:#ef4444"><h3>💸 المصروفات</h3><div class="stat-value">${formatMoney(totalExpenses)}</div></div>
-            <div class="stat-card" onclick="switchPage('sales')" style="border-color:#10b981"><h3>📈 صافي الربح</h3><div class="stat-value" style="color:${profit>=0?'#10b981':'#ef4444'}">${formatMoney(profit)}</div></div>
-            <div class="stat-card" onclick="switchPage('inventory')" style="border-color:#f59e0b"><h3>📦 عدد المنتجات</h3><div class="stat-value">${db.products.length}</div></div>
-            <div class="stat-card" onclick="switchPage('inventory')" style="border-color:#f59e0b"><h3>⚠️ منتجات منخفضة</h3><div class="stat-value">${lowStock}</div></div>
-            <div class="stat-card" onclick="switchPage('clients')" style="border-color:#8b5cf6"><h3>👥 العملاء</h3><div class="stat-value">${db.clients.length}</div></div>
-        </div>
-        <div class="card">
-            <h3>📋 آخر المبيعات</h3>
-            <table>
-                <thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>المبلغ</th></tr></thead>
-                <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td>${s.date}</td><td>${s.product}</td><td>${s.client}</td><td>${s.qty}</td><td>${formatMoney(s.total)}</td></tr>`).join('')}</tbody>
-            </table>
-        </div>
-    `;
-}
-
-// ========== المخزون ==========
-function renderInventory() {
-    document.getElementById('pageContent').innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-            <h2>📦 إدارة المخزون</h2>
-            <button class="btn btn-primary" onclick="openProductModal()">+ منتج جديد</button>
-        </div>
-        <div class="card">
-            <input type="text" id="searchProduct" placeholder="🔍 بحث في المنتجات..." onkeyup="refreshProducts()" style="margin-bottom:15px">
-            <table>
-                <thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-                <tbody id="productsList"></tbody>
-            </table>
-        </div>
-    `;
-    refreshProducts();
-}
-
-function refreshProducts() {
-    let search = document.getElementById('searchProduct')?.value.toLowerCase() || '';
-    let filtered = db.products.filter(p=>p.name.toLowerCase().includes(search));
-    document.getElementById('productsList').innerHTML = filtered.map((p,idx)=>`
-        <tr>
-            <td>${idx+1}</td>
-            <td><strong>${p.name}</strong></td>
-            <td>${formatMoney(p.cost)}</td>
-            <td>${formatMoney(p.price)}</td>
-            <td style="${p.qty<=5?'color:#f59e0b':''}">${p.qty}</td>
-            <td>${p.qty<=5?'⚠️ منخفض':'متوفر'}</td>
-            <td>
-                <button class="btn btn-primary" style="padding:5px 10px" onclick="editProduct(${p.id})">✏️</button>
-                <button class="btn btn-danger" style="padding:5px 10px" onclick="deleteProduct(${p.id})">🗑️</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function openProductModal(id=null) {
-    let p = id ? db.products.find(x=>x.id==id) : {name:'', cost:0, price:0, qty:0};
-    document.getElementById('modalBody').innerHTML = `
-        <h3>${id?'✏️ تعديل منتج':'➕ إضافة منتج'}</h3>
-        <input id="prodName" value="${p.name}" placeholder="اسم المنتج">
-        <input id="prodCost" type="number" value="${p.cost}" placeholder="سعر الشراء (${currencySymbol})">
-        <input id="prodPrice" type="number" value="${p.price}" placeholder="سعر البيع (${currencySymbol})">
-        <input id="prodQty" type="number" value="${p.qty}" placeholder="الكمية">
-        <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="saveProduct(${id})">💾 حفظ</button>
-    `;
-    document.getElementById('modal').classList.add('show');
-}
-
-function saveProduct(id) {
-    let name = document.getElementById('prodName').value;
-    if(!name) { alert('❌ يرجى كتابة اسم المنتج'); return; }
-    let newProd = {
-        id: id || Date.now(),
-        name: name,
-        cost: parseFloat(document.getElementById('prodCost').value) || 0,
-        price: parseFloat(document.getElementById('prodPrice').value) || 0,
-        qty: parseInt(document.getElementById('prodQty').value) || 0
+    // ========== التنقل ==========
+    window.switchPage = function(page, el) {
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        if(el) el.classList.add('active');
+        if(page === 'dashboard') renderDashboard();
+        else if(page === 'inventory') renderInventory();
+        else if(page === 'sales') renderSales();
+        else if(page === 'expenses') renderExpenses();
+        else if(page === 'clients') renderClients();
     };
-    if(id) {
-        let idx = db.products.findIndex(x=>x.id==id);
-        db.products[idx] = newProd;
-    } else {
-        db.products.push(newProd);
-    }
-    saveData();
-    closeModal();
-    renderInventory();
-    alert(`✅ ${id?'تم التعديل':'تمت الإضافة'} بنجاح`);
-}
-
-function editProduct(id) { openProductModal(id); }
-function deleteProduct(id) {
-    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
-        db.products = db.products.filter(p=>p.id!==id);
-        saveData();
-        renderInventory();
-        alert('🗑️ تم الحذف');
-    }
-}
-
-// ========== المبيعات ==========
-function renderSales() {
-    document.getElementById('pageContent').innerHTML = `
-        <h2>🛒 المبيعات</h2>
-        <div class="card">
-            <select id="saleProduct">${db.products.map(p=>`<option value="${p.id}">${p.name} (متوفر: ${p.qty}) - ${formatMoney(p.price)}</option>`)}</select>
-            <select id="saleClient">${db.clients.map(c=>`<option value="${c.name}">${c.name}</option>`)}<option>زبون نقدي</option></select>
-            <input id="saleQty" type="number" value="1" placeholder="الكمية">
-            <button class="btn btn-success" style="width:100%" onclick="doSale()">💰 إتمام البيع</button>
-        </div>
-        <div class="card">
-            <h3>📋 سجل الفواتير</h3>
-            <table>
-                <thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
-                <tbody>${db.sales.slice().reverse().map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.date}</td><td>${s.product}</td><td>${s.client}</td><td>${s.qty}</td><td>${formatMoney(s.total)}</td></tr>`).join('')}</tbody>
-            </table>
-        </div>
-    `;
-}
-
-function doSale() {
-    let productId = parseInt(document.getElementById('saleProduct').value);
-    let product = db.products.find(p=>p.id===productId);
-    let qty = parseInt(document.getElementById('saleQty').value);
-    if(product && product.qty >= qty) {
-        product.qty -= qty;
-        let sale = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString('ar-EG'),
-            product: product.name,
-            client: document.getElementById('saleClient').value,
-            qty: qty,
-            total: qty * product.price
+    
+    // ========== لوحة التحكم ==========
+    window.renderDashboard = function() {
+        let totalSales = db.sales.reduce((a,b)=>a+b.total, 0);
+        let totalExpenses = db.expenses.reduce((a,b)=>a+b.amount, 0);
+        let profit = totalSales - totalExpenses;
+        let lowStock = db.products.filter(p=>p.qty<=5).length;
+        
+        document.getElementById('pageContent').innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card" onclick="switchPage('sales')"><h3>💰 إجمالي المبيعات</h3><div class="stat-value">${formatMoney(totalSales)}</div></div>
+                <div class="stat-card" onclick="switchPage('expenses')" style="border-color:#ef4444"><h3>💸 المصروفات</h3><div class="stat-value">${formatMoney(totalExpenses)}</div></div>
+                <div class="stat-card" onclick="switchPage('sales')" style="border-color:#10b981"><h3>📈 صافي الربح</h3><div class="stat-value" style="color:${profit>=0?'#10b981':'#ef4444'}">${formatMoney(profit)}</div></div>
+                <div class="stat-card" onclick="switchPage('inventory')" style="border-color:#f59e0b"><h3>📦 عدد المنتجات</h3><div class="stat-value">${db.products.length}</div></div>
+                <div class="stat-card" onclick="switchPage('inventory')" style="border-color:#f59e0b"><h3>⚠️ منتجات منخفضة</h3><div class="stat-value">${lowStock}</div></div>
+                <div class="stat-card" onclick="switchPage('clients')" style="border-color:#8b5cf6"><h3>👥 العملاء</h3><div class="stat-value">${db.clients.length}</div></div>
+            </div>
+            <div class="card">
+                <h3>📋 آخر المبيعات</h3>
+                <table>
+                    <thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>المبلغ</th></tr></thead>
+                    <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td>${s.date}</td><td>${s.product}</td><td>${s.client}</td><td>${s.qty}</td><td>${formatMoney(s.total)}</td></tr>`).join('')}</tbody>
+                </table>
+            </div>
+        `;
+    };
+    
+    // ========== المخزون ==========
+    window.renderInventory = function() {
+        document.getElementById('pageContent').innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+                <h2>📦 إدارة المخزون</h2>
+                <button class="btn btn-primary" onclick="openProductModal()">+ منتج جديد</button>
+            </div>
+            <div class="card">
+                <input type="text" id="searchProduct" placeholder="🔍 بحث في المنتجات..." onkeyup="refreshProducts()" style="margin-bottom:15px">
+                <table>
+                    <thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                    <tbody id="productsList"></tbody>
+                </table>
+            </div>
+        `;
+        refreshProducts();
+    };
+    
+    window.refreshProducts = function() {
+        let search = document.getElementById('searchProduct')?.value.toLowerCase() || '';
+        let filtered = db.products.filter(p=>p.name.toLowerCase().includes(search));
+        document.getElementById('productsList').innerHTML = filtered.map((p,idx)=>`
+            <tr>
+                <td>${idx+1}</td>
+                <td><strong>${p.name}</strong></td>
+                <td>${formatMoney(p.cost)}</td>
+                <td>${formatMoney(p.price)}</td>
+                <td style="${p.qty<=5?'color:#f59e0b':''}">${p.qty}</td>
+                <td>${p.qty<=5?'⚠️ منخفض':'متوفر'}</td>
+                <td>
+                    <button class="btn btn-primary" style="padding:5px 10px" onclick="editProduct(${p.id})">✏️</button>
+                    <button class="btn btn-danger" style="padding:5px 10px" onclick="deleteProduct(${p.id})">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    };
+    
+    window.openProductModal = function(id=null) {
+        let p = id ? db.products.find(x=>x.id==id) : {name:'', cost:0, price:0, qty:0};
+        document.getElementById('modalBody').innerHTML = `
+            <h3>${id?'✏️ تعديل منتج':'➕ إضافة منتج'}</h3>
+            <input id="prodName" value="${p.name}" placeholder="اسم المنتج">
+            <input id="prodCost" type="number" value="${p.cost}" placeholder="سعر الشراء (${currencySymbol})">
+            <input id="prodPrice" type="number" value="${p.price}" placeholder="سعر البيع (${currencySymbol})">
+            <input id="prodQty" type="number" value="${p.qty}" placeholder="الكمية">
+            <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="saveProduct(${id})">💾 حفظ</button>
+        `;
+        document.getElementById('modal').classList.add('show');
+    };
+    
+    window.saveProduct = function(id) {
+        let name = document.getElementById('prodName').value;
+        if(!name) { alert('❌ يرجى كتابة اسم المنتج'); return; }
+        let newProd = {
+            id: id || Date.now(),
+            name: name,
+            cost: parseFloat(document.getElementById('prodCost').value) || 0,
+            price: parseFloat(document.getElementById('prodPrice').value) || 0,
+            qty: parseInt(document.getElementById('prodQty').value) || 0
         };
-        db.sales.push(sale);
+        if(id) {
+            let idx = db.products.findIndex(x=>x.id==id);
+            db.products[idx] = newProd;
+        } else {
+            db.products.push(newProd);
+        }
         saveData();
-        renderSales();
-        alert(`✅ تم البيع\nالمنتج: ${product.name}\nالكمية: ${qty}\nالإجمالي: ${formatMoney(qty*product.price)}`);
-    } else {
-        alert(`❌ الكمية غير كافية\nالمتوفر: ${product?.qty || 0}`);
-    }
-}
-
-// ========== المصروفات ==========
-function renderExpenses() {
-    let total = db.expenses.reduce((a,b)=>a+b.amount, 0);
-    document.getElementById('pageContent').innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-            <h2>💸 المصروفات (${formatMoney(total)})</h2>
-            <button class="btn btn-danger" onclick="openExpenseModal()">+ إضافة مصروف</button>
-        </div>
-        <div class="card">
-            <table>
-                <thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead>
-                <tbody>${db.expenses.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.date}</td><td>${e.name}</td><td>${formatMoney(e.amount)}</td><td><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`).join('')}</tbody>
-            </table>
-        </div>
-    `;
-}
-
-function openExpenseModal() {
-    document.getElementById('modalBody').innerHTML = `
-        <h3>➕ إضافة مصروف</h3>
-        <input id="expName" placeholder="البيان (مثال: كهرباء، إيجار)">
-        <input id="expAmount" type="number" placeholder="المبلغ (${currencySymbol})">
-        <button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="addExpense()">💾 حفظ</button>
-    `;
-    document.getElementById('modal').classList.add('show');
-}
-
-function addExpense() {
-    let name = document.getElementById('expName').value;
-    let amount = parseFloat(document.getElementById('expAmount').value);
-    if(!name) { alert('❌ يرجى كتابة البيان'); return; }
-    if(isNaN(amount)) { alert('❌ يرجى كتابة المبلغ'); return; }
-    db.expenses.push({id:Date.now(), date:new Date().toLocaleDateString('ar-EG'), name:name, amount:amount});
-    saveData();
-    closeModal();
-    renderExpenses();
-    alert('✅ تمت إضافة المصروف');
-}
-
-function deleteExpense(id) {
-    if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
-        db.expenses = db.expenses.filter(e=>e.id!==id);
+        closeModal();
+        renderInventory();
+        alert(`✅ ${id?'تم التعديل':'تمت الإضافة'} بنجاح`);
+    };
+    
+    window.editProduct = function(id) { openProductModal(id); };
+    window.deleteProduct = function(id) {
+        if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+            db.products = db.products.filter(p=>p.id!==id);
+            saveData();
+            renderInventory();
+            alert('🗑️ تم الحذف');
+        }
+    };
+    
+    // ========== المبيعات ==========
+    window.renderSales = function() {
+        document.getElementById('pageContent').innerHTML = `
+            <h2>🛒 المبيعات</h2>
+            <div class="card">
+                <select id="saleProduct">${db.products.map(p=>`<option value="${p.id}">${p.name} (متوفر: ${p.qty}) - ${formatMoney(p.price)}</option>`)}</select>
+                <select id="saleClient">${db.clients.map(c=>`<option value="${c.name}">${c.name}</option>`)}<option>زبون نقدي</option></select>
+                <input id="saleQty" type="number" value="1" placeholder="الكمية">
+                <button class="btn btn-success" style="width:100%" onclick="doSale()">💰 إتمام البيع</button>
+            </div>
+            <div class="card">
+                <h3>📋 سجل الفواتير</h3>
+                <table>
+                    <thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
+                    <tbody>${db.sales.slice().reverse().map((s,idx)=>`<tr><td>${idx+1}</td><td>${s.date}</td><td>${s.product}</td><td>${s.client}</td><td>${s.qty}</td><td>${formatMoney(s.total)}</td></tr>`).join('')}</tbody>
+                </table>
+            </div>
+        `;
+    };
+    
+    window.doSale = function() {
+        let productId = parseInt(document.getElementById('saleProduct').value);
+        let product = db.products.find(p=>p.id===productId);
+        let qty = parseInt(document.getElementById('saleQty').value);
+        if(product && product.qty >= qty) {
+            product.qty -= qty;
+            let sale = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('ar-EG'),
+                product: product.name,
+                client: document.getElementById('saleClient').value,
+                qty: qty,
+                total: qty * product.price
+            };
+            db.sales.push(sale);
+            saveData();
+            renderSales();
+            alert(`✅ تم البيع\nالمنتج: ${product.name}\nالكمية: ${qty}\nالإجمالي: ${formatMoney(qty*product.price)}`);
+        } else {
+            alert(`❌ الكمية غير كافية\nالمتوفر: ${product?.qty || 0}`);
+        }
+    };
+    
+    // ========== المصروفات ==========
+    window.renderExpenses = function() {
+        let total = db.expenses.reduce((a,b)=>a+b.amount, 0);
+        document.getElementById('pageContent').innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+                <h2>💸 المصروفات (${formatMoney(total)})</h2>
+                <button class="btn btn-danger" onclick="openExpenseModal()">+ إضافة مصروف</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead>
+                    <tbody>${db.expenses.map((e,idx)=>`<tr><td>${idx+1}</td><td>${e.date}</td><td>${e.name}</td><td>${formatMoney(e.amount)}</td><td><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`).join('')}</tbody>
+                </table>
+            </div>
+        `;
+    };
+    
+    window.openExpenseModal = function() {
+        document.getElementById('modalBody').innerHTML = `
+            <h3>➕ إضافة مصروف</h3>
+            <input id="expName" placeholder="البيان (مثال: كهرباء، إيجار)">
+            <input id="expAmount" type="number" placeholder="المبلغ (${currencySymbol})">
+            <button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="addExpense()">💾 حفظ</button>
+        `;
+        document.getElementById('modal').classList.add('show');
+    };
+    
+    window.addExpense = function() {
+        let name = document.getElementById('expName').value;
+        let amount = parseFloat(document.getElementById('expAmount').value);
+        if(!name) { alert('❌ يرجى كتابة البيان'); return; }
+        if(isNaN(amount)) { alert('❌ يرجى كتابة المبلغ'); return; }
+        db.expenses.push({id:Date.now(), date:new Date().toLocaleDateString('ar-EG'), name:name, amount:amount});
         saveData();
+        closeModal();
         renderExpenses();
-        alert('🗑️ تم الحذف');
-    }
-}
-
-// ========== العملاء ==========
-function renderClients() {
-    document.getElementById('pageContent').innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-            <h2>👥 العملاء</h2>
-            <button class="btn btn-primary" onclick="openClientModal()">+ عميل جديد</button>
-        </div>
-        <div class="card">
-            <table>
-                <thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي مشترياته</th><th></th></tr></thead>
-                <tbody>${db.clients.map((c,idx)=> {
-                    let total = db.sales.filter(s=>s.client===c.name).reduce((a,b)=>a+b.total, 0);
-                    return `<tr><td>${idx+1}</td><td><strong>${c.name}</strong></td><td>${c.phone || '-'}</td><td>${formatMoney(total)}</td><td><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`;
-                }).join('')}</tbody>
-            </table>
-        </div>
-    `;
-}
-
-function openClientModal() {
-    document.getElementById('modalBody').innerHTML = `
-        <h3>➕ إضافة عميل</h3>
-        <input id="clientName" placeholder="اسم العميل">
-        <input id="clientPhone" placeholder="رقم الهاتف">
-        <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addClient()">💾 حفظ</button>
-    `;
-    document.getElementById('modal').classList.add('show');
-}
-
-function addClient() {
-    let name = document.getElementById('clientName').value;
-    if(!name) { alert('❌ يرجى كتابة اسم العميل'); return; }
-    db.clients.push({id:Date.now(), name:name, phone:document.getElementById('clientPhone').value || '-'});
-    saveData();
-    closeModal();
-    renderClients();
-    alert(`✅ تمت إضافة العميل: ${name}`);
-}
-
-function deleteClient(id) {
-    if(confirm('⚠️ هل أنت متأكد من حذف العميل؟')) {
-        db.clients = db.clients.filter(c=>c.id!==id);
+        alert('✅ تمت إضافة المصروف');
+    };
+    
+    window.deleteExpense = function(id) {
+        if(confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+            db.expenses = db.expenses.filter(e=>e.id!==id);
+            saveData();
+            renderExpenses();
+            alert('🗑️ تم الحذف');
+        }
+    };
+    
+    // ========== العملاء ==========
+    window.renderClients = function() {
+        document.getElementById('pageContent').innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+                <h2>👥 العملاء</h2>
+                <button class="btn btn-primary" onclick="openClientModal()">+ عميل جديد</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>إجمالي مشترياته</th><th></th></tr></thead>
+                    <tbody>${db.clients.map((c,idx)=> {
+                        let total = db.sales.filter(s=>s.client===c.name).reduce((a,b)=>a+b.total, 0);
+                        return `<tr><td>${idx+1}</td><td><strong>${c.name}</strong></td><td>${c.phone || '-'}</td><td>${formatMoney(total)}</td><td><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteClient(${c.id})">🗑️</button></td></td>`;
+                    }).join('')}</tbody>
+                </table>
+            </div>
+        `;
+    };
+    
+    window.openClientModal = function() {
+        document.getElementById('modalBody').innerHTML = `
+            <h3>➕ إضافة عميل</h3>
+            <input id="clientName" placeholder="اسم العميل">
+            <input id="clientPhone" placeholder="رقم الهاتف">
+            <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addClient()">💾 حفظ</button>
+        `;
+        document.getElementById('modal').classList.add('show');
+    };
+    
+    window.addClient = function() {
+        let name = document.getElementById('clientName').value;
+        if(!name) { alert('❌ يرجى كتابة اسم العميل'); return; }
+        db.clients.push({id:Date.now(), name:name, phone:document.getElementById('clientPhone').value || '-'});
         saveData();
+        closeModal();
         renderClients();
-        alert('🗑️ تم الحذف');
+        alert(`✅ تمت إضافة العميل: ${name}`);
+    };
+    
+    window.deleteClient = function(id) {
+        if(confirm('⚠️ هل أنت متأكد من حذف العميل؟')) {
+            db.clients = db.clients.filter(c=>c.id!==id);
+            saveData();
+            renderClients();
+            alert('🗑️ تم الحذف');
+        }
+    };
+    
+    window.closeModal = function() {
+        document.getElementById('modal').classList.remove('show');
+    };
+    
+    // بدء التشغيل إذا كان مسجل دخول
+    if(localStorage.getItem('semo_logged') === 'true') {
+        renderDashboard();
     }
-}
-
-function closeModal() {
-    document.getElementById('modal').classList.remove('show');
-}
 </script>
 </body>
 </html>
