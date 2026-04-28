@@ -73,7 +73,6 @@
             min-height: 100vh;
         }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -608,13 +607,14 @@
         <p>النظام المحاسبي المتكامل السحابي</p>
         <select id="currencySelect">
             <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
-            <option value="LYD">🇱🇾 دينار ليبي (د.ل)</option>
+            <option value="LYD" selected>🇱🇾 دينار ليبي (د.ل)</option>
         </select>
-        <input type="email" id="loginEmail" placeholder="📧 البريد الإلكتروني">
-        <input type="password" id="loginPassword" placeholder="🔒 كلمة المرور">
+        <input type="email" id="loginEmail" placeholder="📧 البريد الإلكتروني" value="test@example.com">
+        <input type="password" id="loginPassword" placeholder="🔒 كلمة المرور" value="123456">
         <button id="authBtn" onclick="handleAuth()">🚪 دخول للنظام</button>
         <div id="loginError" class="error-msg"></div>
         <p class="toggle-auth" onclick="toggleAuthMode()" id="toggleText">📝 ليس لديك حساب؟ إنشاء حساب جديد</p>
+        <p style="font-size:11px; margin-top:10px;">🔐 حساب تجريبي: test@example.com / 123456</p>
     </div>
 </div>
 
@@ -679,7 +679,7 @@
 // ========== المتغيرات العامة ==========
 let authMode = 'login';
 let currentUser = null;
-let currencySymbol = 'ج.م';
+let currencySymbol = 'د.ل';
 
 function formatMoney(amount) {
     return (amount || 0).toLocaleString() + ' ' + currencySymbol;
@@ -711,7 +711,6 @@ window.handleAuth = async function() {
             userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
         } else {
             userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
-            // تهيئة بيانات للمستخدم الجديد
             await window.set(window.ref(window.db, `users/${userCredential.user.uid}/data`), {
                 inventory: [],
                 sales: [],
@@ -879,7 +878,7 @@ function renderDashboard() {
         </div>
         <div class="card"><h3>📊 حركة المبيعات الشهرية</h3><canvas id="salesChart" height="120"></canvas></div>
         <div class="card"><h3>📋 آخر المبيعات</h3><div class="table-wrapper"><table class="data-table"><thead><tr><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th></tr></thead>
-        <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center"><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td></tr>`).join('')}</tbody></table></div></div>
+        <tbody>${db.sales.slice().reverse().slice(0,5).map(s=>`<tr><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center"><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td></tr>`).join('')}</tbody>}</div></div>
     `;
     
     // رسم بياني
@@ -906,9 +905,9 @@ function renderInventory() {
     document.getElementById('pageContent').innerHTML = `
         <div class="card">
             <div class="card-header"><h2>📦 إدارة المخزون</h2><button class="btn btn-primary" onclick="openProductModal()">+ إضافة منتج جديد</button></div>
-            <input type="text" id="searchInventory" class="search-input" placeholder="🔍 بحث في المنتجات..." onkeyup="filterInventory()">
+            <input type="text" id="searchInventory" class="search-input" placeholder="🔍 بحث في المنتجات..." onkeyup="refreshInventory()">
             <div class="table-wrapper"><table id="inventoryTable"><thead><tr><th>#</th><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-            <tbody id="inventoryList"></tbody></tr></div>
+            <tbody id="inventoryList"></tbody>}</div>
         </div>
     `;
     refreshInventory();
@@ -932,8 +931,6 @@ function refreshInventory() {
         </tr>
     `).join('');
 }
-
-function filterInventory() { refreshInventory(); }
 
 function openProductModal(id=null) {
     let p = id ? db.inventory.find(x=>x.id==id) : {name:'', cost:0, price:0, qty:0};
@@ -999,7 +996,7 @@ function renderSales() {
         <div class="card">
             <h3>📋 سجل الفواتير</h3>
             <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>العميل</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th><th>طباعة</th></tr></thead>
-            <tbody>${db.sales.slice().reverse().map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center"><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td><td style="text-align:center"><button class="btn btn-primary" style="padding:5px 10px" onclick="printInvoice(${s.id})">🖨️</button></td></tr>`).join('')}</tbody></td></div>
+            <tbody>${db.sales.slice().reverse().map((s,idx)=>`</td><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center"><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td><td style="text-align:center"><button class="btn btn-primary" style="padding:5px 10px" onclick="printInvoice(${s.id})">🖨️</button></td></tr>`).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1043,45 +1040,31 @@ function printInvoice(id) {
     printWindow.document.write(`
         <!DOCTYPE html>
         <html dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <title>فاتورة #${sale.id}</title>
-            <style>
-                body{font-family:'Cairo',sans-serif;padding:40px;direction:rtl}
-                .header{text-align:center;margin-bottom:30px}
-                .logo{font-size:50px}
-                h1{color:#3b82f6;margin:10px 0}
-                .info{border:1px solid #ddd;border-radius:12px;padding:20px;margin:20px 0}
-                .row{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee}
-                table{width:100%;border-collapse:collapse;margin:20px 0}
-                th,td{padding:10px;text-align:center;border:1px solid #ddd}
-                th{background:#3b82f6;color:#fff}
-                .total{font-size:24px;font-weight:bold;color:#3b82f6;text-align:center;margin-top:20px}
-                .footer{text-align:center;margin-top:30px;font-size:12px;color:#666}
-                @media print{body{padding:20px}}
-            </style>
+        <head><meta charset="UTF-8"><title>فاتورة #${sale.id}</title>
+        <style>
+            body{font-family:'Cairo',sans-serif;padding:40px;direction:rtl}
+            .header{text-align:center;margin-bottom:30px}
+            h1{color:#3b82f6;margin:10px 0}
+            .info{border:1px solid #ddd;border-radius:12px;padding:20px;margin:20px 0}
+            .row{display:flex;justify-content:space-between;padding:8px}
+            table{width:100%;border-collapse:collapse;margin:20px 0}
+            th,td{padding:10px;text-align:center;border:1px solid #ddd}
+            th{background:#3b82f6;color:#fff}
+            .total{font-size:24px;font-weight:bold;color:#3b82f6;text-align:center}
+            .footer{text-align:center;margin-top:30px;font-size:12px}
+        </style>
         </head>
         <body>
-            <div class="header">
-                <div class="logo">📊</div>
-                <h1>SEMO ERP PRO</h1>
-                <p>فاتورة ضريبية</p>
-            </div>
+            <div class="header"><h1>SEMO ERP PRO</h1><p>فاتورة ضريبية</p></div>
             <div class="info">
                 <div class="row"><strong>رقم الفاتورة:</strong> <span>#${sale.id}</span></div>
                 <div class="row"><strong>التاريخ:</strong> <span>${sale.date}</span></div>
                 <div class="row"><strong>العميل:</strong> <span>${sale.client}</span></div>
-                <div class="row"><strong>الحالة:</strong> <span>${sale.status}</span></div>
             </div>
-            <table>
-                <thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
-                <tbody><tr><td>${sale.product}</td><td>${sale.qty}</td><td>${formatMoney(unitPrice)}</td><td>${formatMoney(sale.total)}</td></tr></tbody>
-            </table>
+            <table><thead><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></thead>
+            <tbody><td>${sale.product}</td><td>${sale.qty}</td><td>${formatMoney(unitPrice)}</td><td>${formatMoney(sale.total)}</td></tbody></table>
             <div class="total">الإجمالي: ${formatMoney(sale.total)}</div>
-            <div class="footer">
-                <p>شكراً لتعاملكم معنا</p>
-                <p>SEMO ERP PRO - نظام محاسبي متكامل</p>
-            </div>
+            <div class="footer"><p>شكراً لتعاملكم معنا</p></div>
             <script>window.print();<\/script>
         </body>
         </html>
@@ -1103,7 +1086,7 @@ function renderPurchases() {
         <div class="card">
             <h3>📋 سجل المشتريات</h3>
             <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>المورد</th><th>الإجمالي</th></tr></thead>
-            <tbody>${db.purchases.slice().reverse().map((p,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${p.date}</td><td style="text-align:center">${p.product}</td><td style="text-align:center">${p.qty}</td><td style="text-align:center">${p.supplier}</td><td style="text-align:center">${formatMoney(p.total || p.qty * (p.price || 0))}</td></tr>`).join('')}</tbody></td></div>
+            <tbody>${db.purchases.slice().reverse().map((p,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${p.date}</td><td style="text-align:center">${p.product}</td><td style="text-align:center">${p.qty}</td><td style="text-align:center">${p.supplier}</td><td style="text-align:center">${formatMoney(p.total || p.qty * (p.price || 0))}</td></tr>`).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1141,8 +1124,8 @@ function renderExpenses() {
     document.getElementById('pageContent').innerHTML = `
         <div class="card">
             <div class="card-header"><h2>💸 المصروفات (${formatMoney(total)})</h2><button class="btn btn-danger" onclick="openExpenseModal()">+ إضافة مصروف</button></div>
-            <div class="table-wrapper"><table class="data-table"><thead></td><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></thead>
-            <tbody>${db.expenses.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.date}</td><td style="text-align:center">${e.name}</td><td style="text-align:center">${formatMoney(e.amount)}</td></tr>`).join('')}</tbody></table></div>
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></thead>
+            <tbody>${db.expenses.map((e,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${e.date}</td><td style="text-align:center">${e.name}</td><td style="text-align:center">${formatMoney(e.amount)}</td></tr>`).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1180,8 +1163,8 @@ function renderRevenues() {
     document.getElementById('pageContent').innerHTML = `
         <div class="card">
             <div class="card-header"><h2>💰 الإيرادات (${formatMoney(total)})</h2><button class="btn btn-success" onclick="openRevenueModal()">+ إضافة إيراد</button></div>
-            <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></tr></thead>
-            <tbody>${db.revenues.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.date}</td><td style="text-align:center">${r.name}</td><td style="text-align:center">${formatMoney(r.amount)}</td></tr>`).join('')}</tbody></table></div>
+            <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المبلغ</th></thead>
+            <tbody>${db.revenues.map((r,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${r.date}</td><td style="text-align:center">${r.name}</td><td style="text-align:center">${formatMoney(r.amount)}</td></tr>`).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1221,7 +1204,7 @@ function renderDebts() {
         <div class="card">
             <h2>⏳ الديون المستحقة <span style="color: var(--danger); font-size: 16px;">(الإجمالي: ${formatMoney(totalDebts)})</span></h2>
             <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>تحصيل</th></tr></thead>
-            <tbody>${debts.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center">${formatMoney(s.paid||0)}</td><td style="text-align:center" style="color: var(--danger)">${formatMoney(s.total - (s.paid||0))}</td><td style="text-align:center"><button class="btn btn-success" style="padding:5px 10px" onclick="collectDebt(${s.id})">💰 تحصيل</button></td></tr>`).join('')}</tbody></table></div>
+            <tbody>${debts.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center">${s.date}</td><td style="text-align:center">${s.client}</td><td style="text-align:center">${s.product}</td><td style="text-align:center">${formatMoney(s.total)}</td><td style="text-align:center">${formatMoney(s.paid||0)}</td><td style="text-align:center" style="color: var(--danger)">${formatMoney(s.total - (s.paid||0))}</td><td style="text-align:center"><button class="btn btn-success" style="padding:5px 10px" onclick="collectDebt(${s.id})">💰 تحصيل</button></td></tr>`).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1251,7 +1234,7 @@ function renderClients() {
             <tbody>${db.clients.map((c,idx) => {
                 let total = db.sales.filter(s=>s.client===c.name).reduce((a,b)=>a+(b.total||0), 0);
                 return `<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${c.name}</strong></td><td style="text-align:center">${c.phone || '-'}</td><td style="text-align:center">${formatMoney(total)}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteClient(${c.id})">🗑️</button></td></tr>`;
-            }).join('')}</tbody></table></div>
+            }).join('')}</tbody>}</div>
         </div>
     `;
 }
@@ -1295,4 +1278,13 @@ function renderSuppliers() {
         <div class="card">
             <div class="card-header"><h2>🏭 الموردين</h2><button class="btn btn-primary" onclick="openSupplierModal()">+ إضافة مورد جديد</button></div>
             <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>حذف</th></tr></thead>
-            <tbody>${db.suppliers.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><t
+            <tbody>${db.suppliers.map((s,idx)=>`<tr><td style="text-align:center">${idx+1}</td><td style="text-align:center"><strong>${s.name}</strong></td><td style="text-align:center">${s.phone || '-'}</td><td style="text-align:center"><button class="btn btn-danger" style="padding:5px 10px" onclick="deleteSupplier(${s.id})">🗑️</button></td></tr>`).join('')}</tbody>}</div>
+        </div>
+    `;
+}
+
+function openSupplierModal() {
+    document.getElementById('modalBody').innerHTML = `
+        <h3>➕ إضافة مورد جديد</h3>
+        <input type="text" id="supplierName" placeholder="اسم المورد">
+        <input type="text" id="supplierPhone" placeholder="رقم الهاتف">
