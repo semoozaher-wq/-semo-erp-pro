@@ -18,74 +18,69 @@
         }
         body { background: var(--bg); color: var(--text); direction: rtl; font-size: 14px; overflow-x: hidden; }
         
-        /* شاشة تسجيل الدخول */
+        /* Login Screen */
         .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea, #764ba2); }
-        .login-box { background: white; padding: 40px; border-radius: 30px; width: 400px; max-width: 90%; text-align: center; box-shadow: 0 20px 35px rgba(0,0,0,0.1); }
+        .login-box { background: white; padding: 40px; border-radius: 30px; width: 400px; max-width: 90%; text-align: center; }
         .login-box h2 { margin-bottom: 25px; color: var(--primary); }
         .login-box input, .login-box select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; }
         .switch-auth { margin-top: 15px; color: #666; cursor: pointer; }
         .switch-auth span { color: var(--primary); font-weight: bold; }
         
-        /* التطبيق الرئيسي */
-        #mainApp { background: var(--bg); min-height: 100vh; }
-        
-        /* الهيدر */
+        /* Header */
         .top-header { background: white; padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; position: sticky; top: 0; z-index: 100; }
         .header-logo { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
         .header-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
         .currency-selector { background: var(--bg); border: 1px solid var(--border); padding: 8px 15px; border-radius: 40px; cursor: pointer; font-weight: 600; }
         .user-info { display: flex; align-items: center; gap: 15px; background: var(--bg); padding: 5px 20px; border-radius: 40px; }
-        .logout-btn { background: var(--danger); border: none; padding: 6px 16px; border-radius: 40px; color: white; cursor: pointer; font-weight: 600; }
+        .logout-btn { background: var(--danger); border: none; padding: 6px 16px; border-radius: 40px; color: white; cursor: pointer; }
         
-        /* أيقونات القائمة */
+        /* Menu Icons */
         .menu-icons { display: flex; justify-content: space-around; background: white; padding: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
         .icon-item { text-align: center; cursor: pointer; padding: 8px 15px; border-radius: 12px; transition: 0.2s; }
         .icon-item:hover { background: var(--bg); transform: translateY(-3px); }
         .icon-circle { width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; color: white; font-size: 20px; }
         .icon-item span { font-size: 12px; color: var(--text-muted); }
         
-        /* كروت الإحصائيات */
+        /* Stats Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; padding: 20px; }
         .stat-card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; border: 1px solid var(--border); text-align: center; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
         .stat-value { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
         .stat-label { font-size: 14px; color: var(--text-muted); }
         
-        /* البطاقات */
+        /* Cards */
         .card-box { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         
-        /* الأزرار */
+        /* Buttons */
         .btn { padding: 8px 20px; border-radius: 40px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-info { background: var(--info); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         
-        /* الجداول */
+        /* Tables */
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th, .data-table td { padding: 12px 8px; text-align: right; border-bottom: 1px solid var(--border); }
         .data-table th { color: var(--text-muted); font-size: 12px; }
-        .data-table tr:hover { background: #f1f5f9; cursor: pointer; }
+        .data-table tr { cursor: pointer; transition: 0.1s; }
+        .data-table tr:hover { background: #f1f5f9; }
         
         .badge { padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; }
         .badge-success { background: #d1fae5; color: #059669; }
         .badge-warning { background: #fed7aa; color: #c2410c; }
         
-        /* النافذة المنبثقة */
+        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal.show { display: flex; }
-        .modal-content { background: white; border-radius: 20px; max-width: 550px; width: 90%; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 20px; max-width: 600px; width: 90%; padding: 20px; max-height: 85vh; overflow-y: auto; }
         
-        /* تفاصيل الفاتورة */
         .invoice-details { padding: 15px; background: #f8fafc; border-radius: 15px; margin: 10px 0; }
         .invoice-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ddd; }
         .share-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         .share-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; }
         .share-btn.whatsapp { background: #25D366; }
-        .share-btn.facebook { background: #1877F2; }
-        .share-btn.email { background: #EA4335; }
         
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; }
@@ -93,21 +88,14 @@
         .profit-negative { color: #ef4444; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         
-        /* الأقسام */
         .page-section { display: none; padding: 20px; animation: fadeIn 0.3s; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* الجوال */
-        .mobile-menu-btn { display: none; position: fixed; bottom: 20px; left: 20px; background: var(--primary); width: 50px; height: 50px; border-radius: 50%; z-index: 200; cursor: pointer; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .mobile-menu-btn { display: none; position: fixed; bottom: 20px; left: 20px; background: var(--primary); width: 50px; height: 50px; border-radius: 50%; z-index: 200; cursor: pointer; align-items: center; justify-content: center; color: white; font-size: 24px; }
         @media (max-width: 768px) { .mobile-menu-btn { display: flex; } }
         
-        /* الطباعة */
-        @media print {
-            .top-header, .menu-icons, .btn, .mobile-menu-btn, .share-buttons, .currency-selector, .user-info { display: none; }
-            .modal-content { box-shadow: none; padding: 0; margin: 0; }
-            .modal { position: relative; display: block; background: white; }
-        }
+        @media print { .top-header, .menu-icons, .btn, .mobile-menu-btn, .share-buttons { display: none; } .modal-content { box-shadow: none; padding: 0; } }
     </style>
 </head>
 <body>
@@ -199,12 +187,14 @@ let db = {
         { id: 4, name: 'شاشة 24 بوصة', qty: 8, costPrice: 1800, sellPrice: 3000 }
     ],
     sales: JSON.parse(localStorage.getItem('simo_sales')) || [
-        { id: 1001, clientName: 'شركة الأهرام', productName: 'مكتب خشبي', qty: 2, price: 2500, total: 5000, paid: 5000, status: 'مدفوع', dateISO: '2026-04-30' },
-        { id: 1002, clientName: 'مؤسسة النور', productName: 'طابعة HP', qty: 1, price: 3500, total: 3500, paid: 2000, status: 'آجل', dateISO: '2026-04-30' }
+        { id: 1001, clientName: 'شركة الأهرام', clientId: 1, productName: 'مكتب خشبي', productId: 1, qty: 2, price: 2500, total: 5000, paid: 5000, status: 'مدفوع', dateISO: '2026-04-30' },
+        { id: 1002, clientName: 'مؤسسة النور', clientId: 2, productName: 'طابعة HP', productId: 3, qty: 1, price: 3500, total: 3500, paid: 2000, status: 'آجل', dateISO: '2026-04-30' },
+        { id: 1003, clientName: 'الشركة الحديثة', clientId: 3, productName: 'كرسي دوار', productId: 2, qty: 5, price: 900, total: 4500, paid: 4500, status: 'مدفوع', dateISO: '2026-04-29' }
     ],
     clients: JSON.parse(localStorage.getItem('simo_clients')) || [
         { id: 1, name: 'شركة الأهرام', phone: '0512345678', address: 'الرياض' },
-        { id: 2, name: 'مؤسسة النور', phone: '0587654321', address: 'جدة' }
+        { id: 2, name: 'مؤسسة النور', phone: '0587654321', address: 'جدة' },
+        { id: 3, name: 'الشركة الحديثة', phone: '0511122233', address: 'الدمام' }
     ],
     suppliers: JSON.parse(localStorage.getItem('simo_suppliers')) || [
         { id: 1, name: 'العالمية للتوريدات', phone: '0555555555', address: 'الرياض' }
@@ -331,65 +321,7 @@ function backupData() {
 
 function toggleMobileMenu() { document.querySelector('.menu-icons')?.classList.toggle('open'); }
 
-// ==================== الطباعة والمشاركة ====================
-function printInvoice(invoiceData) {
-    let printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html><head><title>فاتورة #${invoiceData.id}</title><meta charset="UTF-8">
-        <style>body{font-family:'Cairo',sans-serif;direction:rtl;padding:20px;} .inv{max-width:400px;margin:0 auto;border:1px solid #ddd;padding:20px;border-radius:10px;} h2{text-align:center;color:#3b82f6;} .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee;} .total{font-weight:bold;margin-top:10px;padding-top:10px;border-top:2px solid #3b82f6;} .footer{text-align:center;margin-top:20px;font-size:12px;color:#666;} @media print{.no-print{display:none;}}</style>
-        </head><body><div class="inv">
-        <h2>فاتورة ضريبية</h2>
-        <div class="row"><span><strong>رقم الفاتورة:</strong></span><span>#${invoiceData.id}</span></div>
-        <div class="row"><span><strong>التاريخ:</strong></span><span>${invoiceData.dateISO}</span></div>
-        <div class="row"><span><strong>العميل:</strong></span><span>${invoiceData.clientName}</span></div>
-        <div class="row"><span><strong>المنتج:</strong></span><span>${invoiceData.productName}</span></div>
-        <div class="row"><span><strong>الكمية:</strong></span><span>${invoiceData.qty}</span></div>
-        <div class="row"><span><strong>السعر:</strong></span><span>${formatCurrency(invoiceData.price)}</span></div>
-        <div class="row"><span><strong>الإجمالي:</strong></span><span>${formatCurrency(invoiceData.total)}</span></div>
-        <div class="row"><span><strong>المدفوع:</strong></span><span>${formatCurrency(invoiceData.paid || 0)}</span></div>
-        <div class="row"><span><strong>المتبقي:</strong></span><span>${formatCurrency((invoiceData.total||0)-(invoiceData.paid||0))}</span></div>
-        <div class="row"><span><strong>الحالة:</strong></span><span>${invoiceData.status}</span></div>
-        <div class="total"><span><strong>الإجمالي المستحق:</strong></span><span>${formatCurrency(invoiceData.total)}</span></div>
-        <div class="footer"><p>شكراً لتعاملكم معنا</p><p>${new Date().toLocaleDateString('ar-EG')}</p></div>
-        </div><div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;">🖨️ طباعة</button><button onclick="window.close()" style="padding:10px 20px;">إغلاق</button></div></body></html>
-    `);
-    printWindow.document.close();
-}
-
-function shareViaWhatsApp(invoiceData) {
-    let text = `فاتورة #${invoiceData.id}\nالتاريخ: ${invoiceData.dateISO}\nالعميل: ${invoiceData.clientName}\nالإجمالي: ${formatCurrency(invoiceData.total)}\nالحالة: ${invoiceData.status}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-}
-
-function shareViaFacebook(invoiceData) {
-    let text = `فاتورة #${invoiceData.id} - ${invoiceData.clientName} - ${formatCurrency(invoiceData.total)}`;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
-}
-
-function shareViaEmail(invoiceData) {
-    let subject = `فاتورة #${invoiceData.id}`;
-    let body = `تفاصيل الفاتورة:\nالتاريخ: ${invoiceData.dateISO}\nالعميل: ${invoiceData.clientName}\nالمنتج: ${invoiceData.productName}\nالإجمالي: ${formatCurrency(invoiceData.total)}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
-function shareInvoice(invoiceData) {
-    let shareText = `فاتورة #${invoiceData.id}\nالتاريخ: ${invoiceData.dateISO}\nالعميل: ${invoiceData.clientName}\nالإجمالي: ${formatCurrency(invoiceData.total)}`;
-    if (navigator.share) { navigator.share({ title: `فاتورة #${invoiceData.id}`, text: shareText }).catch(()=>{}); }
-    else { navigator.clipboard.writeText(shareText); showNotification('تم نسخ تفاصيل الفاتورة'); }
-}
-
-function markAsPaid(id) {
-    let sale = db.sales.find(s => s.id === id);
-    if(sale && sale.status !== 'مدفوع') {
-        sale.paid = sale.total;
-        sale.status = 'مدفوع';
-        saveAll();
-        showNotification('تم تسجيل الفاتورة كمدفوعة بالكامل');
-        viewFullInvoice(id);
-    } else { showNotification('الفاتورة مدفوعة بالفعل', 'info'); }
-}
-
-// ==================== إدارة المنتجات ====================
+// ==================== إدارة المنتجات والموردين والعملاء ====================
 function addProduct() {
     let name = prompt('اسم المنتج:'); if(!name) return;
     let qty = parseInt(prompt('الكمية:')) || 0;
@@ -423,21 +355,6 @@ function addRevenue() {
     db.revenues.push({ id: Date.now(), type, amount, date: todayISO() });
     saveAll(); showNotification(`تم إضافة إيراد`); renderExpensesRevenues();
 }
-function addSale() {
-    if(db.inventory.length === 0) { showNotification('لا توجد منتجات', 'error'); return; }
-    let prodList = db.inventory.map((p,i) => `${i+1}. ${p.name} (${p.qty}) - ${formatCurrency(p.sellPrice)}`).join('\n');
-    let idx = prompt(`اختر المنتج:\n${prodList}`); if(!idx) return;
-    let product = db.inventory[parseInt(idx)-1];
-    let qty = parseInt(prompt(`الكمية المتاحة: ${product.qty}`));
-    if(isNaN(qty) || qty > product.qty) { showNotification('كمية غير متوفرة', 'error'); return; }
-    let total = qty * product.sellPrice;
-    let paid = parseFloat(prompt('المدفوع:')) || 0;
-    let clientName = prompt('اسم العميل:', 'عميل نقدي');
-    let newId = db.settings.nextInvoiceId++;
-    product.qty -= qty;
-    db.sales.push({ id: newId, clientName: clientName || 'عميل نقدي', productName: product.name, qty, price: product.sellPrice, total, paid, status: paid >= total ? 'مدفوع' : 'آجل', dateISO: todayISO() });
-    saveAll(); showNotification(`تمت فاتورة ${formatCurrency(total)}`); renderSales();
-}
 function addPurchase() {
     if(db.suppliers.length === 0) { showNotification('أضف مورد أولا', 'error'); return; }
     let sup = db.suppliers[0];
@@ -453,11 +370,192 @@ function addPurchase() {
     else { db.inventory.push({ id: Date.now(), name: productName, qty, costPrice: price, sellPrice: price * 1.3 }); }
     saveAll(); showNotification(`تمت فاتورة شراء`); renderPurchases();
 }
+function addSale() {
+    if(db.inventory.length === 0) { showNotification('لا توجد منتجات', 'error'); return; }
+    let prodList = db.inventory.map((p,i) => `${i+1}. ${p.name} (${p.qty}) - ${formatCurrency(p.sellPrice)}`).join('\n');
+    let idx = prompt(`اختر المنتج:\n${prodList}`); if(!idx) return;
+    let product = db.inventory[parseInt(idx)-1];
+    let qty = parseInt(prompt(`الكمية المتاحة: ${product.qty}`));
+    if(isNaN(qty) || qty > product.qty) { showNotification('كمية غير متوفرة', 'error'); return; }
+    let total = qty * product.sellPrice;
+    let paid = parseFloat(prompt('المدفوع:')) || 0;
+    let clientName = prompt('اسم العميل:', 'عميل نقدي');
+    let newId = db.settings.nextInvoiceId++;
+    product.qty -= qty;
+    db.sales.push({ id: newId, clientName: clientName || 'عميل نقدي', productName: product.name, productId: product.id, qty, price: product.sellPrice, total, paid, status: paid >= total ? 'مدفوع' : 'آجل', dateISO: todayISO() });
+    saveAll(); showNotification(`تمت فاتورة ${formatCurrency(total)}`); renderSales();
+}
+
+// ==================== عرض وتعديل الفاتورة (الميزة الأساسية) ====================
+function viewInvoiceDetails(id) {
+    let sale = db.sales.find(s => s.id === id);
+    if(!sale) return;
+    let remaining = (sale.total || 0) - (sale.paid || 0);
+    let productsList = db.inventory.map(p => `<option value="${p.id}" ${p.id === sale.productId ? 'selected' : ''}>${p.name} - ${formatCurrency(p.sellPrice)}</option>`).join('');
+    
+    let html = `
+        <h2 style="color:var(--primary); text-align:center;">🧾 فاتورة #${sale.id}</h2>
+        <div class="invoice-details" id="invoiceDetails">
+            <div class="invoice-row"><span><strong>📅 التاريخ:</strong></span><span id="viewDate">${sale.dateISO}</span></div>
+            <div class="invoice-row"><span><strong>👤 العميل:</strong></span><span id="viewClient">${sale.clientName}</span></div>
+            <div class="invoice-row"><span><strong>📦 المنتج:</strong></span><span id="viewProduct">${sale.productName}</span></div>
+            <div class="invoice-row"><span><strong>🔢 الكمية:</strong></span><span id="viewQty">${sale.qty}</span></div>
+            <div class="invoice-row"><span><strong>💰 السعر:</strong></span><span id="viewPrice">${formatCurrency(sale.price)}</span></div>
+            <div class="invoice-row"><span><strong>💵 الإجمالي:</strong></span><span id="viewTotal">${formatCurrency(sale.total)}</span></div>
+            <div class="invoice-row"><span><strong>💳 المدفوع:</strong></span><span id="viewPaid">${formatCurrency(sale.paid || 0)}</span></div>
+            <div class="invoice-row"><span><strong>📉 المتبقي:</strong></span><span id="viewRemaining">${formatCurrency(remaining)}</span></div>
+            <div class="invoice-row"><span><strong>📌 الحالة:</strong></span><span class="badge ${sale.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}" id="viewStatus">${sale.status}</span></div>
+        </div>
+        
+        <!-- نموذج التعديل (مخفي في البداية) -->
+        <div id="editForm" style="display:none; margin-top:20px;">
+            <h3 style="color:var(--warning);">✏️ تعديل الفاتورة</h3>
+            <div class="grid-2">
+                <div><label>العميل</label><input type="text" id="editClient" value="${sale.clientName}"></div>
+                <div><label>المنتج</label><select id="editProduct">${productsList}</select></div>
+                <div><label>الكمية</label><input type="number" id="editQty" value="${sale.qty}"></div>
+                <div><label>السعر</label><input type="number" id="editPrice" value="${sale.price}"></div>
+                <div><label>المدفوع</label><input type="number" id="editPaid" value="${sale.paid || 0}"></div>
+            </div>
+            <div class="share-buttons" style="margin-top:15px;">
+                <button class="share-btn" style="background:#10b981;" onclick="updateInvoice(${sale.id})"><i class="fas fa-save"></i> حفظ التعديلات</button>
+                <button class="share-btn" style="background:#6b7280;" onclick="cancelEdit()">إلغاء</button>
+            </div>
+        </div>
+        
+        <div class="share-buttons">
+            <button class="share-btn" onclick="toggleEditMode()"><i class="fas fa-edit"></i> تعديل</button>
+            <button class="share-btn whatsapp" onclick="shareViaWhatsApp(${sale.id})"><i class="fab fa-whatsapp"></i> واتساب</button>
+            <button class="share-btn" onclick="printInvoice(${sale.id})"><i class="fas fa-print"></i> طباعة</button>
+            <button class="share-btn" style="background:#10b981;" onclick="recordPayment(${sale.id})"><i class="fas fa-money-bill-wave"></i> تسديد</button>
+            <button class="share-btn" style="background:#ef4444;" onclick="deleteInvoice(${sale.id})"><i class="fas fa-trash"></i> حذف</button>
+            <button class="share-btn" style="background:#6b7280;" onclick="closeModal()">إغلاق</button>
+        </div>
+    `;
+    openModal(html);
+    window.currentSaleId = sale.id;
+    window.currentSaleData = sale;
+}
+
+function toggleEditMode() {
+    let details = document.getElementById('invoiceDetails');
+    let editForm = document.getElementById('editForm');
+    if(details.style.display !== 'none') {
+        details.style.display = 'none';
+        editForm.style.display = 'block';
+    } else {
+        details.style.display = 'block';
+        editForm.style.display = 'none';
+    }
+}
+
+function cancelEdit() {
+    document.getElementById('invoiceDetails').style.display = 'block';
+    document.getElementById('editForm').style.display = 'none';
+}
+
+function updateInvoice(id) {
+    let sale = db.sales.find(s => s.id === id);
+    if(!sale) return;
+    
+    let newClientName = document.getElementById('editClient')?.value || sale.clientName;
+    let newProductId = parseInt(document.getElementById('editProduct')?.value) || sale.productId;
+    let newProduct = db.inventory.find(p => p.id === newProductId);
+    let newProductName = newProduct ? newProduct.name : sale.productName;
+    let newPrice = parseFloat(document.getElementById('editPrice')?.value) || sale.price;
+    let newQty = parseFloat(document.getElementById('editQty')?.value) || sale.qty;
+    let newPaid = parseFloat(document.getElementById('editPaid')?.value) || sale.paid || 0;
+    let newTotal = newQty * newPrice;
+    let newStatus = newPaid >= newTotal ? 'مدفوع' : 'آجل';
+    
+    // تحديث المخزون: إعادة الكمية القديمة وخصم الجديدة
+    let oldProduct = db.inventory.find(p => p.id === sale.productId);
+    if(oldProduct) oldProduct.qty += sale.qty;
+    if(newProduct) newProduct.qty -= newQty;
+    
+    sale.clientName = newClientName;
+    sale.productId = newProductId;
+    sale.productName = newProductName;
+    sale.price = newPrice;
+    sale.qty = newQty;
+    sale.total = newTotal;
+    sale.paid = newPaid;
+    sale.status = newStatus;
+    
+    saveAll();
+    showNotification('تم تعديل الفاتورة بنجاح');
+    closeModal();
+    renderSales();
+}
+
+function deleteInvoice(id) {
+    if(confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
+        let sale = db.sales.find(s => s.id === id);
+        if(sale) {
+            let product = db.inventory.find(p => p.id === sale.productId);
+            if(product) product.qty += sale.qty;
+            db.sales = db.sales.filter(s => s.id !== id);
+            db.journalEntries = db.journalEntries.filter(j => j.referenceId !== id);
+            saveAll();
+            showNotification('تم حذف الفاتورة');
+            renderSales();
+        }
+    }
+}
+
+function recordPayment(id) {
+    let sale = db.sales.find(s => s.id === id);
+    if(!sale) return;
+    let remaining = (sale.total || 0) - (sale.paid || 0);
+    let amount = parseFloat(prompt(`المبلغ المتبقي: ${formatCurrency(remaining)}\nأدخل مبلغ الدفعة:`, remaining));
+    if(isNaN(amount) || amount <= 0) return;
+    sale.paid = (sale.paid || 0) + amount;
+    sale.status = sale.paid >= sale.total ? 'مدفوع' : 'آجل';
+    saveAll();
+    showNotification(`تم تسجيل دفعة ${formatCurrency(amount)}`);
+    closeModal();
+    renderSales();
+}
+
+function printInvoice(id) {
+    let sale = db.sales.find(s => s.id === id);
+    if(!sale) return;
+    let win = window.open('', '_blank');
+    win.document.write(`
+        <html><head><title>فاتورة #${sale.id}</title><meta charset="UTF-8">
+        <style>body{font-family:Cairo;padding:20px;direction:rtl;} .inv{max-width:400px;margin:0 auto;border:1px solid #ddd;padding:20px;border-radius:10px;} h2{text-align:center;color:#3b82f6;} .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee;} .total{font-weight:bold;margin-top:10px;padding-top:10px;border-top:2px solid #3b82f6;} .footer{text-align:center;margin-top:20px;}</style>
+        </head><body><div class="inv">
+        <h2>فاتورة ضريبية</h2>
+        <div class="row"><span><strong>رقم الفاتورة:</strong></span><span>#${sale.id}</span></div>
+        <div class="row"><span><strong>التاريخ:</strong></span><span>${sale.dateISO}</span></div>
+        <div class="row"><span><strong>العميل:</strong></span><span>${sale.clientName}</span></div>
+        <div class="row"><span><strong>المنتج:</strong></span><span>${sale.productName}</span></div>
+        <div class="row"><span><strong>الكمية:</strong></span><span>${sale.qty}</span></div>
+        <div class="row"><span><strong>السعر:</strong></span><span>${formatCurrency(sale.price)}</span></div>
+        <div class="row"><span><strong>الإجمالي:</strong></span><span>${formatCurrency(sale.total)}</span></div>
+        <div class="row"><span><strong>المدفوع:</strong></span><span>${formatCurrency(sale.paid||0)}</span></div>
+        <div class="row"><span><strong>المتبقي:</strong></span><span>${formatCurrency((sale.total||0)-(sale.paid||0))}</span></div>
+        <div class="row"><span><strong>الحالة:</strong></span><span>${sale.status}</span></div>
+        <div class="total"><span><strong>الإجمالي المستحق:</strong></span><span>${formatCurrency(sale.total)}</span></div>
+        <div class="footer"><p>شكراً لتعاملكم معنا</p></div>
+        </div><div style="text-align:center;margin-top:20px;"><button onclick="window.print()">طباعة</button><button onclick="window.close()">إغلاق</button></div></body></html>
+    `);
+    win.document.close();
+}
+
+function shareViaWhatsApp(id) {
+    let sale = db.sales.find(s => s.id === id);
+    if(sale) {
+        let text = `فاتورة #${sale.id}\nالتاريخ: ${sale.dateISO}\nالعميل: ${sale.clientName}\nالإجمالي: ${formatCurrency(sale.total)}\nالحالة: ${sale.status}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+}
 
 // ==================== نقطة البيع ====================
 function renderPOS() {
     let html = `<div class="card-box"><div class="card-header"><h3>🛒 نقطة البيع POS</h3></div><div class="grid-2"><div><h4>المنتجات</h4><div id="posProducts" style="max-height:400px;overflow-y:auto;">${db.inventory.map(p => `<div onclick="addToCart(${p.id})" style="background:#f1f5f9;padding:12px;margin:8px;border-radius:12px;cursor:pointer;"><strong>${p.name}</strong><br>${formatCurrency(p.sellPrice)}<br><small>📦 متاح: ${p.qty}</small></div>`).join('')}</div></div><div><h4>سلة المشتريات</h4><div id="cartDisplay" style="max-height:350px;overflow-y:auto;background:#f8fafc;border-radius:16px;padding:10px;"></div><hr><div><strong id="cartTotal">الإجمالي: 0</strong></div><input type="text" id="posClientName" placeholder="اسم العميل" style="margin-top:15px;"><button class="btn-success" style="width:100%;padding:12px;margin-top:15px;" onclick="checkoutPOS()">إتمام البيع</button></div></div></div>`;
-    document.getElementById('pageContent').innerHTML = html; renderCart();
+    document.getElementById('pageContent').innerHTML = html;
+    renderCart();
 }
 function addToCart(id) {
     let p = db.inventory.find(p => p.id === id);
@@ -482,45 +580,17 @@ function checkoutPOS() {
     let paid = parseFloat(prompt('المبلغ المدفوع:', total)) || 0;
     let clientName = document.getElementById('posClientName')?.value || 'عميل نقدي';
     let newId = db.settings.nextInvoiceId++;
-    db.sales.push({ id: newId, clientName, productName: cart.map(i => i.name).join(', '), qty: cart.reduce((s,i) => s + i.qty, 0), price: total / cart.reduce((s,i) => s + i.qty, 0), total, paid, status: paid >= total ? 'مدفوع' : 'آجل', dateISO: todayISO() });
+    db.sales.push({ id: newId, clientName, productName: cart.map(i => i.name).join(', '), productId: cart[0].id, qty: cart.reduce((s,i) => s + i.qty, 0), price: total / cart.reduce((s,i) => s + i.qty, 0), total, paid, status: paid >= total ? 'مدفوع' : 'آجل', dateISO: todayISO() });
     saveAll(); cart = []; showNotification(`✅ تمت الفاتورة ${formatCurrency(total)}`); renderPOS();
 }
 
 // ==================== عرض الصفحات ====================
-function viewFullInvoice(id) {
-    let sale = db.sales.find(s => s.id === id);
-    if(!sale) return;
-    let remaining = (sale.total || 0) - (sale.paid || 0);
-    let html = `<h2 style="color:var(--primary); text-align:center;">🧾 فاتورة #${sale.id}</h2>
-        <div class="invoice-details">
-            <div class="invoice-row"><span><strong>📅 التاريخ:</strong></span><span>${sale.dateISO}</span></div>
-            <div class="invoice-row"><span><strong>👤 العميل:</strong></span><span>${sale.clientName}</span></div>
-            <div class="invoice-row"><span><strong>📦 المنتج:</strong></span><span>${sale.productName}</span></div>
-            <div class="invoice-row"><span><strong>🔢 الكمية:</strong></span><span>${sale.qty}</span></div>
-            <div class="invoice-row"><span><strong>💰 السعر:</strong></span><span>${formatCurrency(sale.price)}</span></div>
-            <div class="invoice-row"><span><strong>💵 الإجمالي:</strong></span><span>${formatCurrency(sale.total)}</span></div>
-            <div class="invoice-row"><span><strong>💳 المدفوع:</strong></span><span>${formatCurrency(sale.paid || 0)}</span></div>
-            <div class="invoice-row"><span><strong>📉 المتبقي:</strong></span><span>${formatCurrency(remaining)}</span></div>
-            <div class="invoice-row"><span><strong>📌 الحالة:</strong></span><span class="badge ${sale.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}">${sale.status}</span></div>
-        </div>
-        <div class="share-buttons">
-            <button class="share-btn" onclick="printInvoice(${JSON.stringify(sale).replace(/"/g, '&quot;')})"><i class="fas fa-print"></i> طباعة</button>
-            <button class="share-btn whatsapp" onclick="shareViaWhatsApp(${JSON.stringify(sale).replace(/"/g, '&quot;')})"><i class="fab fa-whatsapp"></i> واتساب</button>
-            <button class="share-btn facebook" onclick="shareViaFacebook(${JSON.stringify(sale).replace(/"/g, '&quot;')})"><i class="fab fa-facebook"></i> فيسبوك</button>
-            <button class="share-btn email" onclick="shareViaEmail(${JSON.stringify(sale).replace(/"/g, '&quot;')})"><i class="fas fa-envelope"></i> بريد</button>
-            <button class="share-btn" onclick="shareInvoice(${JSON.stringify(sale).replace(/"/g, '&quot;')})"><i class="fas fa-share-alt"></i> مشاركة</button>
-            <button class="share-btn" style="background:#10b981;" onclick="markAsPaid(${sale.id})"><i class="fas fa-check-circle"></i> تسديد</button>
-            <button class="share-btn" style="background:#6b7280;" onclick="closeModal()">إغلاق</button>
-        </div>`;
-    openModal(html);
-}
-
 function renderDashboard() {
     let monthlyData = [12500, 14200, 16800, 15400, 18900, 20500, 22300, 19800, 21500, 23400, 25100, 27800];
     let html = `<div class="stats-grid">
         <div class="stat-card" onclick="switchPage('sales')"><div class="stat-value">${formatCurrency(totalSales())}</div><div class="stat-label">💰 إجمالي المبيعات</div></div>
-        <div class="stat-card" onclick="switchPage('purchases')"><div class="stat-value">${formatCurrency(totalPurchases())}</div><div class="stat-label">🛒 إجمالي المشتريات</div></div>
-        <div class="stat-card" onclick="switchPage('account_info')"><div class="stat-value ${netProfit() >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(netProfit())}</div><div class="stat-label">📈 صافي الربح</div></div>
+        <div class="stat-card" onclick="switchPage('purchases')"><div class="stat-value">${formatCurrency(totalPurchases())}</div><div class="stat-label">🛒 المشتريات</div></div>
+        <div class="stat-card" onclick="switchPage('account_info')"><div class="stat-value ${netProfit()>=0?'profit-positive':'profit-negative'}">${formatCurrency(netProfit())}</div><div class="stat-label">📈 صافي الربح</div></div>
         <div class="stat-card" onclick="switchPage('expenses_rev')"><div class="stat-value">${formatCurrency(totalExpenses())}</div><div class="stat-label">💸 المصروفات</div></div>
         <div class="stat-card" onclick="switchPage('expenses_rev')"><div class="stat-value">${formatCurrency(totalRevenues())}</div><div class="stat-label">💰 الإيرادات</div></div>
         <div class="stat-card" onclick="switchPage('inventory')"><div class="stat-value">${db.inventory.length}</div><div class="stat-label">📦 المنتجات</div></div>
@@ -533,15 +603,15 @@ function renderDashboard() {
     let ctx = document.getElementById('monthlyChart')?.getContext('2d');
     if(ctx) charts.push(new Chart(ctx, { type: 'line', data: { labels: ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'], datasets: [{ label: 'المبيعات', data: monthlyData, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true } }));
     let recent = [...db.sales].slice(0,5);
-    document.getElementById('recentSales').innerHTML = recent.map(s => `<tr onclick="viewFullInvoice(${s.id})"><td>${s.dateISO}</td><td>${s.clientName}</td><td>${s.productName}</td><td>${formatCurrency(s.total)}</td><td><span class="badge ${s.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td><td><button class="btn-primary" style="padding:5px 10px;" onclick="event.stopPropagation();viewFullInvoice(${s.id})">عرض</button></td></tr>`).join('');
+    document.getElementById('recentSales').innerHTML = recent.map(s => `<tr onclick="viewInvoiceDetails(${s.id})"><td>${s.dateISO}</td><td>${s.clientName}</td><td>${s.productName}</td><td>${formatCurrency(s.total)}</td><td><span class="badge ${s.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td>}<button class="btn-primary" style="padding:5px 10px;" onclick="event.stopPropagation();viewInvoiceDetails(${s.id})">عرض</button></td></tr>`).join('');
 }
 
 function renderInventory() {
-    let html = `<div class="card-box"><div class="card-header"><h3>📦 المخزون</h3><button class="btn-success" onclick="addProduct()">+ منتج جديد</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>المنتج</th><th>الكمية</th><th>سعر الشراء</th><th>سعر البيع</th><th>القيمة</th><th>الحالة</th><th></th></thead><tbody>${db.inventory.map(p => `<tr><td><strong>${p.name}</strong></td><td>${p.qty}</td><td>${formatCurrency(p.costPrice)}</td><td>${formatCurrency(p.sellPrice)}</td><td>${formatCurrency(p.qty * p.costPrice)}</td><td><span class="badge ${p.qty<=5?'badge-warning':'badge-success'}">${p.qty<=5?'مخزون منخفض':'متوفر'}</span></td><td><button class="btn-danger" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('')}</tbody></div></div>`;
+    let html = `<div class="card-box"><div class="card-header"><h3>📦 المخزون</h3><button class="btn-success" onclick="addProduct()">+ منتج جديد</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>المنتج</th><th>الكمية</th><th>سعر الشراء</th><th>سعر البيع</th><th>القيمة</th><th>الحالة</th><th></th></thead><tbody>${db.inventory.map(p => `<tr><td><strong>${p.name}</strong></td><td>${p.qty}</td><td>${formatCurrency(p.costPrice)}</td><td>${formatCurrency(p.sellPrice)}</td><td>${formatCurrency(p.qty * p.costPrice)}</td><td><span class="badge ${p.qty<=5?'badge-warning':'badge-success'}">${p.qty<=5?'مخزون منخفض':'متوفر'}</span></td>}<button class="btn-danger" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('')}</tbody></div></div>`;
     document.getElementById('pageContent').innerHTML = html;
 }
 function renderSuppliers() {
-    let html = `<div class="card-box"><div class="card-header"><h3>🚚 الموردين</h3><button class="btn-success" onclick="addSupplier()">+ مورد جديد</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجمالي المشتريات</th><th>المدفوع</th><th>المتبقي</th></thead><tbody>${db.suppliers.map(sup => { let pur = db.purchases.filter(p => p.supplierId === sup.id); let total = pur.reduce((s,p) => s + p.total,0); let paid = pur.reduce((s,p) => s + p.paid,0); return `<tr><td><strong>${sup.name}</strong></td><td>${sup.phone || '-'}</td><td>${sup.address || '-'}</td><td>${formatCurrency(total)}</td><td>${formatCurrency(paid)}</td><td class="${total-paid>0?'profit-negative':'profit-positive'}">${formatCurrency(total-paid)}</td></tr>`; }).join('')}</tbody></div></div>`;
+    let html = `<div class="card-box"><div class="card-header"><h3>🚚 الموردين</h3><button class="btn-success" onclick="addSupplier()">+ مورد جديد</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجمالي المشتريات</th><th>المدفوع</th><th>المتبقي</th></thead><tbody>${db.suppliers.map(sup => { let pur = db.purchases.filter(p => p.supplierId === sup.id); let total = pur.reduce((s,p) => s + p.total,0); let paid = pur.reduce((s,p) => s + p.paid,0); return `<tr><td><strong>${sup.name}</strong></td><td>${sup.phone || '-'}</td><td>${sup.address || '-'}</td><td>${formatCurrency(total)}</td><td>${formatCurrency(paid)}<td><td class="${total-paid>0?'profit-negative':'profit-positive'}">${formatCurrency(total-paid)}</td></tr>`; }).join('')}</tbody></div></div>`;
     document.getElementById('pageContent').innerHTML = html;
 }
 function renderPurchases() {
@@ -549,7 +619,7 @@ function renderPurchases() {
     document.getElementById('pageContent').innerHTML = html;
 }
 function renderSales() {
-    let html = `<div class="card-box"><div class="card-header"><h3>💰 المبيعات</h3><button class="btn-success" onclick="addSale()">+ فاتورة جديدة</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th><th>المدفوع</th><th>الحالة</th><th></th></thead><tbody>${db.sales.map(s => `<tr><td>${s.dateISO}</td><td>${s.clientName}</td><td>${s.productName}</td><td>${s.qty}</td><td>${formatCurrency(s.total)}</td><td>${formatCurrency(s.paid)}</td><td><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td><td><button class="btn-primary" onclick="viewFullInvoice(${s.id})">عرض</button></td></tr>`).join('')}</tbody></div></div>`;
+    let html = `<div class="card-box"><div class="card-header"><h3>💰 المبيعات</h3><button class="btn-success" onclick="addSale()">+ فاتورة جديدة</button></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>العميل</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th><th>المدفوع</th><th>الحالة</th><th></th></thead><tbody>${db.sales.map(s => `<tr><td>${s.dateISO}</td><td>${s.clientName}</td><td>${s.productName}</td><td>${s.qty}</td><td>${formatCurrency(s.total)}</td><td>${formatCurrency(s.paid)}</td><td><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td>}<button class="btn-primary" onclick="viewInvoiceDetails(${s.id})">عرض</button></td></tr>`).join('')}</tbody></div></div>`;
     document.getElementById('pageContent').innerHTML = html;
 }
 function renderClients() {
@@ -569,17 +639,16 @@ function renderReports() {
     if(ctx) charts.push(new Chart(ctx, { type: 'doughnut', data: { labels: ['المبيعات','المشتريات','المصروفات','الإيرادات'], datasets: [{ data: [totalSales(),totalPurchases(),totalExpenses(),totalRevenues()], backgroundColor: ['#3b82f6','#f59e0b','#ef4444','#10b981'] }] }, options: { responsive: true } }));
 }
 function renderAccountInfo() {
-    let html = `<div class="card-box"><div class="card-header"><h3><i class="fas fa-chart-line"></i> ملخص الحسابات</h3></div>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">${formatCurrency(totalSales())}</div><div class="stat-label">💰 المبيعات</div></div>
-            <div class="stat-card"><div class="stat-value">${formatCurrency(totalPurchases())}</div><div class="stat-label">🛒 المشتريات</div></div>
-            <div class="stat-card"><div class="stat-value ${netProfit()>=0?'profit-positive':'profit-negative'}">${formatCurrency(netProfit())}</div><div class="stat-label">📈 صافي الربح</div></div>
-            <div class="stat-card"><div class="stat-value">${formatCurrency(totalExpenses())}</div><div class="stat-label">💸 المصروفات</div></div>
-            <div class="stat-card"><div class="stat-value">${formatCurrency(totalRevenues())}</div><div class="stat-label">💰 الإيرادات</div></div>
-            <div class="stat-card"><div class="stat-value">${formatCurrency(inventoryValue())}</div><div class="stat-label">📦 قيمة المخزون</div></div>
-        </div>
-        <div class="card-box"><div class="card-header"><h3><i class="fas fa-list"></i> سجل المعاملات المالية</h3></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>المبلغ</th></thead><tbody>${db.journalEntries.map(e => `<tr><td>${e.date}</td><td>${e.description}</td><td>${e.debitAccount}</td><td>${e.creditAccount}</td><td>${formatCurrency(e.amount)}</td></tr>`).join('')}</tbody></div></div>
-        <div class="card-box"><div class="card-header"><h3><i class="fas fa-receipt"></i> آخر الفواتير</h3></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th></th></thead><tbody>${db.sales.slice(0,10).map(s => `<tr><td>${s.dateISO}</td><td>${s.clientName}</td><td>${formatCurrency(s.total)}</td><td><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span><td><button class="btn-primary" onclick="viewFullInvoice(${s.id})">عرض</button></td></tr>`).join('')}</tbody></div></div>`;
+    let html = `<div class="card-box"><div class="card-header"><h3><i class="fas fa-chart-line"></i> ملخص الحسابات</h3></div><div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">${formatCurrency(totalSales())}</div><div class="stat-label">💰 المبيعات</div></div>
+        <div class="stat-card"><div class="stat-value">${formatCurrency(totalPurchases())}</div><div class="stat-label">🛒 المشتريات</div></div>
+        <div class="stat-card"><div class="stat-value ${netProfit()>=0?'profit-positive':'profit-negative'}">${formatCurrency(netProfit())}</div><div class="stat-label">📈 صافي الربح</div></div>
+        <div class="stat-card"><div class="stat-value">${formatCurrency(totalExpenses())}</div><div class="stat-label">💸 المصروفات</div></div>
+        <div class="stat-card"><div class="stat-value">${formatCurrency(totalRevenues())}</div><div class="stat-label">💰 الإيرادات</div></div>
+        <div class="stat-card"><div class="stat-value">${formatCurrency(inventoryValue())}</div><div class="stat-label">📦 قيمة المخزون</div></div>
+    </div>
+    <div class="card-box"><div class="card-header"><h3><i class="fas fa-list"></i> سجل المعاملات</h3></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>المبلغ</th></thead><tbody>${db.journalEntries.map(e => `<tr><td>${e.date}</td><td>${e.description}</td><td>${e.debitAccount}</td><td>${e.creditAccount}</td><td>${formatCurrency(e.amount)}</td></tr>`).join('')}</tbody></div></div>
+    <div class="card-box"><div class="card-header"><h3><i class="fas fa-receipt"></i> آخر الفواتير</h3></div><div style="overflow-x:auto"><table class="data-table"><thead><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>الحالة</th><th></th></thead><tbody>${db.sales.slice(0,10).map(s => `<tr><td>${s.dateISO}</td><td>${s.clientName}</td><td>${formatCurrency(s.total)}</td><td><span class="badge ${s.status==='مدفوع'?'badge-success':'badge-warning'}">${s.status}</span></td>}<button class="btn-primary" onclick="viewInvoiceDetails(${s.id})">عرض</button></td></tr>`).join('')}</tbody></div></div>`;
     document.getElementById('pageContent').innerHTML = html;
 }
 function openModal(html) { document.getElementById('modalContentInner').innerHTML = html; document.getElementById('detailsModal').classList.add('show'); }
@@ -600,12 +669,4 @@ function switchPage(pageId) {
 
 document.getElementById('currencySelector').value = currentCurrency;
 if(localStorage.getItem('simo_current_user')) {
-    currentUser = JSON.parse(localStorage.getItem('simo_current_user'));
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('userName').innerText = currentUser.name;
-    switchPage('dashboard');
-}
-</script>
-</body>
-</html>
+    currentUser = JSON.parse(localStorage.getItem('simo_cur
