@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ERP SYSTEM - النسخة النهائية المتكاملة مع الذكاء الاصطناعي</title>
+    <title>ERP SYSTEM - النسخة النهائية المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -18,7 +18,7 @@
         .login-page{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#0f172a,#1e1b4b);position:relative;overflow:hidden;}
         .login-page::before{content:'';position:absolute;width:200%;height:200%;background:radial-gradient(circle,rgba(37,99,235,0.15) 0%,transparent 70%);animation: pulse 4s ease infinite;}
         @keyframes pulse{0%{transform:translate(-25%,-25%) scale(1);}100%{transform:translate(-25%,-25%) scale(1.2);}}
-        .login-box{background:rgba(255,255,255,0.97);padding:40px;border-radius:30px;width:420px;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);z-index:1;backdrop-filter:blur(10px);}
+        .login-box{background:rgba(255,255,255,0.98);padding:40px;border-radius:30px;width:420px;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);z-index:1;backdrop-filter:blur(10px);}
         .login-box h2{color:#1e293b;margin-bottom:10px;font-size:28px;}
         .login-box .subtitle{color:#64748b;margin-bottom:25px;font-size:14px;}
         .login-box input{width:100%;padding:14px;margin:12px 0;border:2px solid #e2e8f0;border-radius:15px;font-size:14px;transition:0.3s;}
@@ -28,7 +28,6 @@
         .switch-auth{margin-top:15px;color:#666;cursor:pointer;}
         .switch-auth span{color:#2563eb;font-weight:bold;}
         .voice-btn{background:#10b981;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;}
-        .voice-btn i{font-size:18px;}
         
         .app-container{display:none;}
         .top-header{background:white;padding:12px 20px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
@@ -66,11 +65,12 @@
         .btn-info{background:#3b82f6;color:white;}
         .btn:hover{transform:scale(1.02);opacity:0.9;}
         
-        .data-table{width:100%;border-collapse:collapse;font-size:13px;}
+        .data-table{width:100%;border-collapse:collapse;font-size:13px;overflow-x:auto;display:block;}
+        @media(min-width:768px){.data-table{display:table;}}
         .data-table th,.data-table td{padding:10px 6px;text-align:right;border-bottom:1px solid #e2e8f0;}
-        .data-table th{color:#64748b;font-weight:600;}
+        .data-table th{background:#f8fafc;color:#475569;font-weight:600;position:sticky;top:0;}
         .data-table tr{cursor:pointer;transition:0.1s;}
-        .data-table tr:hover{background:#f8fafc;}
+        .data-table tr:hover{background:#f1f5f9;}
         .badge{padding:3px 10px;border-radius:30px;font-size:11px;font-weight:600;}
         .badge-success{background:#d1fae5;color:#059669;}
         .badge-warning{background:#fed7aa;color:#c2410c;}
@@ -104,7 +104,7 @@
         .search-box input{flex:1;}
         
         /* Toast Notification */
-        .toast-notification{position:fixed;top:20px;left:20px;background:#1e293b;color:white;padding:14px 22px;border-radius:16px;z-index:2000;display:flex;align-items:center;gap:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.02);animation:slideIn 0.3s ease;direction:rtl;}
+        .toast-notification{position:fixed;top:20px;left:20px;background:#1e293b;color:white;padding:14px 22px;border-radius:16px;z-index:2000;display:flex;align-items:center;gap:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);animation:slideIn 0.3s ease;direction:rtl;}
         .toast-notification.warning{background:#f59e0b;}
         .toast-notification.error{background:#ef4444;}
         .toast-notification.success{background:#10b981;}
@@ -124,15 +124,21 @@
         .voice-status{display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:12px;margin-bottom:10px;}
         .voice-status i{font-size:20px;}
         .voice-status.listening i{color:#ef4444;animation:pulseText 1s infinite;}
-        @keyframes pulseText{0%{opacity:1;}50%{opacity:0.5;}100%{opacity:1;}}
         .voice-commands-list{font-size:12px;color:#64748b;margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;}
         .voice-commands-list p{margin:5px 0;}
         
+        /* AI Insights */
+        .ai-insights{background:linear-gradient(135deg,#1e293b,#0f172a);color:white;padding:15px;border-radius:16px;margin-bottom:20px;}
+        .ai-insights h4{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+        .ai-insights p{font-size:13px;opacity:0.9;}
+        .ai-insights .insight-text{font-size:14px;font-weight:500;margin-top:8px;color:#94a3b8;}
+        
+        /* Print Styles */
         @media print {
             body *{visibility:hidden;}
             .print-invoice,.print-invoice *{visibility:visible;}
             .print-invoice{position:fixed;top:0;right:0;left:0;padding:20px;background:white;direction:rtl;}
-            .no-print{display:none!important;}
+            .no-print,.menu-bar,.top-header,.voice-badge,.voice-command-panel{display:none!important;}
         }
         
         .print-invoice{max-width:100%;margin:0 auto;direction:rtl;}
@@ -153,11 +159,8 @@
         .text-red{color:#ef4444;font-weight:bold;}
         .text-green{color:#10b981;font-weight:bold;}
         
-        /* AI Insights */
-        .ai-insights{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:15px;border-radius:16px;margin-bottom:20px;}
-        .ai-insights h4{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-        .ai-insights p{font-size:13px;opacity:0.9;}
-        .ai-insights .insight-text{font-size:14px;font-weight:500;margin-top:8px;}
+        .rtl{direction:rtl;}
+        .ltr{direction:ltr;}
     </style>
 </head>
 <body>
@@ -213,7 +216,6 @@
     <div class="content" id="pageContent"></div>
 </div>
 
-<!-- Voice Command Badge -->
 <div class="voice-badge" id="voiceBadge" onclick="toggleVoiceCommand()">
     <i class="fas fa-microphone"></i>
 </div>
@@ -231,6 +233,9 @@
         <p><i class="fas fa-chart-simple"></i> "تقرير الأرباح"</p>
         <p><i class="fas fa-file-excel"></i> "تصدير المبيعات"</p>
         <p><i class="fas fa-print"></i> "طباعة الفاتورة"</p>
+        <p><i class="fas fa-home"></i> "الرئيسية"</p>
+        <p><i class="fas fa-sign-out-alt"></i> "تسجيل خروج"</p>
+        <p><i class="fas fa-question-circle"></i> "مساعدة"</p>
     </div>
 </div>
 
@@ -257,7 +262,6 @@ const SecureStorage = {
         }).toString();
         return USER_SESSION_KEY;
     },
-    
     save: function(key, data) {
         if (!USER_SESSION_KEY) return false;
         try {
@@ -268,7 +272,6 @@ const SecureStorage = {
             return true;
         } catch(e) { console.error("Save error:", e); return false; }
     },
-    
     load: function(key, defaultValue) {
         if (!USER_SESSION_KEY) return defaultValue;
         try {
@@ -341,6 +344,9 @@ function startVoiceCommand() {
 }
 
 function toggleVoiceCommand() {
+    if (!isListening) {
+        startVoiceCommand();
+    }
     const panel = document.getElementById('voicePanel');
     if (panel) {
         panel.classList.toggle('show');
@@ -421,20 +427,7 @@ function speakText(text) {
 }
 
 function showVoiceHelp() {
-    const commands = `الأوامر الصوتية المتاحة:
-- عرض المبيعات
-- عرض المخزون
-- عرض العملاء
-- عرض الموردين
-- فتح نقطة البيع
-- عرض التقارير
-- تقرير الأرباح
-- تصدير المبيعات
-- تصدير المخزون
-- طباعة الفاتورة
-- الرئيسية
-- تسجيل خروج
-- مساعدة`;
+    const commands = `الأوامر الصوتية المتاحة:\n- عرض المبيعات\n- عرض المخزون\n- عرض العملاء\n- عرض الموردين\n- فتح نقطة البيع\n- عرض التقارير\n- تقرير الأرباح\n- تصدير المبيعات\n- تصدير المخزون\n- طباعة الفاتورة\n- الرئيسية\n- تسجيل خروج\n- مساعدة`;
     showAIToast(commands, 'info');
     speakText('يمكنك استخدام الأوامر الصوتية التالية');
 }
@@ -445,7 +438,6 @@ function showAIToast(msg, type) {
     
     const toast = document.createElement('div');
     toast.className = `toast-notification ${type}`;
-    let icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
     toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i><span>${msg}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 4000);
@@ -477,8 +469,8 @@ let db = {
         { id: 8, name: 'سماعة رأس', qty: 25, costPrice: 150, sellPrice: 300 }
     ],
     sales: [
-        { id: 1001, clientName: 'شركة الأهرام', clientId: 1, productName: 'مكتب خشبي', qty: 2, price: 2500, total: 5000, paid: 5000, status: 'مدفوع', dateISO: '2026-04-30' },
-        { id: 1002, clientName: 'مؤسسة النور', clientId: 2, productName: 'طابعة HP', qty: 1, price: 3500, total: 3500, paid: 2000, status: 'آجل', dateISO: '2026-04-15' }
+        { id: 1001, clientName: 'شركة الأهرام', clientId: 1, productName: 'مكتب خشبي', qty: 2, price: 2500, total: 5000, paid: 5000, status: 'مدفوع', dateISO: '2026-04-30', discount: 0 },
+        { id: 1002, clientName: 'مؤسسة النور', clientId: 2, productName: 'طابعة HP', qty: 1, price: 3500, total: 3500, paid: 2000, status: 'آجل', dateISO: '2026-04-15', discount: 0 }
     ],
     clients: [
         { id: 1, name: 'شركة الأهرام', phone: '0512345678', address: 'الرياض', balance: 0 },
@@ -670,7 +662,9 @@ function getDailyTip() {
         '💡 نصيحة: راجع المنتجات منخفضة المخزون بشكل دوري',
         '💡 نصيحة: يمكنك استخدام الأوامر الصوتية للتحكم في النظام',
         '💡 نصيحة: تصدير التقارير يساعدك في تحليل الأداء',
-        '💡 نصيحة: متابعة العملاء الآجلين تحسن التدفق النقدي'
+        '💡 نصيحة: متابعة العملاء الآجلين تحسن التدفق النقدي',
+        '💡 نصيحة: استخدام نظام نقاط البيع يسرع عملية البيع',
+        '💡 نصيحة: راجع تقارير الأرباح أسبوعياً لتحسين الأداء'
     ];
     return tips[Math.floor(Math.random() * tips.length)];
 }
@@ -747,7 +741,7 @@ function updateInvoiceWithClient(id) {
     renderSales();
 }
 
-// ======================== دوال بسيطة ========================
+// ======================== دوال سريعة ========================
 function editClient(id) { if (!canModify()) { showAIToast('غير مصرح لك بهذه العملية', 'error'); return; } let client = db.clients.find(c => c.id === id); if (!client) return; let html = `<h2>✏️ تعديل عميل</h2><div class="form-group"><label>الاسم</label><input type="text" id="editClientName" value="${sanitizeText(client.name)}"></div><div class="form-group"><label>الهاتف</label><input type="text" id="editClientPhone" value="${sanitizeText(client.phone || '')}"></div><div class="form-group"><label>العنوان</label><input type="text" id="editClientAddress" value="${sanitizeText(client.address || '')}"></div><div class="share-buttons"><button class="btn-success" onclick="updateClient(${id})">حفظ</button><button class="btn-danger" onclick="closeModal()">إلغاء</button></div>`; openModal(html); }
 function updateClient(id) { let client = db.clients.find(c => c.id === id); if (client) { client.name = sanitizeText(document.getElementById('editClientName').value); client.phone = sanitizeText(document.getElementById('editClientPhone').value); client.address = sanitizeText(document.getElementById('editClientAddress').value); saveAll(); addLog('تعديل', `تم تعديل بيانات العميل ${client.name}`); showAIToast('تم تحديث بيانات العميل', 'success'); closeModal(); renderClients(); } }
 function editSupplier(id) { if (!canModify()) { showAIToast('غير مصرح لك بهذه العملية', 'error'); return; } let supplier = db.suppliers.find(s => s.id === id); if (!supplier) return; let html = `<h2>✏️ تعديل مورد</h2><div class="form-group"><label>الاسم</label><input type="text" id="editSupplierName" value="${sanitizeText(supplier.name)}"></div><div class="form-group"><label>الهاتف</label><input type="text" id="editSupplierPhone" value="${sanitizeText(supplier.phone || '')}"></div><div class="form-group"><label>العنوان</label><input type="text" id="editSupplierAddress" value="${sanitizeText(supplier.address || '')}"></div><div class="form-group"><label>التصنيف</label><input type="text" id="editSupplierCategory" value="${sanitizeText(supplier.category || 'عام')}"></div><div class="share-buttons"><button class="btn-success" onclick="updateSupplier(${id})">حفظ</button><button class="btn-danger" onclick="closeModal()">إلغاء</button></div>`; openModal(html); }
@@ -761,7 +755,7 @@ function addProduct() { if (!canModify()) { showAIToast('غير مصرح لك ب
 function addSupplier() { if (!canModify()) { showAIToast('غير مصرح لك بهذه العملية', 'error'); return; } let n = prompt('اسم المورد:'); if (!n) return; db.suppliers.push({ id: Date.now(), name: sanitizeText(n), phone: sanitizeText(prompt('الهاتف:') || ''), address: sanitizeText(prompt('العنوان:') || ''), category: sanitizeText(prompt('التصنيف:') || 'عام'), balance: 0 }); saveAll(); addLog('إضافة', `تم إضافة مورد جديد: ${n}`); showAIToast(`تم إضافة المورد ${n}`, 'success'); renderSuppliers(); }
 function addClient() { if (!canModify()) { showAIToast('غير مصرح لك بهذه العملية', 'error'); return; } let n = prompt('اسم العميل:'); if (!n) return; db.clients.push({ id: Date.now(), name: sanitizeText(n), phone: sanitizeText(prompt('الهاتف:') || ''), address: sanitizeText(prompt('العنوان:') || ''), balance: 0 }); saveAll(); addLog('إضافة', `تم إضافة عميل جديد: ${n}`); showAIToast(`تم إضافة العميل ${n}`, 'success'); renderClients(); }
 
-// دوال إخفاء رقم الهاتف
+// إخفاء رقم الهاتف
 let visiblePhones = {};
 function togglePhone(clientId) { visiblePhones[clientId] = !visiblePhones[clientId]; renderClients(); }
 function getDisplayPhone(phone, clientId) { if (!phone) return '-'; if (visiblePhones[clientId]) return phone; return '*******' + phone.slice(-3); }
@@ -771,4 +765,4 @@ function showClientAccount(cId) {
     let c = db.clients.find(c => c.id === cId); if (!c) return;
     let invs = db.sales.filter(s => s.clientId === cId);
     let total = invs.reduce((s, i) => s + i.total, 0), paid = invs.reduce((s, i) => s + i.paid, 0), rem = total - paid;
-    let html = `<h2 style="color:#2563eb;">👤 ${sanitizeText(c.name)}</h2><div class="invoice-details"><div class="invoice-row"><span>📞 الهاتف:</span><span>${c.phone || '-'}</span></div><div class="invoice-row"><span>📍 العنوان:</span><span>${c.address || '-'}</span></div><div class="invoice-row"><span>💰 إجمالي المشتريات:</span><span>${formatCurrency(total)}</span></div><div class="invoice-row"><span>💳 المدفوع:</span><span>${formatCurrency(paid)}</span></div><div class="invoice-row"><span>📉 المتبقي:</span><span class="${rem > 0 ? 'profit-negative' : 'profit-positive'}">${formatCurrency(rem)}</span></div></div><h3>📋 فواتير العميل</h3><div style="overflow-x:auto"><table class="data-table"><thead><th>#</th><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th><th></th></thead><tbody>${invs.map(s => `<tr onclick="viewInvoice(${s.id})"><td>${s.id}</td><td onclick="event.stopPropagation()">${s.dateISO}</td><td onclick="event.stopPropagation()">${s.productName}</td><td onclick="event.stopPropagation()">${s.qty}</td><td onclick="event.stopPropagation()">${formatCurrency(s.total)}<td onclick="event.stopPropagation()"><span class="badge ${s.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td><td onclick="event.stopPropagation()"><button class="btn-warning" onclick="event.stopPropagation();editInvoice(${s.id})">تعديل</button> <button class="btn-danger" onclick="event.stopPropagation();deleteInvoice(${s.id})">حذف</button></td>`).join('')}</tbody></div></div><div class="share-buttons"><button class="share-btn" onclick="printClientAccount(${c.id});closeMo
+    let html = `<h2 style="color:#2563eb;">👤 ${sanitizeText(c.name)}</h2><div class="invoice-details"><div class="invoice-row"><span>📞 الهاتف:</span><span>${c.phone || '-'}</span></div><div class="invoice-row"><span>📍 العنوان:</span><span>${c.address || '-'}</span></div><div class="invoice-row"><span>💰 إجمالي المشتريات:</span><span>${formatCurrency(total)}</span></div><div class="invoice-row"><span>💳 المدفوع:</span><span>${formatCurrency(paid)}</span></div><div class="invoice-row"><span>📉 المتبقي:</span><span class="${rem > 0 ? 'profit-negative' : 'profit-positive'}">${formatCurrency(rem)}</span></div></div><h3>📋 فواتير العميل</h3><div style="overflow-x:auto"><table class="data-table"><thead><th>#</th><th>التاريخ</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th><th>الحالة</th><th></th></thead><tbody>${invs.map(s => `<tr onclick="viewInvoice(${s.id})"><td>${s.id}</td><td onclick="event.stopPropagation()">${s.dateISO}</td><td onclick="event.stopPropagation()">${s.productName}</td><td onclick="event.stopPropagation()">${s.qty}</td><td onclick="event.stopPropagation()">${formatCurrency(s.total)}<td onclick="event.stopPropagation()"><span class="badge ${s.status === 'مدفوع' ? 'badge-success' : 'badge-warning'}">${
