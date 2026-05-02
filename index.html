@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--text);direction:rtl;min-height:100vh;trans
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg);color:var(--text)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--border)}
-th{background:var(--bg);color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0}
+th{background:var(--bg);color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
 tbody tr:nth-child(even){background:var(--table-stripe)}
 tbody tr:hover{background:var(--primary-light)}
 input,select,textarea{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:13px;font-family:'Cairo';transition:.2s;outline:none}
@@ -116,6 +116,28 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
 .tbl-wrap{overflow-x:auto}
 .search-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .search-bar input{max-width:280px}
+/* ---- ألوان مخصصة ---- */
+.color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:3px solid transparent;transition:.2s;display:inline-block}
+.color-swatch.selected{border-color:var(--text);transform:scale(1.15)}
+/* ---- تقرير PDF ---- */
+@media print{
+  .top-bar,.menu,.no-print{display:none!important}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ddd}
+  .content{padding:0}
+}
+/* ---- تنبيهات مخزون ---- */
+.alert-bar{background:#fef3c7;border:1px solid #f59e0b;border-radius:12px;padding:10px 16px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;gap:10px;color:#92400e}
+.dark .alert-bar{background:#78350f;border-color:#b45309;color:#fde68a}
+/* ---- فاتورة احترافية ---- */
+.invoice-print{max-width:700px;margin:0 auto;padding:30px;background:#fff;color:#000}
+.invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0d9488}
+.invoice-logo{font-size:1.5rem;font-weight:900;color:#0d9488}
+.invoice-title{font-size:1.8rem;font-weight:900;color:#0d9488;text-align:left}
+.invoice-table th{background:#0d9488;color:#fff}
+.invoice-total{text-align:left;margin-top:16px;font-size:1.1rem;font-weight:700}
+.invoice-footer{margin-top:24px;padding-top:12px;border-top:1px solid #ddd;text-align:center;color:#64748b;font-size:12px}
+
 @media(max-width:768px){
 .pos-layout{grid-template-columns:1fr}.pos-products{max-height:35vh}
 .flex-2,.flex-3{grid-template-columns:1fr}
@@ -151,10 +173,14 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
 
 <div id="app" class="app">
 <header class="top-bar">
-    <div class="logo">ERP PRO ULTIMATE</div>
+    <div class="logo" id="topLogo">ERP PRO ULTIMATE</div>
     <div class="top-actions">
         <span class="user-badge" id="userBadge"></span>
         <button onclick="toggleDark()" title="الوضع الليلي"><i class="fas fa-moon" id="darkIcon"></i></button>
+        <button onclick="showNotifications()" title="التنبيهات" style="position:relative">
+            <i class="fas fa-bell"></i>
+            <span id="notifBadge" style="position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;border-radius:50%;width:14px;height:14px;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700"></span>
+        </button>
         <button onclick="logout()" title="خروج" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i></button>
     </div>
 </header>
@@ -180,6 +206,7 @@ const PAGES=[
     {id:'pos',icon:'fa-cash-register',label:'نقطة البيع'},
     {id:'expenses',icon:'fa-money-bill-trend-up',label:'المصروفات'},
     {id:'accounting',icon:'fa-scale-balanced',label:'المحاسبة'},
+    {id:'reports',icon:'fa-chart-bar',label:'التقارير'},
     {id:'settings',icon:'fa-gear',label:'الإعدادات'},
     {id:'backup',icon:'fa-cloud-arrow-down',label:'النسخ الاحتياطي'}
 ];
@@ -205,9 +232,20 @@ const CHART_OF_ACCOUNTS=[
     {code:'5300',name:'مصروفات إدارية',type:'expense',parent:'5000'}
 ];
 const EXPENSE_CATS=['إيجار','رواتب وأجور','كهرباء ومياه','إنترنت واتصالات','صيانة','نقل وشحن','تسويق وإعلان','مستلزمات مكتبية','ضريبة ورسوم','أخرى'];
+const THEME_COLORS=[
+    {name:'أخضر مائي',primary:'#0d9488',dark:'#0f766e'},
+    {name:'أزرق',primary:'#2563eb',dark:'#1d4ed8'},
+    {name:'بنفسجي',primary:'#7c3aed',dark:'#6d28d9'},
+    {name:'وردي',primary:'#db2777',dark:'#be185d'},
+    {name:'برتقالي',primary:'#ea580c',dark:'#c2410c'},
+    {name:'رمادي',primary:'#475569',dark:'#334155'}
+];
 
 /* ========== 2. الحالة ========== */
-let currentUser=null,currency=localStorage.getItem('erp_currency')||'LYD',isDark=localStorage.getItem('erp_dark')==='true',activePage='dashboard',posCart=[],logs=[],charts=[],companyInfo={name:'شركتي',phone:'',address:'',taxNo:''};
+let currentUser=null,currency=localStorage.getItem('erp_currency')||'LYD',isDark=localStorage.getItem('erp_dark')==='true',activePage='dashboard',posCart=[],logs=[],charts=[],companyInfo={name:'شركتي',phone:'',address:'',taxNo:'',branch:'الرئيسي'};
+let themeColor=localStorage.getItem('erp_theme')||'#0d9488';
+let themeDark=localStorage.getItem('erp_theme_dark')||'#0f766e';
+let lowStockThreshold=parseInt(localStorage.getItem('erp_low_stock')||'5');
 
 /* ========== 3. قاعدة البيانات ========== */
 let db={
@@ -269,9 +307,16 @@ function openModal(html){$('modalBody').innerHTML=html;$('modal').style.display=
 function closeModal(){$('modal').style.display='none'}
 function destroyCharts(){charts.forEach(c=>{try{c.destroy()}catch(e){}});charts=[]}
 
+function applyTheme(){
+    document.documentElement.style.setProperty('--primary',themeColor);
+    document.documentElement.style.setProperty('--primary-dark',themeDark);
+    let r=parseInt(themeColor.slice(1,3),16),g=parseInt(themeColor.slice(3,5),16),b=parseInt(themeColor.slice(5,7),16);
+    document.documentElement.style.setProperty('--primary-light',`rgba(${r},${g},${b},0.12)`);
+}
+
 function save(){
     try{
-        let d=JSON.stringify({db,logs,companyInfo,currency});
+        let d=JSON.stringify({db,logs,companyInfo,currency,themeColor,themeDark,lowStockThreshold});
         if(typeof CryptoJS!=='undefined'){
             let enc=CryptoJS.AES.encrypt(d,'erp_pro_ultimate_key_2025').toString();
             localStorage.setItem('erp_data',enc);
@@ -286,10 +331,24 @@ function load(){
         if(enc&&typeof CryptoJS!=='undefined'){
             let bytes=CryptoJS.AES.decrypt(enc,'erp_pro_ultimate_key_2025');
             let dec=bytes.toString(CryptoJS.enc.Utf8);
-            if(dec){let obj=JSON.parse(dec);if(obj.db)db=obj.db;if(obj.logs)logs=obj.logs;if(obj.companyInfo)companyInfo=obj.companyInfo;if(obj.currency)currency=obj.currency;}
+            if(dec){
+                let obj=JSON.parse(dec);
+                if(obj.db)db=obj.db;
+                if(obj.logs)logs=obj.logs;
+                if(obj.companyInfo)companyInfo=obj.companyInfo;
+                if(obj.currency)currency=obj.currency;
+                if(obj.themeColor){themeColor=obj.themeColor;themeDark=obj.themeDark||'#0f766e';}
+                if(obj.lowStockThreshold)lowStockThreshold=obj.lowStockThreshold;
+            }
         } else {
             let plain=localStorage.getItem('erp_data_plain');
-            if(plain){let obj=JSON.parse(plain);if(obj.db)db=obj.db;if(obj.logs)logs=obj.logs;if(obj.companyInfo)companyInfo=obj.companyInfo;if(obj.currency)currency=obj.currency;}
+            if(plain){
+                let obj=JSON.parse(plain);
+                if(obj.db)db=obj.db;if(obj.logs)logs=obj.logs;
+                if(obj.companyInfo)companyInfo=obj.companyInfo;if(obj.currency)currency=obj.currency;
+                if(obj.themeColor){themeColor=obj.themeColor;themeDark=obj.themeDark||'#0f766e';}
+                if(obj.lowStockThreshold)lowStockThreshold=obj.lowStockThreshold;
+            }
         }
     }catch(e){console.warn('Load error',e);}
 }
@@ -298,6 +357,25 @@ function addLog(action,detail){
     logs.unshift({user:currentUser.name,action,detail,time:new Date().toISOString()});
     if(logs.length>300)logs.length=300;
     save();
+}
+
+function getLowStockItems(){return db.inventory.filter(x=>x.qty<=lowStockThreshold);}
+function updateNotifBadge(){
+    let n=getLowStockItems().length;
+    let el=$('notifBadge');
+    if(!el)return;
+    if(n>0){el.style.display='flex';el.textContent=n;}
+    else el.style.display='none';
+}
+function showNotifications(){
+    let low=getLowStockItems();
+    if(low.length===0){toast('لا توجد تنبيهات حالياً','info');return;}
+    openModal(`<div class="modal-title"><i class="fas fa-bell" style="color:var(--warning)"></i> تنبيهات المخزون المنخفض</div>
+    <div class="tbl-wrap"><table>
+        <thead><tr><th>الصنف</th><th>الكمية المتبقية</th><th>الحد الأدنى</th></tr></thead>
+        <tbody>${low.map(p=>`<tr><td><strong>${p.name}</strong></td><td class="text-danger"><strong>${p.qty}</strong></td><td>${lowStockThreshold}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <button class="btn btn-ghost mt-3" onclick="closeModal()">إغلاق</button>`);
 }
 
 /* ========== 5. المحاسبة المزدوجة ========== */
@@ -370,8 +448,11 @@ function doLogin(){
     $('app').style.display='block';
     $('userBadge').textContent=found.name;
     if(isDark){document.body.classList.add('dark');$('darkIcon').className='fas fa-sun';}
+    applyTheme();
+    $('topLogo').textContent=companyInfo.name||'ERP PRO ULTIMATE';
     addLog('تسجيل دخول',`المستخدم: ${found.username}`);
     buildMenu();navigate('dashboard');
+    updateNotifBadge();
     toast(`مرحباً ${found.name}`,'success');
 }
 function doRegister(){
@@ -408,7 +489,7 @@ function navigate(page){
         dashboard:renderDashboard,inventory:renderInventory,suppliers:renderSuppliers,
         purchases:renderPurchases,sales:renderSales,clients:renderClients,
         pos:renderPOS,expenses:renderExpenses,accounting:renderAccounting,
-        settings:renderSettings,backup:renderBackup
+        reports:renderReports,settings:renderSettings,backup:renderBackup
     };
     if(renderer[page])renderer[page]();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -428,9 +509,12 @@ function renderDashboard(){
         },0);
     },0);
     let netProfit=grossProfit-totalExpenses;
-    let lowStock=db.inventory.filter(x=>x.qty<=5).length;
+    let lowStock=getLowStockItems().length;
+
+    let lowAlert=lowStock>0?`<div class="alert-bar no-print"><i class="fas fa-triangle-exclamation"></i> تنبيه: ${lowStock} صنف/أصناف تحت حد المخزون الأدنى. <span style="cursor:pointer;text-decoration:underline;font-weight:700" onclick="showNotifications()">عرض التفاصيل</span></div>`:'';
 
     $('pageContent').innerHTML=`
+    ${lowAlert}
     <div class="stats-grid">
         <div class="stat-card" onclick="navigate('sales')">
             <div class="stat-icon" style="background:#d1fae5;color:#059669"><i class="fas fa-arrow-trend-up"></i></div>
@@ -460,7 +544,7 @@ function renderDashboard(){
             <div class="stat-icon" style="background:#e0e7ff;color:#4338ca"><i class="fas fa-boxes-stacked"></i></div>
             <h3>${db.inventory.length}</h3><span>أصناف المخزون</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="showNotifications()">
             <div class="stat-icon" style="background:${lowStock?'#fee2e2':'#d1fae5'};color:${lowStock?'#dc2626':'#059669'}"><i class="fas fa-triangle-exclamation"></i></div>
             <h3>${lowStock}</h3><span>أصناف منخفضة المخزون</span>
         </div>
@@ -483,13 +567,10 @@ function renderDashboard(){
         </table></div>
     </div>`;
 
-    // رسم بياني للمبيعات
     let salesLabels=db.sales.slice(-6).map(s=>`#${s.id}`);
     let salesData=db.sales.slice(-6).map(s=>s.grand);
     let ctx1=document.getElementById('salesChart').getContext('2d');
     charts.push(new Chart(ctx1,{type:'bar',data:{labels:salesLabels,datasets:[{label:'قيمة الفاتورة',data:salesData,backgroundColor:'rgba(13,148,136,.7)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{family:'Cairo'}}},x:{ticks:{font:{family:'Cairo'}}}}}}));
-
-    // رسم بياني للمصروفات
     let expMap={};
     db.expenses.forEach(e=>{expMap[e.cat]=(expMap[e.cat]||0)+e.amount});
     let ctx2=document.getElementById('expChart').getContext('2d');
@@ -498,14 +579,21 @@ function renderDashboard(){
 
 /* ========== 9. المخزون ========== */
 function renderInventory(){
+    let low=getLowStockItems();
+    let alert=low.length?`<div class="alert-bar"><i class="fas fa-triangle-exclamation"></i> ${low.length} صنف تحت الحد الأدنى: ${low.map(x=>x.name).join(' | ')}</div>`:'';
     $('pageContent').innerHTML=`
+    ${alert}
     <div class="card">
         <div class="card-header">
             <div class="card-title" style="margin:0"><i class="fas fa-boxes-stacked" style="color:var(--primary)"></i> إدارة المخزون</div>
             <button class="btn btn-primary-bg" onclick="modalAddInventory()"><i class="fas fa-plus"></i> إضافة صنف</button>
         </div>
         <div class="search-bar">
-            <input id="invSearch" placeholder="🔍 بحث..." oninput="filterInventory()" style="max-width:280px">
+            <input id="invSearch" placeholder="🔍 بحث بالاسم أو الفئة..." oninput="filterInventory()" style="max-width:280px">
+            <select id="invCatFilter" onchange="filterInventory()" style="max-width:160px">
+                <option value="">كل الفئات</option>
+                ${[...new Set(db.inventory.map(x=>x.cat))].map(c=>`<option>${c}</option>`).join('')}
+            </select>
         </div>
         <div class="tbl-wrap"><table id="invTable">
             <thead><tr><th>#</th><th>اسم الصنف</th><th>الفئة</th><th>الكمية</th><th>سعر الشراء</th><th>سعر البيع</th><th>هامش الربح</th><th>الإجراءات</th></tr></thead>
@@ -517,21 +605,27 @@ function renderInventory(){
 function renderInvBody(items){
     $('invBody').innerHTML=items.map(p=>{
         let margin=p.sell>0?((p.sell-p.buy)/p.sell*100).toFixed(1):0;
-        let lowClass=p.qty<=5?'text-danger':'';
+        let lowClass=p.qty<=lowStockThreshold?'text-danger':'';
         return`<tr>
             <td>${p.id}</td><td><strong>${p.name}</strong></td><td>${p.cat}</td>
-            <td class="${lowClass}"><strong>${p.qty}</strong>${p.qty<=5?'<span class="badge badge-danger" style="margin-right:4px">منخفض</span>':''}</td>
+            <td class="${lowClass}"><strong>${p.qty}</strong>${p.qty<=lowStockThreshold?'<span class="badge badge-danger" style="margin-right:4px">منخفض</span>':''}</td>
             <td>${fmt(p.buy)}</td><td>${fmt(p.sell)}</td>
             <td><span class="badge badge-success">${margin}%</span></td>
-            <td><button class="btn btn-info btn-sm" onclick="modalEditInventory(${p.id})"><i class="fas fa-edit"></i></button>
-            ${isAdmin()?`<button class="btn btn-danger btn-sm" onclick="deleteInventory(${p.id})"><i class="fas fa-trash"></i></button>`:''}
+            <td>
+              <button class="btn btn-info btn-sm" onclick="modalEditInventory(${p.id})"><i class="fas fa-edit"></i></button>
+              ${isAdmin()?`<button class="btn btn-danger btn-sm" onclick="deleteInventory(${p.id})"><i class="fas fa-trash"></i></button>`:''}
             </td>
         </tr>`;
     }).join('')||'<tr><td colspan="8" class="text-center text-muted">لا توجد أصناف</td></tr>';
 }
 function filterInventory(){
-    let q=$('invSearch').value.toLowerCase();
-    renderInvBody(db.inventory.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)));
+    let q=($('invSearch')?$('invSearch').value:'').toLowerCase();
+    let cat=($('invCatFilter')?$('invCatFilter').value:'');
+    renderInvBody(db.inventory.filter(p=>{
+        let matchQ=p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q);
+        let matchC=!cat||p.cat===cat;
+        return matchQ&&matchC;
+    }));
 }
 function modalAddInventory(){
     openModal(`<div class="modal-title"><i class="fas fa-plus-circle" style="color:var(--primary)"></i> إضافة صنف جديد</div>
@@ -554,7 +648,7 @@ function addInventory(){
     if(!name){toast('اسم الصنف مطلوب','error');return}
     let newItem={id:nextId('inv'),name,cat,qty,buy,sell};
     db.inventory.push(newItem);
-    save();addLog('إضافة صنف',name);closeModal();renderInventory();toast('تم إضافة الصنف','success');
+    save();addLog('إضافة صنف',name);closeModal();renderInventory();updateNotifBadge();toast('تم إضافة الصنف','success');
 }
 function modalEditInventory(id){
     let p=db.inventory.find(x=>x.id===id);if(!p)return;
@@ -577,12 +671,12 @@ function editInventory(id){
     let p=db.inventory.find(x=>x.id===id);if(!p)return;
     p.name=$('iName').value.trim();p.cat=$('iCat').value.trim();
     p.qty=+$('iQty').value;p.buy=+$('iBuy').value;p.sell=+$('iSell').value;
-    save();addLog('تعديل صنف',p.name);closeModal();renderInventory();toast('تم التعديل','success');
+    save();addLog('تعديل صنف',p.name);closeModal();renderInventory();updateNotifBadge();toast('تم التعديل','success');
 }
 function deleteInventory(id){
     if(!confirm('هل أنت متأكد من حذف هذا الصنف؟'))return;
     let idx=db.inventory.findIndex(x=>x.id===id);
-    if(idx>-1){let n=db.inventory[idx].name;db.inventory.splice(idx,1);save();addLog('حذف صنف',n);renderInventory();toast('تم الحذف','success');}
+    if(idx>-1){let n=db.inventory[idx].name;db.inventory.splice(idx,1);save();addLog('حذف صنف',n);renderInventory();updateNotifBadge();toast('تم الحذف','success');}
 }
 
 /* ========== 10. الموردين ========== */
@@ -598,8 +692,9 @@ function renderSuppliers(){
             <tbody>${db.suppliers.map(s=>`<tr>
                 <td>${s.id}</td><td><strong>${s.name}</strong></td><td>${s.cat}</td>
                 <td style="direction:ltr">${s.phone}</td><td>${s.address}</td>
-                <td><button class="btn btn-info btn-sm" onclick="modalEditSupplier(${s.id})"><i class="fas fa-edit"></i></button>
-                ${isAdmin()?`<button class="btn btn-danger btn-sm" onclick="deleteSupplier(${s.id})"><i class="fas fa-trash"></i></button>`:''}
+                <td>
+                  <button class="btn btn-info btn-sm" onclick="modalEditSupplier(${s.id})"><i class="fas fa-edit"></i></button>
+                  ${isAdmin()?`<button class="btn btn-danger btn-sm" onclick="deleteSupplier(${s.id})"><i class="fas fa-trash"></i></button>`:''}
                 </td>
             </tr>`).join('')||'<tr><td colspan="6" class="text-center text-muted">لا يوجد موردين</td></tr>'}
             </tbody>
@@ -679,97 +774,4 @@ function renderPurchases(){
                 <td><span class="badge ${p.status==='مدفوع'?'badge-success':'badge-warning'}">${p.status}</span></td>
                 <td>${p.date}</td>
                 <td>${p.status==='آجل'?`<button class="btn btn-success btn-sm" onclick="payPurchase(${p.id})"><i class="fas fa-check"></i> سداد</button>`:''}</td>
-            </tr>`).join('')||'<tr><td colspan="10" class="text-center text-muted">لا توجد مشتريات</td></tr>'}
-            </tbody>
-        </table></div>
-    </div>`;
-}
-function modalAddPurchase(){
-    let supOpts=db.suppliers.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-    let invOpts=db.inventory.map(p=>`<option value="${p.id}" data-buy="${p.buy}">${p.name}</option>`).join('');
-    openModal(`<div class="modal-title"><i class="fas fa-cart-shopping" style="color:var(--primary)"></i> فاتورة شراء جديدة</div>
-    <div class="flex-2">
-        <div class="field-group"><label>المورد</label><select id="pSup"><option value="">اختر مورد</option>${supOpts}</select></div>
-        <div class="field-group"><label>الصنف</label><select id="pProd" onchange="setPurchasePrice()">${invOpts}</select></div>
-    </div>
-    <div class="flex-3">
-        <div class="field-group"><label>الكمية</label><input id="pQty" type="number" min="1" value="1" oninput="calcPurchaseTotal()"></div>
-        <div class="field-group"><label>السعر</label><input id="pPrice" type="number" min="0" oninput="calcPurchaseTotal()"></div>
-        <div class="field-group"><label>الإجمالي</label><input id="pTotal" readonly style="background:var(--bg)"></div>
-    </div>
-    <div class="flex-2">
-        <div class="field-group"><label>الحالة</label><select id="pStatus"><option>مدفوع</option><option>آجل</option></select></div>
-        <div class="field-group"><label>التاريخ</label><input id="pDate" type="date" value="${today()}"></div>
-    </div>
-    <div class="d-flex gap-2 mt-3">
-        <button class="btn btn-primary-bg" onclick="addPurchase()"><i class="fas fa-save"></i> حفظ</button>
-        <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
-    </div>`);
-    setPurchasePrice();
-}
-function setPurchasePrice(){
-    let sel=$('pProd');if(!sel)return;
-    let opt=sel.options[sel.selectedIndex];
-    if(opt&&opt.dataset.buy){$('pPrice').value=opt.dataset.buy;calcPurchaseTotal();}
-}
-function calcPurchaseTotal(){
-    let q=+($('pQty')?$('pQty').value:0),p=+($('pPrice')?$('pPrice').value:0);
-    if($('pTotal'))$('pTotal').value=(q*p).toLocaleString('ar');
-}
-function addPurchase(){
-    let supId=+$('pSup').value,supEl=$('pSup');
-    let supName=supEl.options[supEl.selectedIndex]?supEl.options[supEl.selectedIndex].text:'';
-    let prodEl=$('pProd'),prodId=+prodEl.value;
-    let prodName=prodEl.options[prodEl.selectedIndex]?prodEl.options[prodEl.selectedIndex].text:'';
-    let qty=+$('pQty').value,price=+$('pPrice').value,status=$('pStatus').value,date=$('pDate').value;
-    if(!supId||!prodId||qty<=0||price<=0){toast('يرجى ملء جميع الحقول','error');return}
-    let total=qty*price;
-    let newP={id:nextId('pur'),supId,supName,prodName,qty,price,total,paid:status==='مدفوع'?total:0,status,date};
-    db.purchases.push(newP);
-    // تحديث المخزون
-    let prod=db.inventory.find(x=>x.id===prodId);if(prod){prod.qty+=qty;prod.buy=price;}
-    jePurchase(newP);
-    save();addLog('فاتورة شراء',`${prodName} x${qty}`);closeModal();renderPurchases();toast('تم إضافة الفاتورة','success');
-}
-function payPurchase(id){
-    let p=db.purchases.find(x=>x.id===id);if(!p)return;
-    let rem=p.total-p.paid;
-    openModal(`<div class="modal-title"><i class="fas fa-money-bill-wave" style="color:var(--success)"></i> سداد فاتورة شراء #${p.id}</div>
-    <p class="text-muted" style="margin-bottom:16px">المبلغ المتبقي: <strong>${fmt(rem)}</strong></p>
-    <div class="field-group"><label>المبلغ المدفوع</label><input id="payAmt" type="number" value="${rem}" min="0" max="${rem}"></div>
-    <div class="d-flex gap-2 mt-3">
-        <button class="btn btn-success" onclick="confirmPayPurchase(${id})"><i class="fas fa-check"></i> تأكيد السداد</button>
-        <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
-    </div>`);
-}
-function confirmPayPurchase(id){
-    let p=db.purchases.find(x=>x.id===id);if(!p)return;
-    let amt=+$('payAmt').value;
-    let rem=p.total-p.paid;
-    if(amt<=0||amt>rem){toast('مبلغ غير صالح','error');return}
-    p.paid+=amt;if(p.paid>=p.total){p.paid=p.total;p.status='مدفوع';}
-    je(`سداد للمورد ${p.supName} #${p.id}`,today(),[{acc:'2100',debit:amt,credit:0},{acc:'1100',debit:0,credit:amt}]);
-    save();addLog('سداد شراء',`فاتورة #${p.id} مبلغ ${fmt(amt)}`);closeModal();renderPurchases();toast('تم تسجيل الدفع','success');
-}
-
-/* ========== 12. المبيعات ========== */
-let saleItems=[];
-function renderSales(){
-    let total=db.sales.reduce((s,x)=>s+x.grand,0);
-    let paid=db.sales.reduce((s,x)=>s+x.paid,0);
-    $('pageContent').innerHTML=`
-    <div class="summary-bar">
-        <span>إجمالي المبيعات: <strong>${fmt(total)}</strong></span>
-        <span>المحصل: <strong>${fmt(paid)}</strong></span>
-        <span class="text-danger">المتبقي: <strong>${fmt(total-paid)}</strong></span>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title" style="margin:0"><i class="fas fa-file-invoice-dollar" style="color:var(--primary)"></i> فواتير المبيعات</div>
-            <button class="btn btn-primary-bg" onclick="modalAddSale()"><i class="fas fa-plus"></i> فاتورة بيع جديدة</button>
-        </div>
-        <div class="tbl-wrap"><table>
-            <thead><tr><th>#</th><th>العميل</th><th>الأصناف</th><th>المجموع</th><th>الضريبة</th><th>الإجمالي</th><th>المدفوع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
-            <tbody>${db.sales.map(s=>`<tr>
-                <td>${s.id}</td><td>${s.clientName}</td>
-           
+            </tr>`).join('')||'<tr><t
