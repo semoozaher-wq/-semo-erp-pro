@@ -3,77 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOLDEN ERP V1.2 | نظام الحسابات المستقلة</title>
+    <title>GOLDEN ERP V28 | النسخة المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #0f172a; --accent: #3b82f6; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+        :root { --primary: #0f172a; --accent: #3b82f6; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
         [data-theme="dark"] { --primary: #f8fafc; --accent: #60a5fa; --bg: #020617; --card: #1e293b; --text: #f1f5f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
-        /* Auth Screen */
-        #authScreen { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--card); width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; text-align: center; }
-        /* Main UI */
+        body { background: var(--bg); color: var(--text); transition: 0.3s; }
         .wrapper { display: flex; }
-        .sidebar { width: 260px; background: var(--primary); color: white; position: fixed; right: 0; height: 100vh; padding: 20px; }
+        .sidebar { width: 260px; background: var(--primary); color: white; position: fixed; right: 0; height: 100vh; padding: 20px; z-index: 1000; }
         .main { flex: 1; margin-right: 260px; padding: 25px; min-height: 100vh; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; color: #94a3b8; margin-bottom: 5px; }
-        .nav-item.active { background: var(--accent); color: white; }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .btn { padding: 10px 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-p { background: var(--accent); color: white; } .btn-d { background: var(--danger); color: white; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 10px; width: 100%; margin: 8px 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; color: #94a3b8; margin-bottom: 5px; transition: 0.2s; }
+        .nav-item.active, .nav-item:hover { background: var(--accent); color: white; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-p { background: var(--accent); color: white; } .btn-d { background: var(--danger); color: white; } .btn-s { background: var(--success); color: white; }
+        input, select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; margin-top: 5px; background: var(--card); color: var(--text); }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        th, td { padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg); width: 90%; max-width: 500px; padding: 25px; border-radius: 20px; }
+        .qty-btn { width: 30px; height: 30px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer; }
         @media print { .sidebar, .btn, .no-print { display: none !important; } .main { margin: 0; } }
     </style>
 </head>
 <body>
 
-<!-- شاشة الحسابات (تسجيل دخول / إنشاء حساب) -->
-<div id="authScreen">
-    <div class="auth-card">
+<div id="authScreen" style="position:fixed; inset:0; background:var(--primary); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div class="card" style="width:90%; max-width:400px; text-align:center;">
         <h2 id="authTitle" style="color:var(--accent); margin-bottom:20px;">تسجيل الدخول</h2>
         <input type="email" id="authEmail" placeholder="البريد الإلكتروني">
         <input type="password" id="authPass" placeholder="كلمة المرور">
-        <button class="btn btn-p" style="width:100%; margin-top:10px;" onclick="app.handleAuth()">دخول</button>
-        <p id="toggleAuth" style="margin-top:15px; cursor:pointer; font-size:14px; color:var(--accent);" onclick="app.toggleAuthMode()">ليس لديك حساب؟ إنشاء حساب جديد</p>
+        <div id="roleSelect" style="display:none; margin-top:10px;">
+            <select id="userRole"><option value="admin">مدير النظام</option><option value="staff">موظف مبيعات</option></select>
+        </div>
+        <button class="btn btn-p" style="width:100%; margin-top:15px; justify-content:center;" onclick="app.handleAuth()">دخول</button>
+        <p id="toggleAuth" style="margin-top:15px; cursor:pointer; color:var(--accent);" onclick="app.toggleAuthMode()">إنشاء حساب جديد</p>
     </div>
 </div>
 
 <div class="wrapper" id="appUI" style="display:none;">
     <aside class="sidebar">
-        <h3 style="text-align:center; color:var(--accent); margin-bottom:20px;">GOLDEN ERP V1.2</h3>
-        <p id="userEmailLabel" style="font-size:12px; text-align:center; opacity:0.7; margin-bottom:15px;"></p>
-        <nav>
-            <div class="nav-item active" onclick="app.route('dash', this)"><i class="fas fa-home"></i> الرئيسية</div>
-            <div class="nav-item" onclick="app.route('pos', this)"><i class="fas fa-cash-register"></i> المبيعات</div>
-            <div class="nav-item" onclick="app.route('stock', this)"><i class="fas fa-boxes"></i> المخزن</div>
-            <div class="nav-item" onclick="app.route('ledger', this)"><i class="fas fa-users"></i> العملاء</div>
-            <div class="nav-item" onclick="app.route('exp', this)"><i class="fas fa-wallet"></i> المصاريف</div>
-            <div class="nav-item" onclick="app.logout()" style="color:var(--danger); margin-top:20px;"><i class="fas fa-sign-out-alt"></i> خروج</div>
-        </nav>
+        <h2 style="text-align:center; color:var(--accent); margin-bottom:20px;">GOLDEN V28</h2>
+        <nav id="mainNav"></nav>
     </aside>
     <main class="main" id="viewPort"></main>
 </div>
 
-<div id="modal" class="modal"><div class="modal-content" id="modal-body"></div></div>
+<div id="modal" class="modal"><div class="modal-content" id="modalBody"></div></div>
 
 <script>
-// --- إعدادات Firebase (ضع بيانات مشروعك هنا) ---
 const firebaseConfig = {
-    apiKey: "AIzaSy...", 
-    databaseURL: "https://my-pos-system-11dee-default-rtdb.firebaseio.com",
+    apiKey: "AIzaSyCfVMHNoqbh86I0JJjnguGY6seA4vWJsSU",
     authDomain: "my-pos-system-11dee.firebaseapp.com",
+    databaseURL: "https://my-pos-system-11dee-default-rtdb.firebaseio.com",
     projectId: "my-pos-system-11dee"
 };
 firebase.initializeApp(firebaseConfig);
@@ -81,19 +71,18 @@ const auth = firebase.auth();
 const db = firebase.database();
 
 const app = {
-    user: null,
-    authMode: 'login',
-    data: { products: [], sales: [], contacts: [], expenses: [] },
+    user: null, role: 'staff', authMode: 'login',
+    data: { products: [], sales: [], contacts: [], expenses: [], returns: [] },
     cart: [],
 
     init() {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                this.user = user;
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('appUI').style.display = 'flex';
-                document.getElementById('userEmailLabel').innerText = user.email;
-                this.loadUserData();
+        auth.onAuthStateChanged(u => {
+            if(u) {
+                this.user = u;
+                db.ref(`users/${u.uid}/role`).once('value', s => {
+                    this.role = s.val() || 'admin';
+                    this.loadData();
+                });
             } else {
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('appUI').style.display = 'none';
@@ -103,72 +92,94 @@ const app = {
 
     toggleAuthMode() {
         this.authMode = this.authMode === 'login' ? 'signup' : 'login';
-        document.getElementById('authTitle').innerText = this.authMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد';
-        document.getElementById('toggleAuth').innerText = this.authMode === 'login' ? 'ليس لديك حساب؟ إنشاء حساب جديد' : 'لديك حساب بالفعل؟ تسجيل دخول';
+        document.getElementById('authTitle').innerText = this.authMode === 'login' ? 'دخول' : 'حساب جديد';
+        document.getElementById('roleSelect').style.display = this.authMode === 'login' ? 'none' : 'block';
     },
 
     handleAuth() {
-        const email = document.getElementById('authEmail').value;
-        const pass = document.getElementById('authPass').value;
-        if (this.authMode === 'login') {
-            auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
+        const e = document.getElementById('authEmail').value, p = document.getElementById('authPass').value;
+        if(this.authMode === 'signup') {
+            auth.createUserWithEmailAndPassword(e,p).then(res => {
+                db.ref(`users/${res.user.uid}/role`).set(document.getElementById('userRole').value);
+            }).catch(err => alert(err.message));
         } else {
-            auth.createUserWithEmailAndPassword(email, pass).catch(err => alert(err.message));
+            auth.signInWithEmailAndPassword(e,p).catch(err => alert(err.message));
         }
     },
 
-    logout() { auth.signOut(); location.reload(); },
-
-    loadUserData() {
-        db.ref(`users/${this.user.uid}/data`).on('value', snap => {
-            this.data = snap.val() || { products: [], sales: [], contacts: [], expenses: [] };
+    loadData() {
+        db.ref(`users/${this.user.uid}/data`).on('value', s => {
+            this.data = s.val() || { products: [], sales: [], contacts: [], expenses: [], returns: [] };
+            if(!this.data.contacts) this.data.contacts = [];
+            if(!this.data.expenses) this.data.expenses = [];
+            this.drawNav();
             this.route('dash');
         });
     },
 
     save() { db.ref(`users/${this.user.uid}/data`).set(this.data); },
 
-    route(page, el) {
-        if(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
-        const vp = document.getElementById('viewPort');
-        if(page === 'dash') vp.innerHTML = this.drawDash();
-        if(page === 'pos') vp.innerHTML = this.drawPOS();
-        if(page === 'stock') vp.innerHTML = this.drawStock();
-        if(page === 'ledger') vp.innerHTML = this.drawLedger();
-        if(page === 'exp') vp.innerHTML = this.drawExp();
+    drawNav() {
+        let h = `<div class="nav-item active" onclick="app.route('dash', this)"><i class="fas fa-home"></i> الرئيسية</div>
+                 <div class="nav-item" onclick="app.route('pos', this)"><i class="fas fa-cash-register"></i> المبيعات</div>`;
+        if(this.role === 'admin') {
+            h += `<div class="nav-item" onclick="app.route('stock', this)"><i class="fas fa-boxes"></i> المخزن</div>
+                  <div class="nav-item" onclick="app.route('ledger', this)"><i class="fas fa-users"></i> الحسابات</div>
+                  <div class="nav-item" onclick="app.route('exp', this)"><i class="fas fa-wallet"></i> المصاريف</div>
+                  <div class="nav-item" onclick="app.route('returns', this)"><i class="fas fa-undo"></i> المرتجعات</div>`;
+        }
+        h += `<div class="nav-item" onclick="auth.signOut()" style="color:var(--danger); margin-top:20px;"><i class="fas fa-sign-out-alt"></i> خروج</div>`;
+        document.getElementById('mainNav').innerHTML = h;
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('appUI').style.display = 'flex';
     },
 
-    // --- المنطق البرمجي للواجهات (تم دمج كل تعديلاتك السابقة) ---
-    drawDash() {
+    route(p, el) {
+        if(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
+        const v = document.getElementById('viewPort');
+        if(p === 'dash') v.innerHTML = this.renderDash();
+        if(p === 'pos') v.innerHTML = this.renderPOS();
+        if(p === 'stock') v.innerHTML = this.renderStock();
+        if(p === 'ledger') v.innerHTML = this.renderLedger();
+        if(p === 'exp') v.innerHTML = this.renderExp();
+        if(p === 'returns') v.innerHTML = this.renderReturns();
+        if(p === 'dash' && this.role === 'admin') this.initChart();
+    },
+
+    renderDash() {
         const s = this.data.sales?.reduce((a,b)=>a+Number(b.total),0) || 0;
         const e = this.data.expenses?.reduce((a,b)=>a+Number(b.amount),0) || 0;
+        const r = this.data.returns?.reduce((a,b)=>a+Number(b.total),0) || 0;
         return `
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:20px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
                 <div class="card" style="background:var(--accent); color:white;"><h4>المبيعات</h4><h2>${s}</h2></div>
-                <div class="card" style="background:var(--danger); color:white;"><h4>المصاريف</h4><h2>${e}</h2></div>
-                <div class="card" style="background:var(--success); color:white;"><h4>الربح الصافي</h4><h2>${s - e}</h2></div>
+                ${this.role === 'admin' ? `<div class="card" style="background:var(--danger); color:white;"><h4>المصاريف والمرتجع</h4><h2>${e + r}</h2></div>
+                <div class="card" style="background:var(--success); color:white;"><h4>الربح الصافي</h4><h2>${s - e - r}</h2></div>` : ''}
             </div>
-            <div class="card" style="margin-top:20px;">
-                <h3>📊 آخر المبيعات</h3>
-                <table><thead><tr><th>التاريخ</th><th>المبلغ</th><th>العميل</th></tr></thead>
-                <tbody>${this.data.sales?.slice(0,5).map(x=>`<tr><td>${x.date}</td><td>${x.total}</td><td>${x.cust}</td></tr>`).join('') || ''}</tbody></table>
-            </div>`;
+            ${this.role === 'admin' ? `<div class="card"><canvas id="salesChart" height="100"></canvas></div>` : ''}
+            <div class="card"><h3>📊 آخر العمليات</h3><table><thead><th>التاريخ</th><th>المبلغ</th><th>إجراء</th></thead>
+            <tbody>${this.data.sales?.slice(0,5).map(x=>`<tr><td>${x.date}</td><td>${x.total}</td><td><button class="btn btn-p" onclick="app.printInv('${x.id}')">📄</button></td></tr>`).join('')}</tbody></table></div>`;
     },
 
-    drawPOS() {
+    initChart() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, { type: 'line', data: { labels: this.data.sales?.slice(0,7).map(x=>x.date), datasets: [{ label: 'المبيعات', data: this.data.sales?.slice(0,7).map(x=>x.total), borderColor: '#3b82f6', fill: true }] } });
+    },
+
+    renderPOS() {
         return `
-            <div style="display:grid; grid-template-columns: 1fr 350px; gap:20px;">
+            <div style="display:grid; grid-template-columns: 1fr 380px; gap:20px;">
                 <div class="card">
-                    <input type="text" placeholder="بحث عن منتج..." onkeyup="app.searchPOS(this.value)">
-                    <div id="pos-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:15px;">
-                        ${this.data.products?.filter(p=>p.qty>0).map(p=>`<div class="card" style="padding:10px; text-align:center; cursor:pointer;" onclick="app.addToCart('${p.id}')"><b>${p.name}</b><br>${p.price} ج.م</div>`).join('')}
+                    <input type="text" placeholder="بحث سريع عن منتج..." onkeyup="app.filterPOS(this.value)">
+                    <div id="posGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:15px;">
+                        ${this.data.products?.filter(p=>p.qty>0).map(p=>`<div class="card" style="text-align:center; cursor:pointer;" onclick="app.addToCart('${p.id}')"><b>${p.name}</b><br><small>${p.price} ج.م</small><br><small>متاح: ${p.qty}</small></div>`).join('')}
                     </div>
                 </div>
                 <div class="card">
                     <h3>🛒 السلة</h3>
-                    <div id="cart-items" style="min-height:200px; border-bottom:1px solid #eee;"></div>
-                    <h3 style="margin:10px 0;">الإجمالي: <span id="total-val">0</span></h3>
-                    <button class="btn btn-p" style="width:100%;" onclick="app.checkout()">إتمام و طباعة</button>
+                    <div id="cartList" style="min-height:250px; border-bottom:1px solid #eee;"></div>
+                    <h2 style="padding:15px 0;">الإجمالي: <span id="cartTotal">0</span></h2>
+                    <button class="btn btn-p" style="width:100%; height:50px;" onclick="app.checkout()">إتمام و طباعة QR</button>
                 </div>
             </div>`;
     },
@@ -176,50 +187,117 @@ const app = {
     addToCart(id) {
         const p = this.data.products.find(x=>x.id==id);
         const inCart = this.cart.find(x=>x.id==id);
-        if(inCart) inCart.count++; else this.cart.push({...p, count: 1});
+        if(inCart) { if(inCart.count < p.qty) inCart.count++; else alert("الكمية انتهت!"); }
+        else { this.cart.push({...p, count: 1}); }
         this.updateCart();
     },
 
     updateCart() {
-        const area = document.getElementById('cart-items');
-        area.innerHTML = this.cart.map((it, i)=>`<div style="display:flex; justify-content:space-between;"><span>${it.name} x${it.count}</span><b>${it.price * it.count}</b></div>`).join('');
-        document.getElementById('total-val').innerText = this.cart.reduce((a,b)=>a+(b.price*b.count),0);
+        const area = document.getElementById('cartList');
+        area.innerHTML = this.cart.map((it, i)=>`
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span>${it.name}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button class="qty-btn" onclick="app.changeQty(${i}, -1)">-</button>
+                    <span>${it.count}</span>
+                    <button class="qty-btn" onclick="app.changeQty(${i}, 1)">+</button>
+                </div>
+                <b>${it.price * it.count} <i class="fas fa-trash" onclick="app.cart.splice(${i},1); app.updateCart();" style="color:red; cursor:pointer;"></i></b>
+            </div>`).join('');
+        document.getElementById('cartTotal').innerText = this.cart.reduce((a,b)=>a+(b.price*b.count),0);
+    },
+
+    changeQty(i, v) {
+        const it = this.cart[i];
+        const p = this.data.products.find(x=>x.id == it.id);
+        if(v === 1 && it.count < p.qty) it.count++;
+        if(v === -1 && it.count > 1) it.count--;
+        this.updateCart();
     },
 
     checkout() {
         if(this.cart.length === 0) return;
         const total = this.cart.reduce((a,b)=>a+(b.price*b.count),0);
         this.cart.forEach(it => { this.data.products.find(x=>x.id==it.id).qty -= it.count; });
-        this.data.sales.unshift({ id: Date.now(), total, date: new Date().toLocaleString(), items: [...this.cart], cust: "نقدي" });
-        this.save();
-        this.cart = []; this.updateCart();
-        alert("تمت العملية بنجاح!");
+        const invId = Date.now();
+        this.data.sales.unshift({ id: invId, total, date: new Date().toLocaleString(), items: [...this.cart] });
+        this.save(); this.printInv(invId); this.cart = []; this.updateCart();
     },
 
-    drawStock() {
-        return `
-            <div class="card">
-                <h3>📦 إضافة منتج</h3>
-                <div style="display:flex; gap:5px;"><input id="pn" placeholder="الاسم"><input id="pp" type="number" placeholder="السعر"><input id="pq" type="number" placeholder="الكمية"><button class="btn btn-p" onclick="app.addP()">حفظ</button></div>
-            </div>
-            <div class="card">
-                <table><thead><tr><th>المنتج</th><th>السعر</th><th>الكمية</th><th>إجراء</th></tr></thead>
-                <tbody>${this.data.products?.map(p=>`<tr><td>${p.name}</td><td>${p.price}</td><td>${p.qty}</td><td><button class="btn btn-d" onclick="app.delP('${p.id}')">حذف</button></td></tr>`).join('')}</tbody></table>
-            </div>`;
+    printInv(id) {
+        const inv = this.data.sales.find(x=>x.id == id);
+        document.getElementById('modalBody').innerHTML = `<div style="text-align:center;"><h2>GOLDEN ERP</h2><p>فاتورة #${inv.id}</p><hr><h3>المجموع: ${inv.total}</h3><div id="qr" style="display:flex; justify-content:center; margin-top:10px;"></div></div><button class="btn btn-p" style="width:100%; margin-top:10px;" onclick="window.print()">طباعة</button><button class="btn btn-d" style="width:100%;" onclick="document.getElementById('modal').style.display='none'">إغلاق</button>`;
+        new QRCode(document.getElementById("qr"), { text: `INV-${inv.id}`, width: 100, height: 100 });
+        document.getElementById('modal').style.display = 'flex';
     },
 
-    addP() {
-        const n=document.getElementById('pn').value, p=document.getElementById('pp').value, q=document.getElementById('pq').value;
-        if(n&&p&&q){ this.data.products.push({id:Date.now(), name:n, price:Number(p), qty:Number(q)}); this.save(); }
+    renderStock() {
+        return `<div class="card"><h3>📦 إدارة المخزون</h3>
+        <div style="display:flex; gap:8px;"><input id="pn" placeholder="الاسم"><input id="pp" placeholder="السعر"><input id="pq" placeholder="الكمية"><button class="btn btn-p" onclick="app.addP()">حفظ</button></div>
+        <input type="text" placeholder="بحث في المخزن..." onkeyup="app.filterTable('stockTable', this.value)" style="margin-top:10px;">
+        <table id="stockTable"><thead><th>المنتج</th><th>السعر</th><th>الكمية</th><th>إجراء</th></thead>
+        <tbody>${this.data.products?.map(p=>`<tr><td>${p.name}</td><td>${p.price}</td><td>${p.qty}</td><td><button class="btn btn-s" onclick="app.editProduct('${p.id}')">تعديل</button><button class="btn btn-d" onclick="app.del('products','${p.id}')">حذف</button></td></tr>`).join('')}</tbody></table></div>`;
     },
 
-    delP(id) { if(confirm("حذف؟")){ this.data.products=this.data.products.filter(x=>x.id!=id); this.save(); } },
+    editProduct(id) {
+        const p = this.data.products.find(x=>x.id == id);
+        const nn = prompt("الاسم الجديد:", p.name), np = prompt("السعر الجديد:", p.price), nq = prompt("الكمية الجديدة:", p.qty);
+        if(nn && np && nq) { p.name = nn; p.price = Number(np); p.qty = Number(nq); this.save(); }
+    },
+
+    renderLedger() {
+        return `<div class="card"><h3>👥 العملاء والموردين</h3>
+        <div style="display:flex; gap:8px;"><input id="cn" placeholder="الاسم"><select id="ct"><option value="عميل">عميل</option><option value="مورد">مورد</option></select><button class="btn btn-p" onclick="app.addContact()">إضافة</button></div>
+        <input type="text" placeholder="بحث في الحسابات..." onkeyup="app.filterTable('ledgerTable', this.value)" style="margin-top:10px;">
+        <table id="ledgerTable"><thead><th>الاسم</th><th>النوع</th><th>الرصيد</th><th>إجراء</th></thead>
+        <tbody>${this.data.contacts?.map(c=>`<tr><td>${c.name}</td><td>${c.type}</td><td>${c.balance || 0}</td><td><button class="btn btn-s" onclick="app.editContact('${c.id}')">تعديل</button><button class="btn btn-p" onclick="app.payDebt('${c.id}')">تسديد</button><button class="btn btn-d" onclick="app.del('contacts','${c.id}')">حذف</button></td></tr>`).join('')}</tbody></table></div>`;
+    },
+
+    addContact() { const n=document.getElementById('cn').value, t=document.getElementById('ct').value; if(n){this.data.contacts.push({id:Date.now(), name:n, type:t, balance:0}); this.save();}},
     
-    drawLedger() { /* ... كود العملاء مشابه لما سبق ... */ return `<div class="card"><h3>👥 العملاء قيد التطوير في v1.3</h3></div>`; },
-    drawExp() { /* ... كود المصاريف ... */ return `<div class="card"><h3>💸 المصاريف قيد التطوير في v1.3</h3></div>`; },
-    toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-};
+    editContact(id) {
+        const c = this.data.contacts.find(x=>x.id == id);
+        const nn = prompt("الاسم الجديد:", c.name); if(nn) { c.name = nn; this.save(); }
+    },
 
+    payDebt(id) {
+        const c = this.data.contacts.find(x=>x.id == id);
+        const amt = prompt("المبلغ المراد تسديده:"); if(amt) { c.balance = (c.balance || 0) - Number(amt); this.save(); }
+    },
+
+    renderExp() {
+        return `<div class="card"><h3>💸 المصاريف</h3>
+        <div style="display:flex; gap:8px;"><input id="en" placeholder="البيان"><input id="ea" placeholder="المبلغ"><button class="btn btn-d" onclick="app.addExp()">إضافة مصروف</button></div>
+        <table><thead><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>إجراء</th></thead>
+        <tbody>${this.data.expenses?.map((x,i)=>`<tr><td>${x.date}</td><td>${x.note}</td><td>${x.amount}</td><td><button class="btn btn-d" onclick="app.delExp(${i})">حذف</button></td></tr>`).join('')}</tbody></table></div>`;
+    },
+
+    addExp() { const n=document.getElementById('en').value, a=document.getElementById('ea').value; if(n&&a){this.data.expenses.unshift({note:n, amount:Number(a), date:new Date().toLocaleDateString()}); this.save();}},
+    delExp(i) { if(confirm("حذف المصروف؟")) { this.data.expenses.splice(i, 1); this.save(); }},
+
+    renderReturns() {
+        return `<div class="card"><h3>↩️ المرتجعات</h3>
+        <div style="display:flex; gap:8px;"><input id="ri" placeholder="رقم الفاتورة"><input id="ra" placeholder="المبلغ المرتجع"><button class="btn btn-w" onclick="app.addRet()" style="background:var(--warning); color:white;">تأكيد المرتجع</button></div>
+        <table><thead><th>التاريخ</th><th>الفاتورة</th><th>المبلغ</th></thead>
+        <tbody>${this.data.returns?.map(r=>`<tr><td>${r.date}</td><td>${r.invId}</td><td>${r.total}</td></tr>`).join('')}</tbody></table></div>`;
+    },
+
+    addRet() {
+        const i = document.getElementById('ri').value, a = document.getElementById('ra').value;
+        if(i && a) { this.data.returns.unshift({ invId: i, total: Number(a), date: new Date().toLocaleString() }); this.save(); alert("تم تسجيل المرتجع"); }
+    },
+
+    addP() { const n=document.getElementById('pn').value, p=document.getElementById('pp').value, q=document.getElementById('pq').value; if(n&&p&&q){this.data.products.push({id:Date.now(), name:n, price:Number(p), qty:Number(q)}); this.save();} },
+    del(type, id) { if(confirm("حذف نهائي؟")) { this.data[type] = this.data[type].filter(x=>x.id != id); this.save(); } },
+    filterTable(id, val) { 
+        const rows = document.querySelectorAll(`#${id} tbody tr`);
+        rows.forEach(r => r.style.display = r.innerText.includes(val) ? '' : 'none');
+    },
+    filterPOS(val) {
+        const items = document.querySelectorAll('#posGrid .card');
+        items.forEach(i => i.style.display = i.innerText.includes(val) ? '' : 'none');
+    }
+};
 app.init();
 </script>
 </body>
