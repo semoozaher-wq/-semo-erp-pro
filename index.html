@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>الدفتر الذهبي | النظام المحاسبي النهائي</title>
+    <title>الدفتر الذهبي | النظام المحاسبي المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -13,31 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', sans-serif;
-        }
-        :root {
-            --primary: #0f172a;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
-        }
-        [data-theme="dark"] {
-            --primary: #f8fafc;
-            --accent: #60a5fa;
-            --bg: #020617;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --border: #334155;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        :root { --primary: #0f172a; --accent: #3b82f6; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
+        [data-theme="dark"] { --primary: #f8fafc; --accent: #60a5fa; --bg: #020617; --card: #1e293b; --text: #f1f5f9; --border: #334155; }
         body { background: var(--bg); color: var(--text); transition: 0.3s; }
         .sidebar { width: 270px; background: var(--primary); color: white; position: fixed; right: 0; height: 100vh; padding: 20px; z-index: 1000; overflow-y: auto; }
         .main { margin-right: 270px; padding: 25px; min-height: 100vh; }
@@ -340,7 +318,7 @@ const app = {
                 <select id="stockCat" onchange="app.filterStock()" style="width:200px;"><option value="">كل الفئات</option></select>
             </div>
             <div style="overflow-x:auto;">
-                <table id="stockTable"><thead><th>المنتج</th><th>الفئة</th><th>الباركود</th><th>سعر التكلفة</th><th>سعر البيع</th><th>الكمية</th><th>إجراءات</th></thead><tbody></tbody><table>
+                <table id="stockTable"><thead><th>المنتج</th><th>الفئة</th><th>الباركود</th><th>سعر التكلفة</th><th>سعر البيع</th><th>الكمية</th><th>إجراءات</th></thead><tbody></tbody></table>
             </div>
         </div>`;
         this.loadStockCategories();
@@ -370,7 +348,7 @@ const app = {
                 <td><input value="${p.price}" id="stockPrice_${p.id}" style="width:80px;" type="number"></td>
                 <td><input value="${p.qty}" id="stockQty_${p.id}" style="width:70px;" type="number"></td>
                 <td><button class="btn btn-p" onclick="app.updateProductInline(${p.id})">حفظ</button> <button class="btn btn-d" onclick="app.deleteProductInline(${p.id})">حذف</button></td>
-            <td>
+            </tr>
         `).join('');
     },
 
@@ -390,7 +368,7 @@ const app = {
     },
 
     deleteProductInline(id) {
-        if(confirm("هل أنت متأكد من حذف هذا المنتج نهائياً؟")) {
+        if(confirm("هل أنت متأكد من حذف هذا المنتج نهائياً?")) {
             this.data.products = this.data.products.filter(p => p.id !== id);
             this.saveData();
             this.filterStock();
@@ -473,7 +451,7 @@ const app = {
     },
 
     deleteClientInline(id) {
-        if(confirm("هل أنت متأكد من حذف هذا العميل/المورد نهائياً؟")) {
+        if(confirm("هل أنت متأكد من حذف هذا العميل/المورد نهائياً?")) {
             this.data.contacts = this.data.contacts.filter(c => c.id !== id);
             this.saveData();
             this.filterClients();
@@ -491,7 +469,7 @@ const app = {
                 <td><select id="clientType_${c.id}" style="width:100px;"><option ${c.type === 'عميل' ? 'selected' : ''}>عميل</option><option ${c.type === 'مورد' ? 'selected' : ''}>مورد</option></select></td>
                 <td><input value="${c.debt || 0}" id="clientDebt_${c.id}" style="width:100px;" type="number"></td>
                 <td><button class="btn btn-p" onclick="app.editClientInline(${c.id})">حفظ</button> <button class="btn btn-s" onclick="app.payClientDebt(${c.id})">تسديد</button> <button class="btn btn-d" onclick="app.deleteClientInline(${c.id})">حذف</button></td>
-            </table>
+            </tr>
         `).join('');
     },
 
@@ -504,7 +482,7 @@ const app = {
                 <button class="btn btn-d" onclick="app.addExpense()">إضافة</button>
             </div>
             <div style="overflow-x:auto;">
-                <table id="expTable"><thead><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>تعديل</th><th>حذف</th></thead><tbody></tbody></table>
+                <table id="expTable"><thead><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>تعديل</th><th>حذف</th></thead><tbody></tbody><tr>
             </div>
         </div>`;
         this.filterExpenses();
@@ -518,7 +496,7 @@ const app = {
                 <td><input value="${e.note}" id="expNote_${i}" style="width:200px;"></td>
                 <td><input value="${e.amount}" id="expAmount_${i}" style="width:100px;" type="number"></td>
                 <td><button class="btn btn-p" onclick="app.updateExpenseInline(${i})">حفظ</button></td>
-                <td><button class="btn btn-d" onclick="app.deleteExpenseInline(${i})">حذف</button></td>
+                <td><button class="btn btn-d" onclick="app.deleteExpenseInline(${i})">حذف</button></table>
             </tr>
         `).join('');
     },
@@ -544,7 +522,7 @@ const app = {
     },
 
     deleteExpenseInline(i) {
-        if(confirm("هل أنت متأكد من حذف هذا المصروف؟")) {
+        if(confirm("هل أنت متأكد من حذف هذا المصروف?")) {
             this.data.expenses.splice(i, 1);
             this.saveData();
             this.filterExpenses();
@@ -601,7 +579,7 @@ const app = {
     },
 
     deleteReturnInline(i) {
-        if(confirm("هل أنت متأكد من حذف هذا المرتجع؟")) {
+        if(confirm("هل أنت متأكد من حذف هذا المرتجع?")) {
             this.data.returns.splice(i, 1);
             this.saveData();
             this.filterReturns();
@@ -648,7 +626,7 @@ const app = {
     },
 
     returnSaleById(id) {
-        if(confirm("هل تريد إرجاع هذه الفاتورة بالكامل واسترجاع المنتجات للمخزن؟")) {
+        if(confirm("هل تريد إرجاع هذه الفاتورة بالكامل واسترجاع المنتجات للمخزن?")) {
             let sale = this.data.sales.find(s => s.id == id);
             if(sale && sale.items) {
                 sale.items.forEach(item => {
