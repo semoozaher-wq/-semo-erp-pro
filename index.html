@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الدفتر الذهبي - نظام محاسبي متكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -876,6 +879,112 @@
             display: flex;
             gap: 10px;
         }
+
+        /* PDF Report Styles */
+        .pdf-report {
+            display: none;
+        }
+
+        .pdf-report.active {
+            display: block;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 20px;
+        }
+
+        .report-logo {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .report-company-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .report-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .report-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .report-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: right;
+            border: 1px solid #ddd;
+        }
+
+        .report-table td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: var(--light);
+        }
+
+        .report-summary {
+            margin-top: 30px;
+            border-top: 2px solid var(--primary);
+            padding-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--primary);
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .report-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .pdf-report {
+                display: block !important;
+            }
+            header, nav, .page {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1266,6 +1375,15 @@
                         <input type="number" id="defaultTax" value="15" min="0" max="100">
                     </div>
 
+                    <div class="form-group">
+                        <label>شعار الشركة (صورة)</label>
+                        <input type="file" id="companyLogo" accept="image/*" onchange="uploadLogo()">
+                    </div>
+
+                    <div id="logoPreview" style="margin: 15px 0; text-align: center;">
+                        <img id="logoImg" src="" style="max-width: 100px; display: none; border-radius: 6px;">
+                    </div>
+
                     <button class="btn btn-success" onclick="saveSettings()">
                         <i class="fas fa-save"></i> حفظ
                     </button>
@@ -1418,7 +1536,8 @@
             companyName: 'الدفتر الذهبي',
             companyPhone: '',
             companyEmail: '',
-            defaultTax: 15
+            defaultTax: 15,
+            companyLogo: null
         };
 
         // Authentication
@@ -1494,74 +1613,4 @@
             document.getElementById(pageName).classList.add('active');
 
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('button').classList.add('active');
-
-            if (pageName === 'dashboard') loadDashboard();
-            else if (pageName === 'pos') loadPOS();
-            else if (pageName === 'inventory') loadInventory();
-            else if (pageName === 'customers') loadCustomers();
-            else if (pageName === 'expenses') loadExpenses();
-            else if (pageName === 'reports') loadReports();
-            else if (pageName === 'settings') loadSettings();
-        }
-
-        // Dashboard
-        function loadDashboard() {
-            const today = new Date().toISOString().split('T')[0];
-            const todaySales = sales.filter(s => s.date === today).reduce((sum, s) => sum + s.total, 0);
-            const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-            const lowStockProducts = products.filter(p => p.quantity <= 5).length;
-
-            document.getElementById('todaySales').textContent = todaySales.toFixed(2) + ' ر.س';
-            document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2) + ' ر.س';
-            document.getElementById('lowStock').textContent = lowStockProducts;
-
-            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
-            const profit = totalSales - totalExpenses;
-            document.getElementById('totalProfit').textContent = profit.toFixed(2) + ' ر.س';
-        }
-
-        // POS
-        function loadPOS() {
-            displayProducts();
-            updateCart();
-        }
-
-        function displayProducts() {
-            const list = document.getElementById('productsList');
-            list.innerHTML = products.map(p => `
-                <div class="product-card">
-                    <div class="product-name">${p.name}</div>
-                    <div class="product-info">السعر: ${p.price} ر.س | المتوفر: ${p.quantity}</div>
-                    <button class="btn btn-primary btn-small" onclick="addToCart(${p.id})">
-                        <i class="fas fa-plus"></i> إضافة
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function filterProducts() {
-            const search = document.getElementById('posSearch').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(search));
-            const list = document.getElementById('productsList');
-            list.innerHTML = filtered.map(p => `
-                <div class="product-card">
-                    <div class="product-name">${p.name}</div>
-                    <div class="product-info">السعر: ${p.price} ر.س | المتوفر: ${p.quantity}</div>
-                    <button class="btn btn-primary btn-small" onclick="addToCart(${p.id})">
-                        <i class="fas fa-plus"></i> إضافة
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-
-            const cartItem = cart.find(item => item.id === productId);
-            if (cartItem) {
-                if (cartItem.quantity < product.quantity) {
-                    cartItem.quantity++;
-                } else {
-                    showNotifi
+            event.target.closest('button').classList.add('active')
