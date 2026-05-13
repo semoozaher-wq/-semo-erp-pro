@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الدفتر الذهبي - نظام محاسبي متكامل</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>الدفتر الذهبي - نظام إدارة متكامل</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,27 +16,31 @@
         }
 
         :root {
-            --primary: #1e40af;
-            --secondary: #0f766e;
-            --danger: #dc2626;
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
             --warning: #f59e0b;
-            --success: #16a34a;
-            --dark: #1f2937;
-            --light: #f3f4f6;
-            --border: #e5e7eb;
+            --dark-bg: #1a1a1a;
+            --dark-card: #2d2d2d;
+            --dark-border: #404040;
+            --light-bg: #f9fafb;
+            --light-card: #ffffff;
+            --light-border: #e5e7eb;
+            --text-dark: #1f2937;
+            --text-light: #f3f4f6;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
             transition: all 0.3s ease;
-            min-height: 100vh;
         }
 
         body.dark-mode {
-            background: #1a1a2e;
-            color: #e0e0e0;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
         }
 
         .container {
@@ -47,54 +51,45 @@
 
         /* Header */
         header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            background: var(--light-card);
+            border-bottom: 1px solid var(--light-border);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         body.dark-mode header {
-            background: #2d2d44;
-            color: #e0e0e0;
+            background: var(--dark-card);
+            border-color: var(--dark-border);
         }
 
-        .header-title {
+        .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             font-size: 24px;
             font-weight: bold;
             color: var(--primary);
         }
 
-        .header-title i {
-            font-size: 32px;
-        }
-
-        .header-controls {
+        .header-actions {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 10px 20px;
+        button {
+            padding: 8px 16px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 500;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 500;
         }
 
         .btn-primary {
@@ -103,27 +98,19 @@
         }
 
         .btn-primary:hover {
-            background: #1e3a8a;
+            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
-            background: var(--secondary);
-            color: white;
+            background: var(--light-border);
+            color: var(--text-dark);
         }
 
-        .btn-secondary:hover {
-            background: #0d5a57;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #b91c1c;
+        body.dark-mode .btn-secondary {
+            background: var(--dark-border);
+            color: var(--text-light);
         }
 
         .btn-success {
@@ -131,8 +118,9 @@
             color: white;
         }
 
-        .btn-success:hover {
-            background: #15803d;
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
 
         .btn-warning {
@@ -140,132 +128,64 @@
             color: white;
         }
 
-        .btn-warning:hover {
-            background: #d97706;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn-icon {
-            padding: 10px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
         /* Navigation */
         nav {
-            background: white;
-            padding: 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            overflow-x: auto;
-        }
-
-        body.dark-mode nav {
-            background: #2d2d44;
-        }
-
-        nav ul {
-            list-style: none;
             display: flex;
-            gap: 0;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        nav li {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        nav button {
-            width: 100%;
-            padding: 15px 20px;
-            border: none;
-            background: transparent;
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--light-card);
+            border: 2px solid var(--light-border);
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            color: #666;
             transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
+            font-weight: 500;
         }
 
-        body.dark-mode nav button {
-            color: #b0b0b0;
+        body.dark-mode .nav-btn {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--text-light);
         }
 
-        nav button:hover {
-            background: var(--light);
-            color: var(--primary);
-        }
-
-        body.dark-mode nav button:hover {
-            background: #3d3d54;
-        }
-
-        nav button.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-            background: var(--light);
-        }
-
-        body.dark-mode nav button.active {
-            background: #3d3d54;
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Main Content */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-
-        .page {
+        .content {
             display: none;
         }
 
-        .page.active {
+        .content.active {
             display: block;
             animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* Cards */
         .card {
-            background: white;
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         body.dark-mode .card {
-            background: #2d2d44;
-            color: #e0e0e0;
-        }
-
-        .card:hover {
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
+            background: var(--dark-card);
+            border-color: var(--dark-border);
         }
 
         .card-title {
@@ -273,54 +193,38 @@
             font-weight: bold;
             margin-bottom: 15px;
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        /* Dashboard Stats */
-        .stats-grid {
+        /* Grid */
+        .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
-            color: white;
+            background: var(--light-card);
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .stat-card.success {
-            background: linear-gradient(135deg, var(--success) 0%, #15803d 100%);
-        }
-
-        .stat-card.warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
-        }
-
-        .stat-card.danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
+        body.dark-mode .stat-card {
+            background: var(--dark-card);
         }
 
         .stat-value {
             font-size: 28px;
             font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
         }
 
-        .stat-icon {
-            font-size: 32px;
-            opacity: 0.3;
-            margin-top: 10px;
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
         }
 
         /* Forms */
@@ -332,17 +236,13 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: #333;
-        }
-
-        body.dark-mode label {
-            color: #e0e0e0;
+            font-size: 14px;
         }
 
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--light-border);
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
@@ -352,22 +252,18 @@
         body.dark-mode input,
         body.dark-mode select,
         body.dark-mode textarea {
-            background: #3d3d54;
-            color: #e0e0e0;
-            border-color: #555;
+            background: var(--dark-border);
+            border-color: var(--dark-border);
+            color: var(--text-light);
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         /* Tables */
-        .table-responsive {
-            overflow-x: auto;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -375,34 +271,33 @@
         }
 
         th {
-            background: var(--light);
+            background: var(--light-border);
             padding: 12px;
             text-align: right;
             font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid var(--light-border);
         }
 
         body.dark-mode th {
-            background: #3d3d54;
-            color: #e0e0e0;
+            background: var(--dark-border);
+            border-color: var(--dark-border);
         }
 
         td {
             padding: 12px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--light-border);
         }
 
         body.dark-mode td {
-            border-bottom-color: #555;
+            border-color: var(--dark-border);
         }
 
         tr:hover {
-            background: var(--light);
+            background: var(--light-border);
         }
 
         body.dark-mode tr:hover {
-            background: #3d3d54;
+            background: var(--dark-border);
         }
 
         /* Modal */
@@ -411,13 +306,12 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            overflow-y: auto;
         }
 
         .modal.active {
@@ -425,20 +319,18 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--light-card);
+            border-radius: 8px;
             padding: 30px;
-            border-radius: 10px;
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            margin: auto;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
         }
 
         body.dark-mode .modal-content {
-            background: #2d2d44;
-            color: #e0e0e0;
+            background: var(--dark-card);
         }
 
         .modal-header {
@@ -446,12 +338,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 15px;
-        }
-
-        .modal-header h2 {
-            color: var(--primary);
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .modal-close {
@@ -459,7 +347,7 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: #6b7280;
         }
 
         /* Alerts */
@@ -467,333 +355,333 @@
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .alert-success {
             background: #d1fae5;
             color: #065f46;
-            border-left: 4px solid var(--success);
+            border: 1px solid #a7f3d0;
         }
 
         .alert-danger {
             background: #fee2e2;
             color: #7f1d1d;
-            border-left: 4px solid var(--danger);
+            border: 1px solid #fecaca;
         }
 
         .alert-warning {
             background: #fef3c7;
-            color: #78350f;
-            border-left: 4px solid var(--warning);
+            color: #92400e;
+            border: 1px solid #fde68a;
         }
 
-        .alert-info {
-            background: #dbeafe;
-            color: #0c2340;
-            border-left: 4px solid var(--primary);
+        /* Auth Page */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: var(--light-card);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* POS Cart */
-        .cart-item {
-            display: grid;
-            grid-template-columns: 1fr 80px 80px 80px 60px;
-            gap: 10px;
-            align-items: center;
-            padding: 10px;
-            background: var(--light);
-            border-radius: 6px;
-            margin-bottom: 10px;
+        body.dark-mode .auth-container {
+            background: var(--dark-card);
         }
 
-        body.dark-mode .cart-item {
-            background: #3d3d54;
-        }
-
-        .cart-item-name {
-            font-weight: 500;
-        }
-
-        .cart-item-price {
+        .auth-title {
             text-align: center;
-        }
-
-        .cart-item-qty {
-            display: flex;
-            gap: 5px;
-        }
-
-        .qty-btn {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cart-item-total {
-            text-align: center;
+            font-size: 28px;
             font-weight: bold;
+            margin-bottom: 30px;
             color: var(--primary);
         }
 
-        .cart-item-remove {
-            width: 30px;
-            height: 30px;
-            padding: 0;
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        /* Search and Filter */
-        .search-filter {
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: var(--light-border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        body.dark-mode .auth-tab {
+            background: var(--dark-border);
+            color: var(--text-light);
+        }
+
+        .auth-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        /* POS Page */
+        .pos-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .pos-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pos-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .product-btn {
+            padding: 15px;
+            background: var(--light-card);
+            border: 2px solid var(--light-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        body.dark-mode .product-btn {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .product-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .pos-cart {
+            background: var(--light-card);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        body.dark-mode .pos-cart {
+            background: var(--dark-card);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        body.dark-mode .cart-item {
+            border-color: var(--dark-border);
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--primary);
+            color: var(--primary);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
             }
 
             header {
                 flex-direction: column;
-                text-align: center;
+                gap: 10px;
             }
 
-            nav ul {
-                flex-wrap: wrap;
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
             }
+        }
 
-            nav li {
-                min-width: 100px;
-            }
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--light-border);
+            border-radius: 13px;
+            cursor: pointer;
+            position: relative;
+            border: none;
+            transition: all 0.3s ease;
+        }
 
-            nav button {
-                padding: 10px 15px;
-                font-size: 12px;
-            }
+        body.dark-mode .theme-toggle {
+            background: var(--primary);
+        }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .theme-toggle::after {
+            content: '☀️';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
 
-            .cart-item {
-                grid-template-columns: 1fr;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 20px;
-            }
+        body.dark-mode .theme-toggle::after {
+            content: '🌙';
+            right: auto;
+            left: 2px;
         }
 
         /* Notifications */
         .notification {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
-            background: white;
+            background: var(--success);
+            color: white;
             padding: 15px 20px;
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease;
             z-index: 2000;
-            animation: slideIn 0.3s ease;
         }
 
-        body.dark-mode .notification {
-            background: #2d2d44;
-            color: #e0e0e0;
-        }
-
-        @keyframes slideIn {
+        @keyframes slideUp {
             from {
-                transform: translateX(400px);
+                transform: translateY(100px);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateY(0);
                 opacity: 1;
             }
         }
 
-        .notification.success {
-            border-left: 4px solid var(--success);
+        .notification.error {
+            background: var(--danger);
         }
 
-        .notification.danger {
-            border-left: 4px solid var(--danger);
-        }
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
 
-        .notification.warning {
-            border-left: 4px solid var(--warning);
-        }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #7f1d1d;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #78350f;
-        }
-
-        .badge-info {
-            background: #dbeafe;
-            color: #0c2340;
-        }
-
-        /* Grid */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 0;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .tab-btn {
-            color: #b0b0b0;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
         }
 
         /* Invoice */
         .invoice {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: 20px auto;
-        }
-
-        body.dark-mode .invoice {
-            background: #2d2d44;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .invoice-header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
         }
 
         .invoice-logo {
-            font-size: 32px;
+            max-width: 100px;
             margin-bottom: 10px;
         }
 
         .invoice-title {
             font-size: 24px;
             font-weight: bold;
-            color: var(--primary);
+            margin: 10px 0;
         }
 
         .invoice-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .invoice-items {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .invoice-summary {
-            border-top: 2px solid var(--border);
-            padding-top: 20px;
             text-align: left;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
             padding: 5px 0;
-        }
-
-        .summary-row.total {
             font-weight: bold;
-            font-size: 18px;
-            color: var(--primary);
-            border-top: 1px solid var(--border);
-            padding-top: 10px;
         }
 
         .qr-code {
@@ -801,592 +689,456 @@
             margin-top: 20px;
         }
 
-        .qr-code img {
-            max-width: 150px;
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
         }
 
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--light);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s linear infinite;
+        .text-right {
+            text-align: right;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .mt-20 {
+            margin-top: 20px;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .mb-20 {
+            margin-bottom: 20px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--light);
-        }
-
-        body.dark-mode ::-webkit-scrollbar-track {
-            background: #3d3d54;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #999;
-        }
-
-        /* Product Card */
-        .product-card {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .product-card {
-            background: #3d3d54;
-        }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .product-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .product-info {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 10px;
-        }
-
-        .product-actions {
-            display: flex;
+        .gap-10 {
             gap: 10px;
         }
 
-        /* PDF Report Styles */
-        .pdf-report {
+        .flex {
+            display: flex;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .hidden {
             display: none;
         }
 
-        .pdf-report.active {
-            display: block;
-        }
-
-        .report-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 20px;
-        }
-
-        .report-logo {
-            font-size: 48px;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .report-company-info {
-            margin: 15px 0;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .report-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 20px 0;
-        }
-
-        .report-date {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .report-table th {
-            background: var(--primary);
-            color: white;
-            padding: 12px;
-            text-align: right;
-            border: 1px solid #ddd;
-        }
-
-        .report-table td {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-
-        .report-table tr:nth-child(even) {
-            background: var(--light);
-        }
-
-        .report-summary {
-            margin-top: 30px;
-            border-top: 2px solid var(--primary);
-            padding-top: 20px;
-        }
-
-        .summary-item {
+        /* Search and Filter */
+        .search-box {
             display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            font-size: 14px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .summary-item.total {
-            font-weight: bold;
-            font-size: 16px;
-            color: var(--primary);
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
+        .search-box input {
+            flex: 1;
         }
 
-        .report-footer {
-            margin-top: 40px;
-            text-align: center;
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
             font-size: 12px;
-            color: #999;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
         }
 
-        @media print {
-            body {
-                background: white;
-            }
-            .pdf-report {
-                display: block !important;
-            }
-            header, nav, .page {
-                display: none !important;
-            }
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--light-border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div class="header-title">
-            <i class="fas fa-book"></i>
-            <span>الدفتر الذهبي</span>
-        </div>
-        <div class="header-controls">
-            <div id="userInfo" style="display: flex; align-items: center; gap: 10px;">
-                <span id="userName">المستخدم</span>
-                <span id="userRole" class="badge badge-info">موظف</span>
-            </div>
-            <button class="btn btn-icon" onclick="toggleDarkMode()" title="تبديل الوضع الليلي">
-                <i class="fas fa-moon"></i>
-            </button>
-            <button class="btn btn-danger" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                خروج
-            </button>
+        <div class="logo">💰 الدفتر الذهبي</div>
+        <div class="header-actions">
+            <span id="userInfo" style="font-size: 14px;"></span>
+            <button class="theme-toggle" id="themeToggle"></button>
+            <button class="btn-secondary btn-small" onclick="logout()">تسجيل الخروج</button>
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><button onclick="switchPage('dashboard')" class="nav-btn active">
-                <i class="fas fa-chart-line"></i> لوحة التحكم
-            </button></li>
-            <li><button onclick="switchPage('pos')" class="nav-btn">
-                <i class="fas fa-cash-register"></i> البيع
-            </button></li>
-            <li><button onclick="switchPage('inventory')" class="nav-btn">
-                <i class="fas fa-boxes"></i> المخزون
-            </button></li>
-            <li><button onclick="switchPage('customers')" class="nav-btn">
-                <i class="fas fa-users"></i> العملاء
-            </button></li>
-            <li><button onclick="switchPage('expenses')" class="nav-btn">
-                <i class="fas fa-money-bill"></i> المصاريف
-            </button></li>
-            <li><button onclick="switchPage('reports')" class="nav-btn">
-                <i class="fas fa-file-pdf"></i> التقارير
-            </button></li>
-            <li><button onclick="switchPage('settings')" class="nav-btn">
-                <i class="fas fa-cog"></i> الإعدادات
-            </button></li>
-        </ul>
-    </nav>
+    <!-- Auth Page -->
+    <div id="authPage" class="content active">
+        <div class="auth-container">
+            <div class="auth-title">الدفتر الذهبي</div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">إنشاء حساب</button>
+            </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="main-content">
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary w-full">تسجيل الدخول</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>نوع الحساب</label>
+                    <select id="registerRole">
+                        <option value="employee">موظف</option>
+                        <option value="admin">مدير</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary w-full">إنشاء حساب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <div class="container">
+            <!-- Navigation -->
+            <nav>
+                <button class="nav-btn active" onclick="switchPage('dashboard')">📊 لوحة التحكم</button>
+                <button class="nav-btn" onclick="switchPage('pos')">🛒 نقطة البيع</button>
+                <button class="nav-btn" onclick="switchPage('inventory')">📦 المخزون</button>
+                <button class="nav-btn" onclick="switchPage('customers')">👥 العملاء</button>
+                <button class="nav-btn" onclick="switchPage('suppliers')">🏭 الموردين</button>
+                <button class="nav-btn" onclick="switchPage('expenses')">💸 المصاريف</button>
+                <button class="nav-btn" onclick="switchPage('returns')">↩️ المرتجعات</button>
+                <button class="nav-btn" onclick="switchPage('reports')">📈 التقارير</button>
+                <button class="nav-btn" onclick="switchPage('settings')">⚙️ الإعدادات</button>
+            </nav>
+
             <!-- Dashboard Page -->
-            <div id="dashboard" class="page active">
-                <div class="stats-grid">
+            <div id="dashboardPage" class="content active">
+                <div class="grid">
                     <div class="stat-card">
-                        <div class="stat-label">المبيعات اليوم</div>
-                        <div class="stat-value" id="todaySales">0 ر.س</div>
-                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-label">إجمالي المبيعات اليوم</div>
+                        <div class="stat-value" id="todaySales">0</div>
                     </div>
-                    <div class="stat-card success">
+                    <div class="stat-card">
+                        <div class="stat-label">إجمالي المصاريف</div>
+                        <div class="stat-value" id="totalExpenses">0</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-label">الأرباح</div>
-                        <div class="stat-value" id="totalProfit">0 ر.س</div>
-                        <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div class="stat-value" id="totalProfit">0</div>
                     </div>
-                    <div class="stat-card warning">
-                        <div class="stat-label">المصاريف</div>
-                        <div class="stat-value" id="totalExpenses">0 ر.س</div>
-                        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
-                    </div>
-                    <div class="stat-card danger">
+                    <div class="stat-card">
                         <div class="stat-label">نواقص المخزون</div>
                         <div class="stat-value" id="lowStock">0</div>
-                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-bell"></i> التنبيهات
-                    </div>
-                    <div id="alertsList">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <span>مرحباً بك في الدفتر الذهبي</span>
-                        </div>
-                    </div>
+                    <div class="card-title">آخر المبيعات</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentSalesList">
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- POS Page -->
-            <div id="pos" class="page">
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-title">
-                            <i class="fas fa-search"></i> المنتجات
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="posSearch" placeholder="ابحث عن منتج..." onkeyup="filterProducts()">
-                        </div>
-                        <div id="productsList" style="max-height: 500px; overflow-y: auto;">
-                            <!-- Products will be loaded here -->
-                        </div>
+            <div id="posPage" class="content">
+                <div class="card">
+                    <div class="card-title">نقطة البيع</div>
+                    <div class="search-box">
+                        <input type="text" id="posSearch" placeholder="ابحث عن منتج..." onkeyup="filterProducts()">
+                        <select id="posCategory" onchange="filterProducts()">
+                            <option value="">جميع الفئات</option>
+                            <option value="electronics">إلكترونيات</option>
+                            <option value="clothing">ملابس</option>
+                            <option value="food">أغذية</option>
+                        </select>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">
-                            <i class="fas fa-shopping-cart"></i> السلة
-                        </div>
-                        <div id="cartItems" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
-                            <div class="empty-state">
-                                <i class="fas fa-shopping-cart"></i>
-                                <p>السلة فارغة</p>
+                    <div class="pos-container">
+                        <div>
+                            <div class="pos-products" id="posList">
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label>الخصم (%)</label>
-                            <input type="number" id="discount" min="0" max="100" value="0" onchange="updateCart()">
-                        </div>
-
-                        <div class="form-group">
-                            <label>الضريبة (%)</label>
-                            <input type="number" id="tax" min="0" max="100" value="15" onchange="updateCart()">
-                        </div>
-
-                        <div class="form-group">
-                            <label>طريقة الدفع</label>
-                            <select id="paymentMethod" onchange="updateCart()">
-                                <option value="cash">نقدي</option>
-                                <option value="card">بطاقة</option>
-                                <option value="transfer">تحويل</option>
-                                <option value="credit">آجل</option>
-                            </select>
-                        </div>
-
-                        <div style="background: var(--light); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                            <div class="summary-row">
-                                <span>الإجمالي:</span>
-                                <span id="cartTotal">0 ر.س</span>
+                        <div class="pos-cart">
+                            <div class="card-title">السلة</div>
+                            <div id="cartItems"></div>
+                            <div class="cart-total">
+                                الإجمالي: <span id="cartTotal">0</span> ريال
                             </div>
-                            <div class="summary-row">
-                                <span>الخصم:</span>
-                                <span id="cartDiscount">0 ر.س</span>
+                            <div class="form-group mt-20">
+                                <label>الخصم (%)</label>
+                                <input type="number" id="discount" value="0" onchange="updateCart()">
                             </div>
-                            <div class="summary-row">
-                                <span>الضريبة:</span>
-                                <span id="cartTax">0 ر.س</span>
+                            <div class="form-group">
+                                <label>الضريبة (%)</label>
+                                <input type="number" id="tax" value="15" onchange="updateCart()">
                             </div>
-                            <div class="summary-row total">
-                                <span>المجموع:</span>
-                                <span id="cartFinal">0 ر.س</span>
+                            <div class="form-group">
+                                <label>طريقة الدفع</label>
+                                <select id="paymentMethod">
+                                    <option value="cash">نقدي</option>
+                                    <option value="card">بطاقة</option>
+                                    <option value="transfer">تحويل</option>
+                                    <option value="credit">آجل</option>
+                                </select>
                             </div>
+                            <button class="btn-success w-full" onclick="completeSale()">إتمام البيع</button>
+                            <button class="btn-secondary w-full mt-20" onclick="clearCart()">مسح السلة</button>
                         </div>
-
-                        <button class="btn btn-success" style="width: 100%; margin-bottom: 10px;" onclick="completeSale()">
-                            <i class="fas fa-check"></i> إتمام البيع
-                        </button>
-                        <button class="btn btn-danger" style="width: 100%;" onclick="clearCart()">
-                            <i class="fas fa-trash"></i> مسح السلة
-                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Inventory Page -->
-            <div id="inventory" class="page">
+            <div id="inventoryPage" class="content">
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-boxes"></i> إدارة المخزون
+                    <div class="card-title">إدارة المخزون</div>
+                    <button class="btn-primary mb-20" onclick="openAddProductModal()">+ إضافة منتج</button>
+                    
+                    <div class="search-box">
+                        <input type="text" id="inventorySearch" placeholder="ابحث عن منتج..." onkeyup="filterInventory()">
+                        <select id="inventoryCategory" onchange="filterInventory()">
+                            <option value="">جميع الفئات</option>
+                            <option value="electronics">إلكترونيات</option>
+                            <option value="clothing">ملابس</option>
+                            <option value="food">أغذية</option>
+                        </select>
                     </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="openAddProductModal()">
-                            <i class="fas fa-plus"></i> إضافة منتج
-                        </button>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المنتج</th>
+                                <th>الفئة</th>
+                                <th>السعر</th>
+                                <th>الكمية</th>
+                                <th>الحد الأدنى</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryList">
+                        </tbody>
+                    </table>
 
-                    <div class="search-filter">
-                        <input type="text" id="inventorySearch" placeholder="ابحث..." onkeyup="filterInventory()">
-                    </div>
-
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>المنتج</th>
-                                    <th>السعر</th>
-                                    <th>الكمية</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryTable">
-                                <!-- Inventory items will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <button class="btn-success mt-20" onclick="exportToExcel()">📥 تصدير Excel</button>
                 </div>
             </div>
 
             <!-- Customers Page -->
-            <div id="customers" class="page">
+            <div id="customersPage" class="content">
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-users"></i> إدارة العملاء
+                    <div class="card-title">إدارة العملاء</div>
+                    <button class="btn-primary mb-20" onclick="openAddCustomerModal()">+ إضافة عميل</button>
+                    
+                    <div class="search-box">
+                        <input type="text" id="customerSearch" placeholder="ابحث عن عميل..." onkeyup="filterCustomers()">
                     </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="openAddCustomerModal()">
-                            <i class="fas fa-plus"></i> إضافة عميل
-                        </button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الرصيد</th>
+                                <th>الديون</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Suppliers Page -->
+            <div id="suppliersPage" class="content">
+                <div class="card">
+                    <div class="card-title">إدارة الموردين</div>
+                    <button class="btn-primary mb-20" onclick="openAddSupplierModal()">+ إضافة مورد</button>
+                    
+                    <div class="search-box">
+                        <input type="text" id="supplierSearch" placeholder="ابحث عن مورد..." onkeyup="filterSuppliers()">
                     </div>
 
-                    <div class="search-filter">
-                        <input type="text" id="customerSearch" placeholder="ابحث..." onkeyup="filterCustomers()">
-                    </div>
-
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>الاسم</th>
-                                    <th>الهاتف</th>
-                                    <th>الرصيد</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customersTable">
-                                <!-- Customers will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الرصيد</th>
+                                <th>الديون</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersList">
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Expenses Page -->
-            <div id="expenses" class="page">
+            <div id="expensesPage" class="content">
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-money-bill"></i> إدارة المصاريف
-                    </div>
+                    <div class="card-title">إدارة المصاريف</div>
+                    <button class="btn-primary mb-20" onclick="openAddExpenseModal()">+ إضافة مصروف</button>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الفئة</th>
+                                <th>الوصف</th>
+                                <th>المبلغ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="openAddExpenseModal()">
-                            <i class="fas fa-plus"></i> إضافة مصروف
-                        </button>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>التاريخ</th>
-                                    <th>الفئة</th>
-                                    <th>الوصف</th>
-                                    <th>المبلغ</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="expensesTable">
-                                <!-- Expenses will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- Returns Page -->
+            <div id="returnsPage" class="content">
+                <div class="card">
+                    <div class="card-title">إدارة المرتجعات</div>
+                    <button class="btn-primary mb-20" onclick="openAddReturnModal()">+ إضافة مرتجع</button>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>رقم الفاتورة</th>
+                                <th>المنتج</th>
+                                <th>الكمية</th>
+                                <th>السبب</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="returnsList">
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Reports Page -->
-            <div id="reports" class="page">
+            <div id="reportsPage" class="content">
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-file-pdf"></i> التقارير
+                    <div class="card-title">التقارير</div>
+                    
+                    <div class="grid">
+                        <button class="btn-primary" onclick="generateSalesReport()">📊 تقرير المبيعات</button>
+                        <button class="btn-primary" onclick="generateExpensesReport()">💸 تقرير المصاريف</button>
+                        <button class="btn-primary" onclick="generateInventoryReport()">📦 تقرير المخزون</button>
+                        <button class="btn-primary" onclick="generateCustomersReport()">👥 تقرير العملاء</button>
                     </div>
 
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('salesReport')">المبيعات</button>
-                        <button class="tab-btn" onclick="switchTab('expensesReport')">المصاريف</button>
-                        <button class="tab-btn" onclick="switchTab('customersReport')">العملاء</button>
-                    </div>
-
-                    <!-- Sales Report -->
-                    <div id="salesReport" class="tab-content active">
-                        <div style="margin-bottom: 20px;">
-                            <button class="btn btn-secondary" onclick="exportSalesReportPDF()">
-                                <i class="fas fa-file-pdf"></i> تصدير PDF
-                            </button>
-                            <button class="btn btn-secondary" onclick="exportSalesReportExcel()">
-                                <i class="fas fa-file-excel"></i> تصدير Excel
-                            </button>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>التاريخ</th>
-                                        <th>الفاتورة</th>
-                                        <th>المبلغ</th>
-                                        <th>الخصم</th>
-                                        <th>الضريبة</th>
-                                        <th>المجموع</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="salesReportTable">
-                                    <!-- Sales report will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Expenses Report -->
-                    <div id="expensesReport" class="tab-content">
-                        <div style="margin-bottom: 20px;">
-                            <button class="btn btn-secondary" onclick="exportExpensesReportPDF()">
-                                <i class="fas fa-file-pdf"></i> تصدير PDF
-                            </button>
-                            <button class="btn btn-secondary" onclick="exportExpensesReportExcel()">
-                                <i class="fas fa-file-excel"></i> تصدير Excel
-                            </button>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>التاريخ</th>
-                                        <th>الفئة</th>
-                                        <th>الوصف</th>
-                                        <th>المبلغ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="expensesReportTable">
-                                    <!-- Expenses report will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Customers Report -->
-                    <div id="customersReport" class="tab-content">
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>الاسم</th>
-                                        <th>الهاتف</th>
-                                        <th>المشتريات</th>
-                                        <th>الرصيد</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="customersReportTable">
-                                    <!-- Customers report will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="mt-20">
+                        <div class="card-title">تقرير المبيعات</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>المبلغ</th>
+                                    <th>الخصم</th>
+                                    <th>الضريبة</th>
+                                    <th>الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesReportList">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             <!-- Settings Page -->
-            <div id="settings" class="page">
+            <div id="settingsPage" class="content">
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-cog"></i> الإعدادات
-                    </div>
-
+                    <div class="card-title">الإعدادات</div>
+                    
                     <div class="form-group">
                         <label>اسم الشركة</label>
-                        <input type="text" id="companyName" value="الدفتر الذهبي">
+                        <input type="text" id="companyName" placeholder="أدخل اسم الشركة">
                     </div>
 
                     <div class="form-group">
                         <label>رقم الهاتف</label>
-                        <input type="tel" id="companyPhone">
+                        <input type="tel" id="companyPhone" placeholder="أدخل رقم الهاتف">
                     </div>
 
                     <div class="form-group">
                         <label>البريد الإلكتروني</label>
-                        <input type="email" id="companyEmail">
+                        <input type="email" id="companyEmail" placeholder="أدخل البريد الإلكتروني">
+                    </div>
+
+                    <div class="form-group">
+                        <label>شعار الشركة</label>
+                        <input type="file" id="companyLogo" accept="image/*" onchange="uploadLogo()">
+                        <img id="logoPreview" style="max-width: 100px; margin-top: 10px; display: none;">
                     </div>
 
                     <div class="form-group">
                         <label>الضريبة الافتراضية (%)</label>
-                        <input type="number" id="defaultTax" value="15" min="0" max="100">
+                        <input type="number" id="defaultTax" value="15">
                     </div>
 
                     <div class="form-group">
-                        <label>شعار الشركة (صورة)</label>
-                        <input type="file" id="companyLogo" accept="image/*" onchange="uploadLogo()">
+                        <label>حد المخزون الأدنى</label>
+                        <input type="number" id="minStock" value="5">
                     </div>
 
-                    <div id="logoPreview" style="margin: 15px 0; text-align: center;">
-                        <img id="logoImg" src="" style="max-width: 100px; display: none; border-radius: 6px;">
-                    </div>
-
-                    <button class="btn btn-success" onclick="saveSettings()">
-                        <i class="fas fa-save"></i> حفظ
-                    </button>
+                    <button class="btn-success" onclick="saveSettings()">💾 حفظ الإعدادات</button>
                 </div>
             </div>
         </div>
@@ -1397,24 +1149,37 @@
     <div id="addProductModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>إضافة منتج</h2>
-                <button class="modal-close" onclick="closeModal('addProductModal')">×</button>
+                <span>إضافة منتج جديد</span>
+                <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
             </div>
-            <div class="form-group">
-                <label>الاسم</label>
-                <input type="text" id="productName">
-            </div>
-            <div class="form-group">
-                <label>السعر</label>
-                <input type="number" id="productPrice" min="0">
-            </div>
-            <div class="form-group">
-                <label>الكمية</label>
-                <input type="number" id="productQuantity" min="0">
-            </div>
-            <button class="btn btn-success" style="width: 100%;" onclick="addProduct()">
-                <i class="fas fa-plus"></i> إضافة
-            </button>
+            <form onsubmit="addProduct(event)">
+                <div class="form-group">
+                    <label>اسم المنتج</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>الفئة</label>
+                    <select id="productCategory" required>
+                        <option value="">اختر فئة</option>
+                        <option value="electronics">إلكترونيات</option>
+                        <option value="clothing">ملابس</option>
+                        <option value="food">أغذية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>السعر</label>
+                    <input type="number" id="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>الكمية</label>
+                    <input type="number" id="productQuantity" required>
+                </div>
+                <div class="form-group">
+                    <label>الحد الأدنى</label>
+                    <input type="number" id="productMinStock" value="5" required>
+                </div>
+                <button type="submit" class="btn-success w-full">إضافة المنتج</button>
+            </form>
         </div>
     </div>
 
@@ -1422,20 +1187,57 @@
     <div id="addCustomerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>إضافة عميل</h2>
-                <button class="modal-close" onclick="closeModal('addCustomerModal')">×</button>
+                <span>إضافة عميل جديد</span>
+                <button class="modal-close" onclick="closeModal('addCustomerModal')">✕</button>
             </div>
-            <div class="form-group">
-                <label>الاسم</label>
-                <input type="text" id="customerName">
+            <form onsubmit="addCustomer(event)">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>الهاتف</label>
+                    <input type="tel" id="customerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="customerEmail">
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" id="customerAddress">
+                </div>
+                <button type="submit" class="btn-success w-full">إضافة العميل</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div id="addSupplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>إضافة مورد جديد</span>
+                <button class="modal-close" onclick="closeModal('addSupplierModal')">✕</button>
             </div>
-            <div class="form-group">
-                <label>الهاتف</label>
-                <input type="tel" id="customerPhone">
-            </div>
-            <button class="btn btn-success" style="width: 100%;" onclick="addCustomer()">
-                <i class="fas fa-plus"></i> إضافة
-            </button>
+            <form onsubmit="addSupplier(event)">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+                <div class="form-group">
+                    <label>الهاتف</label>
+                    <input type="tel" id="supplierPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="supplierEmail">
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" id="supplierAddress">
+                </div>
+                <button type="submit" class="btn-success w-full">إضافة المورد</button>
+            </form>
         </div>
     </div>
 
@@ -1443,174 +1245,255 @@
     <div id="addExpenseModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>إضافة مصروف</h2>
-                <button class="modal-close" onclick="closeModal('addExpenseModal')">×</button>
+                <span>إضافة مصروف جديد</span>
+                <button class="modal-close" onclick="closeModal('addExpenseModal')">✕</button>
             </div>
-            <div class="form-group">
-                <label>الفئة</label>
-                <select id="expenseCategoryAdd">
-                    <option value="salary">رواتب</option>
-                    <option value="rent">إيجار</option>
-                    <option value="utilities">فواتير</option>
-                    <option value="other">أخرى</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>الوصف</label>
-                <input type="text" id="expenseDescription">
-            </div>
-            <div class="form-group">
-                <label>المبلغ</label>
-                <input type="number" id="expenseAmount" min="0">
-            </div>
-            <button class="btn btn-success" style="width: 100%;" onclick="addExpense()">
-                <i class="fas fa-plus"></i> إضافة
-            </button>
+            <form onsubmit="addExpense(event)">
+                <div class="form-group">
+                    <label>الفئة</label>
+                    <select id="expenseCategory" required>
+                        <option value="">اختر فئة</option>
+                        <option value="salary">الرواتب</option>
+                        <option value="rent">الإيجار</option>
+                        <option value="utilities">المرافق</option>
+                        <option value="supplies">المستلزمات</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <input type="text" id="expenseDescription" required>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="expenseAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" id="expenseDate" required>
+                </div>
+                <button type="submit" class="btn-success w-full">إضافة المصروف</button>
+            </form>
         </div>
     </div>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal active">
-        <div class="modal-content" style="max-width: 400px;">
+    <!-- Add Return Modal -->
+    <div id="addReturnModal" class="modal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2>تسجيل الدخول</h2>
+                <span>إضافة مرتجع جديد</span>
+                <button class="modal-close" onclick="closeModal('addReturnModal')">✕</button>
             </div>
-            <div class="form-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email" id="loginEmail" placeholder="example@mail.com">
-            </div>
-            <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="loginPassword">
-            </div>
-            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="login()">
-                <i class="fas fa-sign-in-alt"></i> دخول
-            </button>
-            <button class="btn btn-secondary" style="width: 100%;" onclick="switchToRegister()">
-                <i class="fas fa-user-plus"></i> إنشاء حساب
-            </button>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h2>إنشاء حساب</h2>
-            </div>
-            <div class="form-group">
-                <label>الاسم</label>
-                <input type="text" id="registerName">
-            </div>
-            <div class="form-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email" id="registerEmail">
-            </div>
-            <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="registerPassword">
-            </div>
-            <button class="btn btn-success" style="width: 100%; margin-bottom: 10px;" onclick="register()">
-                <i class="fas fa-user-plus"></i> إنشاء
-            </button>
-            <button class="btn btn-secondary" style="width: 100%;" onclick="switchToLogin()">
-                <i class="fas fa-sign-in-alt"></i> دخول
-            </button>
+            <form onsubmit="addReturn(event)">
+                <div class="form-group">
+                    <label>رقم الفاتورة</label>
+                    <input type="text" id="returnInvoiceNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>المنتج</label>
+                    <input type="text" id="returnProduct" required>
+                </div>
+                <div class="form-group">
+                    <label>الكمية</label>
+                    <input type="number" id="returnQuantity" required>
+                </div>
+                <div class="form-group">
+                    <label>السبب</label>
+                    <select id="returnReason" required>
+                        <option value="">اختر السبب</option>
+                        <option value="defective">معيب</option>
+                        <option value="wrong">خطأ في الطلب</option>
+                        <option value="expired">انتهت الصلاحية</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-success w-full">إضافة المرتجع</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // Data Storage
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let products = JSON.parse(localStorage.getItem('products')) || [
-            { id: 1, name: 'كمبيوتر محمول', price: 3000, quantity: 5 },
-            { id: 2, name: 'فأرة', price: 150, quantity: 20 },
-            { id: 3, name: 'لوحة مفاتيح', price: 200, quantity: 15 }
-        ];
-        let customers = JSON.parse(localStorage.getItem('customers')) || [];
-        let sales = JSON.parse(localStorage.getItem('sales')) || [];
-        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        let cart = [];
-        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-        let settings = JSON.parse(localStorage.getItem('settings')) || {
-            companyName: 'الدفتر الذهبي',
-            companyPhone: '',
-            companyEmail: '',
-            defaultTax: 15,
-            companyLogo: null
+        // ==================== Data Management ====================
+        const app = {
+            users: [],
+            products: [],
+            customers: [],
+            suppliers: [],
+            sales: [],
+            expenses: [],
+            returns: [],
+            cart: [],
+            currentUser: null,
+            settings: {
+                companyName: 'الدفتر الذهبي',
+                companyPhone: '',
+                companyEmail: '',
+                companyLogo: '',
+                defaultTax: 15,
+                minStock: 5
+            }
         };
 
-        // Authentication
-        function login() {
+        // ==================== Local Storage ====================
+        function saveData() {
+            localStorage.setItem('appData', JSON.stringify(app));
+        }
+
+        function loadData() {
+            const data = localStorage.getItem('appData');
+            if (data) {
+                Object.assign(app, JSON.parse(data));
+            } else {
+                initializeDefaultData();
+            }
+        }
+
+        function initializeDefaultData() {
+            app.products = [
+                { id: 1, name: 'لابتوب', category: 'electronics', price: 5000, quantity: 10, minStock: 2 },
+                { id: 2, name: 'ماوس', category: 'electronics', price: 100, quantity: 50, minStock: 10 },
+                { id: 3, name: 'قميص', category: 'clothing', price: 150, quantity: 30, minStock: 5 }
+            ];
+            saveData();
+        }
+
+        // ==================== Authentication ====================
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+                document.querySelector('[onclick="switchAuthTab(\'login\')"]').classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+                document.querySelector('[onclick="switchAuthTab(\'register\')"]').classList.add('active');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            if (!email || !password) {
-                showNotification('الرجاء ملء جميع الحقول', 'warning');
-                return;
-            }
-
-            const user = users.find(u => u.email === email && u.password === password);
+            const user = app.users.find(u => u.email === email && u.password === password);
             if (user) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                document.getElementById('loginModal').classList.remove('active');
-                updateUserInfo();
-                loadDashboard();
-                showNotification('مرحباً ' + user.name, 'success');
+                app.currentUser = user;
+                saveData();
+                showApp();
+                showNotification('تم تسجيل الدخول بنجاح', 'success');
             } else {
-                showNotification('بيانات غير صحيحة', 'danger');
+                showNotification('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
             }
         }
 
-        function register() {
+        function handleRegister(e) {
+            e.preventDefault();
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            const role = document.getElementById('registerRole').value;
 
-            if (!name || !email || !password) {
-                showNotification('الرجاء ملء جميع الحقول', 'warning');
+            if (app.users.find(u => u.email === email)) {
+                showNotification('هذا البريد الإلكتروني مسجل بالفعل', 'error');
                 return;
             }
 
-            if (users.find(u => u.email === email)) {
-                showNotification('البريد مسجل بالفعل', 'danger');
-                return;
-            }
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password,
+                role
+            };
 
-            users.push({ id: Date.now(), name, email, password, role: 'employee' });
-            localStorage.setItem('users', JSON.stringify(users));
+            app.users.push(newUser);
+            app.currentUser = newUser;
+            saveData();
+            showApp();
             showNotification('تم إنشاء الحساب بنجاح', 'success');
-            switchToLogin();
         }
 
         function logout() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            document.getElementById('loginModal').classList.add('active');
-            showNotification('تم تسجيل الخروج', 'success');
+            app.currentUser = null;
+            app.cart = [];
+            saveData();
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('authPage').classList.add('active');
+            document.getElementById('authPage').classList.remove('hidden');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
         }
 
-        function switchToRegister() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('registerModal').classList.add('active');
-        }
-
-        function switchToLogin() {
-            document.getElementById('registerModal').classList.remove('active');
-            document.getElementById('loginModal').classList.add('active');
+        function showApp() {
+            document.getElementById('authPage').classList.remove('active');
+            document.getElementById('mainApp').classList.remove('hidden');
+            updateUserInfo();
+            loadDashboard();
+            loadInventory();
+            loadCustomers();
+            loadSuppliers();
+            loadExpenses();
+            loadReturns();
+            loadPOS();
         }
 
         function updateUserInfo() {
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.name;
+            if (app.currentUser) {
+                document.getElementById('userInfo').textContent = `${app.currentUser.name} (${app.currentUser.role === 'admin' ? 'مدير' : 'موظف'})`;
             }
         }
 
-        // Page Navigation
-        function switchPage(pageName) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageName).classList.add('active');
+        // ==================== Page Navigation ====================
+        function switchPage(page) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(page + 'Page').classList.add('active');
+            event.target.classList.add('active');
 
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('button').classList.add('active')
+            if (page === 'dashboard') {
+                loadDashboard();
+            } else if (page === 'inventory') {
+                loadInventory();
+            } else if (page === 'customers') {
+                loadCustomers();
+            } else if (page === 'suppliers') {
+                loadSuppliers();
+            } else if (page === 'expenses') {
+                loadExpenses();
+            } else if (page === 'returns') {
+                loadReturns();
+            } else if (page === 'reports') {
+                loadReports();
+            } else if (page === 'settings') {
+                loadSettings();
+            }
+        }
+
+        // ==================== Dashboard ====================
+        function loadDashboard() {
+            const today = new Date().toDateString();
+            const todaySales = app.sales.filter(s => new Date(s.date).toDateString() === today);
+            const todayTotal = todaySales.reduce((sum, s) => sum + s.total, 0);
+            const totalExpenses = app.expenses.reduce((sum, e) => sum + e.amount, 0);
+            const profit = todayTotal - totalExpenses;
+            const lowStockProducts = app.products.filter(p => p.quantity <= p.minStock).length;
+
+            document.getElementById('todaySales').textContent = todayTotal.toFixed(2);
+            document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2);
+            document.getElementById('totalProfit').textContent = profit.toFixed(2);
+            document.getElementById('lowStock').textContent = lowStockProducts;
+
+            const recentSales = app.sales.slice(-5).reverse();
+            let html = '';
+            recentSales.forEach(sale => {
+                html += `
+                    <tr>
+                        <td>${new Date(sale.date).toLocaleDateString('ar-SA')}</td>
+                        <td>${sale.total.toFixed(2)} ريال</td>
+                        <td><span style="color: var(--success);">✓ مكتملة</span></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('recentSalesList').innerHTML = html || '<tr><td colspan="3" class="text-center">لا توجد 
